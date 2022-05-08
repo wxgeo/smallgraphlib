@@ -11,13 +11,14 @@ from itertools import chain
 from typing import TypeVar, Set, Union, Tuple, Dict, List, Iterable, FrozenSet, Counter as CounterType
 
 Node = TypeVar("Node")
-Edge = Union[Tuple[Node, ...], Set[Node], FrozenSet[Node]]
+FrozenEdge = Union[Tuple[Node, ...], FrozenSet[Node]]
+Edge = Union[FrozenEdge, Set[Node], Iterable[Node]]
 
 
 class Graph:
     def __init__(self, nodes: Iterable[Node], *edges: Edge):
         self._nodes: Set[Node] = set()
-        self._edges: Set[Edge] = set()
+        self._edges: Set[FrozenEdge] = set()
         self._links: Dict[Node, CounterType[Node]] = {}
         # Nodes must be added before edges.
         self.add_nodes(*nodes)
@@ -37,18 +38,10 @@ class Graph:
 
     def add_edges(self, *new_edges: Edge) -> None:
         self._test_edges(*new_edges)
-        edges_list: List[Edge] = list(new_edges)
-        del new_edges
-        for i, edge in enumerate(edges_list):
-            if isinstance(edge, set):
-                edges_list[i] = frozenset(edge)
-            else:
-                edges_list[i] = tuple(edge)
-        self._edges.update(edges_list)
-        for edge in edges_list:
+        self._edges.update(frozenset(edge) if isinstance(edge, set) else tuple(edge) for edge in new_edges)
+        for edge in new_edges:
             if isinstance(edge, (set, frozenset)):
                 bidirectional_edge = True
-                assert isinstance(edge, frozenset), edge
                 assert 1 <= len(edge) <= 2
                 if len(edge) == 1:
                     (start,) = edge
@@ -64,7 +57,7 @@ class Graph:
                 self._links[end][start] += 1
 
     @property
-    def directed(self) -> bool:
+    def is_directed(self) -> bool:
         return all(isinstance(edge, tuple) for edge in self._edges)
 
     @property
@@ -83,7 +76,7 @@ class Graph:
     def edges(self):
         return tuple(self._edges)
 
-    def adjacents(self, node1: Node, node2: Node) -> bool:
+    def are_adjacents(self, node1: Node, node2: Node) -> bool:
         return node2 in self._links[node1] or node1 in self._links[node2]
 
     @property
@@ -100,7 +93,44 @@ class Graph:
 
     @property
     def is_complete(self) -> bool:
-        return self.is_simple and all(self.adjacents(i, j) for i in self.nodes for j in self.nodes if i != j)
+        return self.is_simple and all(
+            self.are_adjacents(i, j) for i in self.nodes for j in self.nodes if i != j
+        )
+
+    def _test_connection_from_node(self, node: Node) -> bool:
+        """Test if every other node can be accessed from node `node`"""
+        if self.order <= 1:
+            return True
+        connected_nodes = set()
+        border = {node}
+        while border:
+            node = border.pop()
+            connected_nodes.add(node)
+            border |= set(self._links[node]) - connected_nodes
+        return len(connected_nodes) == self.order
+
+    @property
+    def is_connected(self):
+        if self.is_directed:
+            return self.undirected_graph.is_connected
+        return self._test_connection_from_node(next(iter(self.nodes)))
+
+    @property
+    def is_strongly_connected(self):
+        if self.is_directed:
+            node = next(iter(self.nodes))
+            return self._test_connection_from_node(node) and self.reversed_graph._test_connection_from_node(node)
+        return self.is_connected
+
+    @property
+    def reversed_graph(self):
+        return Graph(
+            self.nodes, *(((edge[1], edge[0]) if isinstance(edge, tuple) else edge) for edge in self.edges)
+        )
+
+    @property
+    def undirected_graph(self):
+        return Graph(self.nodes, *(set(edge) for edge in self.edges))
 
     def count_edges(self, node1: Node, node2: Node):
         """Count the number of edges from node1 to node2. Note that undirected loops are counted twice."""
@@ -129,11 +159,11 @@ class Graph:
         nodes_pairs = {frozenset((node1, node2)) for node1 in self.nodes for node2 in self.nodes}
         pair: frozenset
         for pair in nodes_pairs:
-            style = "directed" if self.directed else "undirected"
+            style = "directed" if self.is_directed else "undirected"
             if len(pair) == 1:
                 (node,) = pair
                 n = self._links[node][node]
-                if not self.directed:
+                if not self.is_directed:
                     assert n % 2 == 0, n
                     n //= 2
                 if n > 1:
@@ -145,7 +175,7 @@ class Graph:
                     )
             else:
                 node1, node2 = pair
-                if self.directed:
+                if self.is_directed:
                     n1 = self._links[node1][node2]
                     n2 = self._links[node2][node1]
                     n = n1 + n2
