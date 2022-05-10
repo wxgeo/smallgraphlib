@@ -73,8 +73,19 @@ def test_levels_and_kernel():
     assert g.levels == [{3, 5}, {4, 6}, {7}, {2}, {1}]
     assert g.kernel == {3, 5}
 
+
 def test_cycle():
     g = Graph("ABCD", "AB", "BC", "CA", "AD")
     assert g.has_cycle
     g.remove_nodes("C")
     assert not g.has_cycle
+
+
+def test_greedy_coloring():
+    g = Graph("ABCDE", "AB", "AE", "AD", "BD", "BC", "BE", "CD", "DE", directed=False)
+    coloring = g.greedy_coloring
+    assert coloring["B"] == 0
+    assert coloring["D"] == 1
+    assert coloring["A"] == 2
+    assert coloring["E"] == 3
+    assert coloring["C"] == 2

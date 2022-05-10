@@ -252,6 +252,20 @@ class Graph(typing.Generic[Node]):
         return kernel
 
     @property
+    def greedy_coloring(self) -> Dict[Node, int]:
+        if self.is_directed:
+            raise NotImplementedError("Can't color a directed graph.")
+        coloring: Dict[Node, int] = {}
+        # Sort nodes by reversed degree, then alphabetically
+        nodes = sorted(self.nodes, key=(lambda _node: (-self.node_degree(_node), _node)))
+        for node in nodes:
+            color_num = 0
+            while any(coloring.get(adjacent) == color_num for adjacent in self._links[node]):
+                color_num += 1
+            coloring[node] = color_num
+        return coloring
+
+    @property
     def adjacency_matrix(self):
         nodes = sorted(self.nodes)
         return [[self.count_edges(node1, node2) for node2 in nodes] for node1 in nodes]
