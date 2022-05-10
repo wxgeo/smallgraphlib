@@ -43,3 +43,38 @@ def test_connected():
     assert g.is_connected
     g = Graph("ABCDE", {"A", "B"}, {"C", "D"}, {"C", "E"})
     assert not g.is_connected
+
+def test_remove_nodes():
+    g = Graph(["A", "B", "C"], ("A", "B"), ("B", "A"), ("B", "C"))
+    g.remove_nodes("A")
+    assert g.nodes == {"B", "C"}
+    assert len(g.edges) == 1
+    assert g.edges.pop() == ("B", "C")
+
+def test_levels_and_kernel():
+    g = Graph(
+        (1, 2, 3, 4, 5, 6, 7),
+        (1, 2),
+        (1, 3),
+        (2, 7),
+        (2, 6),
+        (2, 5),
+        (4, 3),
+        (4, 5),
+        (6, 5),
+        (7, 3),
+        (7, 4),
+        (7, 6),
+    )
+    assert g.order == 7
+    assert g.degree == 11
+    assert g.out_degree(1) == 2
+    assert g.in_degree(1) == 0
+    assert g.levels == [{3, 5}, {4, 6}, {7}, {2}, {1}]
+    assert g.kernel == {3, 5}
+
+def test_cycle():
+    g = Graph("ABCD", "AB", "BC", "CA", "AD")
+    assert g.has_cycle
+    g.remove_nodes("C")
+    assert not g.has_cycle
