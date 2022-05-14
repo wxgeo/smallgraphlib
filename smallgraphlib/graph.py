@@ -10,6 +10,7 @@ from collections import Counter
 from itertools import chain
 from typing import Set, Union, Tuple, Dict, List, Iterable, FrozenSet, Counter as CounterType
 import typing
+import random
 
 
 class Comparable(typing.Protocol):
@@ -43,10 +44,67 @@ class Graph(typing.Generic[Node]):
         self.add_nodes(*nodes)
         self.add_edges(*edges)
 
+    @classmethod
+    def from_string(cls, string: str, directed: bool = True):
+        """Graph.from_string("A:B,C B:C C") will generate a graph of 3 nodes, A, B and C, with
+        edges A->B, A->C and B->C."""
+        nodes: List[str] = []
+        edges: List[Tuple[str, str]] = []
+        for substring in string.split():
+            node, *remaining = substring.split(":", 1)
+            nodes.append(node.strip())
+            if remaining:
+                edges.extend((node, successor.strip()) for successor in remaining[0].split(","))
+        return Graph(nodes, *edges, directed=directed)
+
+    @classmethod
+    def complete_graph(cls, order: int):
+        nodes = list(range(1, order + 1))
+        edges = ((i, j) for i in nodes for j in nodes if i < j)
+        return Graph(nodes, *edges, directed=False)
+
+    @classmethod
+    def random_graph(cls, order: int, degree: int, simple=False, directed=True):
+        max_degree_for_simple_graph = order * (order - 1)
+        if not directed:
+            max_degree_for_simple_graph //= 2
+        if simple and degree > max_degree_for_simple_graph:
+            graph_type = "directed" if directed else "undirected"
+            raise ValueError(
+                f"Degree is at most {max_degree_for_simple_graph} for a simple {graph_type} graph of order {order}."
+            )
+
+        nodes: List[int] = list(range(1, order + 1))
+        edges: List[Tuple[int, int]] = []
+        starts = nodes.copy()
+        if simple:
+            # Set possible end nodes for each start node, with `start < end`
+            # to avoid adding the same edge twice (this is an undirected graph).
+            if directed:
+                ends_dict = {start: [end for end in nodes if start != end] for start in nodes}
+            else:
+                ends_dict = {start: [end for end in nodes if start < end] for start in nodes}
+                starts.remove(nodes[-1])  # no possible end for last node since `start < end`.
+        else:
+            ends_dict = dict.fromkeys(nodes, nodes)  # no need to make copies
+        while len(edges) < degree:
+            start = random.choice(starts)
+            ends = ends_dict[start]
+            assert ends
+            end = random.choice(ends)
+            if simple:
+                # The same edge must not appear twice.
+                ends.remove(end)
+                if not ends:
+                    # No end node remaining for this start node.
+                    starts.remove(start)
+            edges.append((start, end))
+        return Graph(nodes, *edges, directed=directed)
+
     def _test_edges(self, *edges: Edge) -> None:
         edges_nodes = set(chain(*edges))
         if not edges_nodes.issubset(self.nodes):
-            raise ValueError(f"Undeclared nodes: {edges_nodes - self.nodes}")
+            raise ValueError(f"Nodes not found: {edges_nodes - self.nodes}")
 
     def add_nodes(self, *new_nodes: Node) -> None:
         for node in new_nodes:
@@ -67,20 +125,25 @@ class Graph(typing.Generic[Node]):
             for predecessor in predecessors:
                 self._links.get(predecessor, {}).pop(node, None)  # type: ignore
 
+    @staticmethod
+    def _get_edge_extremities(edge: Edge) -> Tuple[Node, Node]:
+        nodes = iter(edge)
+        start = next(nodes)
+        try:
+            end = next(nodes)
+        except StopIteration:
+            end = start
+        try:
+            next(nodes)
+            raise ValueError(f"Too many values for an edge: {edge!r}")
+        except StopIteration:
+            pass
+        return start, end
+
     def add_edges(self, *new_edges: Edge) -> None:
         self._test_edges(*new_edges)
         for edge in new_edges:
-            nodes = iter(edge)
-            start = next(nodes)
-            try:
-                end = next(nodes)
-            except StopIteration:
-                end = start
-            try:
-                next(nodes)
-                raise ValueError(f"Too many values for an edge: {edge!r}")
-            except StopIteration:
-                pass
+            start, end = self._get_edge_extremities(edge)
             self._links[start][end] += 1
             self._inverse_links[end][start] += 1
             if isinstance(edge, (set, frozenset)) or not self.is_directed:
@@ -88,6 +151,21 @@ class Graph(typing.Generic[Node]):
                 # Note that bidirectional loops are added twice too.
                 self._links[end][start] += 1
                 self._inverse_links[start][end] += 1
+
+    def remove_edges(self, *edges: Edge) -> None:
+        self._test_edges(*edges)
+
+        def _remove_edge(_start, _end):
+            self._links[_start][_end] -= 1
+            if self._links[_start][_end] == 0:
+                self._links[_start].pop(_end)
+
+        for edge in edges:
+            start, end = self._get_edge_extremities(edge)
+
+            _remove_edge(start, end)
+            if self.is_directed:
+                _remove_edge(end, start)
 
     @property
     def is_directed(self) -> bool:
@@ -133,7 +211,8 @@ class Graph(typing.Generic[Node]):
 
     @property
     def has_multiple_edges(self) -> bool:
-        return any(len(self._links[node]) != len(set(self._links[node])) for node in self._links)
+        return len(self.edges) != len(set(self.edges))
+        # return any(len(self._links[node]) != len(set(self._links[node])) for node in self._links)
 
     @property
     def is_simple(self) -> bool:
@@ -269,6 +348,31 @@ class Graph(typing.Generic[Node]):
     def adjacency_matrix(self):
         nodes = sorted(self.nodes)
         return [[self.count_edges(node1, node2) for node2 in nodes] for node1 in nodes]
+
+    def _number_of_odd_degrees(self):
+        return sum(self.node_degree(node) % 2 for node in self.nodes)
+
+    @property
+    def is_eulerian(self):
+        if self.is_directed:
+            return all(self.out_degree(node) == self.in_degree(node) for node in self.nodes)
+        return self._number_of_odd_degrees() == 0
+
+    @property
+    def is_semi_eulerian(self):
+        if self.is_directed:
+            start_found = end_found = False
+            for node in self.nodes:
+                out_degree = self.out_degree(node)
+                in_degree = self.in_degree(node)
+                if out_degree == in_degree + 1 and not start_found:
+                    start_found = True
+                elif out_degree == in_degree - 1 and not end_found:
+                    end_found = True
+                elif out_degree != in_degree:
+                    return False
+            return start_found and end_found
+        return self._number_of_odd_degrees() == 2
 
     def as_tikz(self) -> str:
         lines: List[str] = [

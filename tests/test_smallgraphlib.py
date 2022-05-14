@@ -44,12 +44,14 @@ def test_connected():
     g = Graph("ABCDE", {"A", "B"}, {"C", "D"}, {"C", "E"})
     assert not g.is_connected
 
+
 def test_remove_nodes():
     g = Graph(["A", "B", "C"], ("A", "B"), ("B", "A"), ("B", "C"))
     g.remove_nodes("A")
     assert g.nodes == {"B", "C"}
     assert len(g.edges) == 1
     assert g.edges.pop() == ("B", "C")
+
 
 def test_levels_and_kernel():
     g = Graph(
@@ -89,3 +91,55 @@ def test_greedy_coloring():
     assert coloring["A"] == 2
     assert coloring["E"] == 3
     assert coloring["C"] == 2
+
+
+def test_complete_eulerian():
+    K = {}
+    for n in range(2, 8):
+        K[n] = Graph.complete_graph(n)
+        assert K[n].order == n
+        assert K[n].degree == n * (n - 1) / 2
+        assert all(K[n].node_degree(node) == n - 1 for node in K[n].nodes)
+        assert K[n].is_eulerian == (n % 2 == 1)
+        assert K[n].is_semi_eulerian == (n == 2)
+
+
+def test_graph_from_string():
+    g = Graph.from_string("A:B,C B:C C")
+    assert g.nodes == {"A", "B", "C"}
+    assert g.degree == 3
+    assert set(g.edges) == {("A", "B"), ("A", "C"), ("B", "C")}
+
+
+def test_random_graph():
+    g = Graph.random_graph(4, 5, simple=True, directed=False)
+    assert not g.is_directed
+    assert g.order == 4
+    assert g.degree == 5
+    assert g.is_simple
+    g = Graph.random_graph(4, 5, simple=True, directed=True)
+    assert g.is_directed
+    assert g.order == 4
+    assert g.degree == 5
+    assert g.is_simple
+
+
+def test_remove_edges():
+    g = Graph("ABCDE", "AB", "AB", "AC", "AD", "EA", "EC", directed=False)
+    assert g.degree == 6
+    g.remove_edges("AB")
+    assert g.degree == 5
+    assert set(g.edges) == {
+        frozenset({"A", "B"}),
+        frozenset({"A", "C"}),
+        frozenset({"A", "D"}),
+        frozenset({"E", "A"}),
+        frozenset({"E", "C"}),
+    }
+
+
+def test_simple():
+    g = Graph("ABCDE", "AB", "BA", "AC", "AD", "EA", "EC", directed=False)
+    assert not g.is_simple
+    g.remove_edges("AB")
+    assert g.is_simple
