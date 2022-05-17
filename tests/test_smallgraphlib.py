@@ -1,4 +1,6 @@
-from smallgraphlib import __version__, Graph
+import random
+
+from smallgraphlib import __version__, Graph, random_graph, complete_graph
 
 
 def test_version():
@@ -27,8 +29,8 @@ def test_modified_graphs():
     assert g.order == 5
     assert g.reversed_graph.order == 5
     assert g.undirected_graph.order == 5
-    assert g.nodes == g.reversed_graph.nodes
-    assert g.nodes == g.undirected_graph.nodes
+    assert list(g.nodes) == list(g.reversed_graph.nodes)
+    assert list(g.nodes) == list(g.undirected_graph.nodes)
 
 
 def test_strongly_connected():
@@ -48,7 +50,7 @@ def test_connected():
 def test_remove_nodes():
     g = Graph(["A", "B", "C"], ("A", "B"), ("B", "A"), ("B", "C"))
     g.remove_nodes("A")
-    assert g.nodes == {"B", "C"}
+    assert set(g.nodes) == {"B", "C"}
     assert len(g.edges) == 1
     assert g.edges.pop() == ("B", "C")
 
@@ -96,7 +98,7 @@ def test_greedy_coloring():
 def test_complete_eulerian():
     K = {}
     for n in range(2, 8):
-        K[n] = Graph.complete_graph(n)
+        K[n] = complete_graph(n)
         assert K[n].order == n
         assert K[n].degree == n * (n - 1) / 2
         assert all(K[n].node_degree(node) == n - 1 for node in K[n].nodes)
@@ -106,22 +108,70 @@ def test_complete_eulerian():
 
 def test_graph_from_string():
     g = Graph.from_string("A:B,C B:C C")
-    assert g.nodes == {"A", "B", "C"}
+    assert set(g.nodes) == {"A", "B", "C"}
     assert g.degree == 3
     assert set(g.edges) == {("A", "B"), ("A", "C"), ("B", "C")}
 
 
+def test_simple_random_graph():
+    for seed in range(10):
+        random.seed(seed)
+        g = random_graph(4, 5, directed=False, simple=True)
+        assert not g.is_directed
+        assert g.order == 4
+        assert g.degree == 5
+        assert g.is_simple
+        g = random_graph(4, 5, directed=True, simple=True)
+        assert g.is_directed
+        assert g.order == 4
+        assert g.degree == 5
+        assert g.is_simple
+
+
 def test_random_graph():
-    g = Graph.random_graph(4, 5, simple=True, directed=False)
-    assert not g.is_directed
-    assert g.order == 4
-    assert g.degree == 5
-    assert g.is_simple
-    g = Graph.random_graph(4, 5, simple=True, directed=True)
-    assert g.is_directed
-    assert g.order == 4
-    assert g.degree == 5
-    assert g.is_simple
+    max_multiple_edges = 5
+    max_multiple_loops = 2
+    for directed in (False, True):
+        for seed in range(10, 20):
+            random.seed(seed)
+            g = random_graph(
+                4,
+                20,
+                directed=directed,
+                tikz_export_supported=False,
+                max_multiple_edges=max_multiple_edges,
+                max_multiple_loops=max_multiple_loops,
+            )
+            M = g.adjacency_matrix
+            assert max(elt for line in M for elt in line) <= max_multiple_edges, g
+            # loops count twice in undirected graphs !
+            assert max(M[i][i] for i, _ in enumerate(M)) <= (
+                max_multiple_loops if directed else 2 * max_multiple_loops
+            ), g
+
+
+def test_random_graph2():
+    max_multiple_edges = 5
+    max_multiple_loops = 2
+    for directed in (False, True):
+        for seed in range(10, 20):
+            random.seed(seed)
+            g = random_graph(
+                4,
+                20,
+                directed=directed,
+                tikz_export_supported=False,
+                max_multiple_edges=max_multiple_edges,
+                max_multiple_loops=max_multiple_loops,
+            )
+            M = g.adjacency_matrix
+            assert max(elt for line in M for elt in line) <= max_multiple_edges, g
+            # loops count twice in undirected graphs !
+            assert max(M[i][i] for i, _ in enumerate(M)) <= (
+                max_multiple_loops if directed else 2 * max_multiple_loops
+            ), g
+
+
 
 
 def test_remove_edges():

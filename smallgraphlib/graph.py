@@ -5,12 +5,15 @@ Created on Sat May  7 12:24:58 2022
 
 @author: nicolas
 """
+import collections
 from abc import abstractmethod
-from collections import Counter
 from itertools import chain
 from typing import Set, Union, Tuple, Dict, List, Iterable, FrozenSet, Counter as CounterType
 import typing
 import random
+
+_TIKZ_EXPORT_MAX_MULTIPLE_EDGES_SUPPORT = 3
+_TIKZ_EXPORT_MAX_MULTIPLE_LOOPS_SUPPORT = 1
 
 
 class Comparable(typing.Protocol):
@@ -19,6 +22,23 @@ class Comparable(typing.Protocol):
     @abstractmethod
     def __lt__(self, other) -> bool:
         pass
+
+
+# Subclass UserDict, not dict, to call __setitem__ on initialisation too.
+class Counter(collections.UserDict, collections.Counter):
+    """A counter that automatically removes empty keys."""
+
+    def __setitem__(self, key, value):
+        if not isinstance(value, int):
+            raise ValueError(f"Counter value must be an integer, not {value!r}.")
+        super().__setitem__(key, value)
+        if self[key] == 0:
+            del self[key]
+        elif self[key] < 0:
+            raise ValueError(f"Counter value can't be negative for key {key!r}.")
+
+    def total(self) -> int:
+        return sum(self.values())
 
 
 # Node = TypeVar("Node", bound=typing.Hashable)  # too subtile for Pycharm
@@ -31,16 +51,118 @@ class CycleFoundError(RuntimeError):
     pass
 
 
+def complete_graph(order: int):
+    nodes = list(range(1, order + 1))
+    edges = ((i, j) for i in nodes for j in nodes if i < j)
+    return Graph(nodes, *edges, directed=False)
+
+
+def random_graph(
+    order: int,
+    degree: int,
+    *,
+    directed=True,
+    simple=False,
+    tikz_export_supported=True,
+    max_multiple_edges: int = None,
+    max_multiple_loops: int = None,
+):
+    """Create a random graph satisfying given constraints.
+
+    Raise a ValueError if contraints can't be satisfied.
+
+    If `simple` is True, ignore remaining keyword arguments.
+    Similarly, if `tikz_export_supported` is True, all remaining keyword arguments will be ignored.
+    """
+    # Test for feasibility: is it possible to satisfy all constraints ?
+    if simple:
+        max_degree_for_simple_graph = order * (order - 1)
+        if not directed:
+            max_degree_for_simple_graph //= 2
+        if degree > max_degree_for_simple_graph:
+            graph_type = "directed" if directed else "undirected"
+            raise ValueError(
+                f"Degree is at most {max_degree_for_simple_graph} for a simple {graph_type} graph of order {order}."
+            )
+    if simple:
+        if max_multiple_edges is not None or max_multiple_loops is not None:
+            raise ValueError(
+                "Conflicting arguments: `simple` must be set to False, "
+                "else `max_multiple_edges` and `max_multiple_loops` will be ignored."
+            )
+        max_multiple_edges = 1
+        max_multiple_loops = 0
+    elif tikz_export_supported:
+        if max_multiple_edges is not None or max_multiple_loops is not None:
+            raise ValueError(
+                "Conflicting arguments: `tikz_export_supported` must be set to False, "
+                "else `max_multiple_edges` and `max_multiple_loops` will be ignored."
+            )
+        max_multiple_edges = _TIKZ_EXPORT_MAX_MULTIPLE_EDGES_SUPPORT
+        max_multiple_loops = _TIKZ_EXPORT_MAX_MULTIPLE_LOOPS_SUPPORT
+    else:
+        if max_multiple_edges is None:
+            max_multiple_edges = degree
+        if max_multiple_loops is None:
+            max_multiple_loops = degree
+
+    if directed:
+        max_degree = order * (max_multiple_loops + (order - 1) * max_multiple_edges)
+    else:
+        max_degree = order * max_multiple_loops + (order * (order - 1) * max_multiple_edges) // 2
+
+    if degree > max_degree:
+        raise ValueError(f"Degree must not exceed {max_degree} with given contraints.")
+
+    nodes: List[int] = list(range(1, order + 1))
+    edges: List[Tuple[int, int]] = []
+
+    # Keep track of remaining edges possibilities, for each (start, end) nodes couple.
+    counters = {
+        start: counter
+        for start in nodes
+        if (
+            counter := Counter(
+                {
+                    end: (max_multiple_loops if start == end else max_multiple_edges)
+                    for end in nodes
+                    if directed or start <= end  # for undirected graph, only keep start <= end
+                }
+            )
+        ).total()
+        > 0
+    }
+    # Keep only nodes which accept edges (all except the last one for undirected simple graph, since start < end).
+    starts = list(counters)
+
+    while len(edges) < degree:
+        start = random.choice(starts)
+        counter = counters[start]
+        assert counter.total() > 0, counter
+        end = random.choice(list(counter.elements()))
+        counter[end] -= 1
+        if counter.total() == 0:
+            # Don't select anymore this node as start point: we can't add any other edge to it.
+            starts.remove(start)
+        edges.append((start, end))  # Loop will always end. :)
+    return Graph(nodes, *edges, directed=directed)
+
+
 class Graph(typing.Generic[Node]):
-    def __init__(self, nodes: Iterable[Node], *edges: Edge, directed: bool = True):
+    def __init__(self, nodes: Iterable[Node], *edges: Edge, directed: bool = True, sort_nodes: bool = True):
         """Create a graph of nodes, when nodes may be any hashable objects.
 
-        Edges may be any iterable of two nodes. If edge
+        Edges may be any iterable of two nodes.
+        If the graph is directed and the edge is a set {A, B} of two nodes,
+        then two edges are added, one from A to B and one from B to A.
+        Note that in that case, adding {A} will result in two edges too.
         """
         self._is_directed = directed
         self._links: Dict[Node, CounterType[Node]] = {}
         self._inverse_links: Dict[Node, CounterType[Node]] = {}
         # Nodes must be added before edges.
+        if sort_nodes:
+            nodes = sorted(nodes)
         self.add_nodes(*nodes)
         self.add_edges(*edges)
 
@@ -57,54 +179,11 @@ class Graph(typing.Generic[Node]):
                 edges.extend((node, successor.strip()) for successor in remaining[0].split(","))
         return Graph(nodes, *edges, directed=directed)
 
-    @classmethod
-    def complete_graph(cls, order: int):
-        nodes = list(range(1, order + 1))
-        edges = ((i, j) for i in nodes for j in nodes if i < j)
-        return Graph(nodes, *edges, directed=False)
-
-    @classmethod
-    def random_graph(cls, order: int, degree: int, simple=False, directed=True):
-        max_degree_for_simple_graph = order * (order - 1)
-        if not directed:
-            max_degree_for_simple_graph //= 2
-        if simple and degree > max_degree_for_simple_graph:
-            graph_type = "directed" if directed else "undirected"
-            raise ValueError(
-                f"Degree is at most {max_degree_for_simple_graph} for a simple {graph_type} graph of order {order}."
-            )
-
-        nodes: List[int] = list(range(1, order + 1))
-        edges: List[Tuple[int, int]] = []
-        starts = nodes.copy()
-        if simple:
-            # Set possible end nodes for each start node, with `start < end`
-            # to avoid adding the same edge twice (this is an undirected graph).
-            if directed:
-                ends_dict = {start: [end for end in nodes if start != end] for start in nodes}
-            else:
-                ends_dict = {start: [end for end in nodes if start < end] for start in nodes}
-                starts.remove(nodes[-1])  # no possible end for last node since `start < end`.
-        else:
-            ends_dict = dict.fromkeys(nodes, nodes)  # no need to make copies
-        while len(edges) < degree:
-            start = random.choice(starts)
-            ends = ends_dict[start]
-            assert ends
-            end = random.choice(ends)
-            if simple:
-                # The same edge must not appear twice.
-                ends.remove(end)
-                if not ends:
-                    # No end node remaining for this start node.
-                    starts.remove(start)
-            edges.append((start, end))
-        return Graph(nodes, *edges, directed=directed)
-
     def _test_edges(self, *edges: Edge) -> None:
+        nodes = set(self.nodes)
         edges_nodes = set(chain(*edges))
-        if not edges_nodes.issubset(self.nodes):
-            raise ValueError(f"Nodes not found: {edges_nodes - self.nodes}")
+        if not edges_nodes.issubset(nodes):
+            raise ValueError(f"Nodes not found: {edges_nodes - nodes}")
 
     def add_nodes(self, *new_nodes: Node) -> None:
         for node in new_nodes:
@@ -155,17 +234,11 @@ class Graph(typing.Generic[Node]):
     def remove_edges(self, *edges: Edge) -> None:
         self._test_edges(*edges)
 
-        def _remove_edge(_start, _end):
-            self._links[_start][_end] -= 1
-            if self._links[_start][_end] == 0:
-                self._links[_start].pop(_end)
-
         for edge in edges:
             start, end = self._get_edge_extremities(edge)
-
-            _remove_edge(start, end)
+            self._links[start][end] -= 1
             if self.is_directed:
-                _remove_edge(end, start)
+                self._links[end][start] -= 1
 
     @property
     def is_directed(self) -> bool:
@@ -181,11 +254,12 @@ class Graph(typing.Generic[Node]):
 
     def __repr__(self):
         edges = (repr(set(edge) if isinstance(edge, frozenset) else list(edge)) for edge in self.edges)
-        return f"Graph({self.nodes!r}, {', '.join(edges)})"
+        args = [repr(tuple(self.nodes))] + list(edges) + [f"directed={self.is_directed}"]
+        return f"Graph({', '.join(args)})"
 
     @property
-    def nodes(self) -> Set[Node]:
-        return set(self._links)
+    def nodes(self) -> typing.Iterator[Node]:
+        return iter(self._links)
 
     @property
     def edges(self) -> List[Edge]:
@@ -240,12 +314,12 @@ class Graph(typing.Generic[Node]):
     def is_connected(self):
         if self.is_directed:
             return self.undirected_graph.is_connected
-        return self._test_connection_from_node(next(iter(self.nodes)))
+        return self._test_connection_from_node(next(self.nodes))
 
     @property
     def is_strongly_connected(self):
         if self.is_directed:
-            node = next(iter(self.nodes))
+            node = next(self.nodes)
             return self._test_connection_from_node(node) and self.reversed_graph._test_connection_from_node(
                 node
             )
@@ -297,7 +371,7 @@ class Graph(typing.Generic[Node]):
                 break
             graph.remove_nodes(*level)
             levels.append(level)
-        if graph.nodes:
+        if graph.order != 0:
             raise CycleFoundError("Can't split the graph into levels, since it has a cycle.")
         return levels
 
@@ -326,7 +400,7 @@ class Graph(typing.Generic[Node]):
             if len(nodes_to_remove) == 0:
                 break
             graph.remove_nodes(*nodes_to_remove)
-        if graph.nodes:
+        if graph.order != 0:
             raise CycleFoundError("Can't split the graph into levels, since it has a cycle.")
         return kernel
 
@@ -346,8 +420,7 @@ class Graph(typing.Generic[Node]):
 
     @property
     def adjacency_matrix(self):
-        nodes = sorted(self.nodes)
-        return [[self.count_edges(node1, node2) for node2 in nodes] for node1 in nodes]
+        return [[self.count_edges(start, end) for end in self.nodes] for start in self.nodes]
 
     def _number_of_odd_degrees(self):
         return sum(self.node_degree(node) % 2 for node in self.nodes)
@@ -374,7 +447,9 @@ class Graph(typing.Generic[Node]):
             return start_found and end_found
         return self._number_of_odd_degrees() == 2
 
-    def as_tikz(self) -> str:
+
+
+    def as_tikz(self, shuffle_nodes=False) -> str:
         lines: List[str] = [
             r"\begin{tikzpicture}["
             r"every node/.style = {draw, circle,font={\scriptsize},inner sep=2},"
@@ -383,12 +458,15 @@ class Graph(typing.Generic[Node]):
             "undirected/.style = {},"
             "]"
         ]
-        theta = 360 / len(self.nodes)
+        theta = 360 / self.order
         angles = {}
-        for i, node in enumerate(self.nodes):
+        nodes = list(self.nodes)
+        if shuffle_nodes:
+            random.shuffle(nodes)
+        for i, node in enumerate(nodes):
             angle = angles[node] = i * theta
             lines.append(rf"\node ({node}) at ({angle}:1cm) {{${node}$}};")
-        nodes_pairs = {frozenset((node1, node2)) for node1 in self.nodes for node2 in self.nodes}
+        nodes_pairs = {frozenset((node1, node2)) for node1 in nodes for node2 in nodes}
         pair: FrozenSet[Node]
         for pair in nodes_pairs:
             style = "directed" if self.is_directed else "undirected"
@@ -398,7 +476,7 @@ class Graph(typing.Generic[Node]):
                 if not self.is_directed:
                     assert n % 2 == 0, n
                     n //= 2
-                if n > 1:
+                if n > _TIKZ_EXPORT_MAX_MULTIPLE_LOOPS_SUPPORT:
                     raise NotImplementedError(n)
                 if n == 1:
                     lines.append(
@@ -424,6 +502,7 @@ class Graph(typing.Generic[Node]):
                 elif n == 3:
                     curves = ["bend left", "", "bend right"]
                 else:
+                    assert n > _TIKZ_EXPORT_MAX_MULTIPLE_EDGES_SUPPORT
                     raise NotImplementedError(n)
                 for style, curve in zip(styles, curves):
                     lines.append(rf"\draw[{style}] ({node1}) to[{curve}] ({node2});")
