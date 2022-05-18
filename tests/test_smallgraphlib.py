@@ -172,8 +172,6 @@ def test_random_graph2():
             ), g
 
 
-
-
 def test_remove_edges():
     g = Graph("ABCDE", "AB", "AB", "AC", "AD", "EA", "EC", directed=False)
     assert g.degree == 6
