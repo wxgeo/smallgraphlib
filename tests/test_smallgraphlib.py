@@ -1,6 +1,9 @@
 import random
 
+from smallgraphlib.graph import DirectedGraph
+
 from smallgraphlib import __version__, Graph, random_graph, complete_graph
+from smallgraphlib.labeled_graph import WeightedGraph
 
 
 def test_version():
@@ -8,13 +11,11 @@ def test_version():
 
 
 def test_properties():
-    from smallgraphlib import Graph
-
-    g = Graph(["A", "B", "C"], ("A", "B"), ("B", "A"), ("B", "C"))
+    g = DirectedGraph(["A", "B", "C"], ("A", "B"), ("B", "A"), ("B", "C"))
     assert g.is_simple
     assert not g.is_complete
     assert g.is_directed
-    assert g.adjacency_matrix == [[0, 1, 0], [1, 0, 1], [0, 0, 0]]
+    assert g.adjacency_matrix == ((0, 1, 0), (1, 0, 1), (0, 0, 0))
     assert g.degree
     assert g.order
     assert g.is_connected
@@ -22,7 +23,7 @@ def test_properties():
 
 
 def test_modified_graphs():
-    g = Graph("ABCDE", "AB", "BC", "CD", "DB", "BE", "ED", "DA")
+    g = DirectedGraph("ABCDE", "AB", "BC", "CD", "DB", "BE", "ED", "DA")
     assert g.degree == 7
     assert g.reversed_graph.degree == 7
     assert g.undirected_graph.degree == 7
@@ -34,9 +35,9 @@ def test_modified_graphs():
 
 
 def test_strongly_connected():
-    g = Graph("ABCDE", "AB", "BC", "CD", "DB", "BE", "ED", "DA")
+    g = DirectedGraph("ABCDE", "AB", "BC", "CD", "DB", "BE", "ED", "DA")
     assert g.is_strongly_connected
-    g = Graph("ABCDE", "AB", "BC", "CD", "DB", "BE", "ED", "DB")
+    g = DirectedGraph("ABCDE", "AB", "BC", "CD", "DB", "BE", "ED", "DB")
     assert not g.is_strongly_connected
 
 
@@ -48,15 +49,15 @@ def test_connected():
 
 
 def test_remove_nodes():
-    g = Graph(["A", "B", "C"], ("A", "B"), ("B", "A"), ("B", "C"))
+    g = DirectedGraph(["A", "B", "C"], ("A", "B"), ("B", "A"), ("B", "C"))
     g.remove_nodes("A")
     assert set(g.nodes) == {"B", "C"}
     assert len(g.edges) == 1
-    assert g.edges.pop() == ("B", "C")
+    assert g.edges == (("B", "C"),)
 
 
 def test_levels_and_kernel():
-    g = Graph(
+    g = DirectedGraph(
         (1, 2, 3, 4, 5, 6, 7),
         (1, 2),
         (1, 3),
@@ -74,19 +75,19 @@ def test_levels_and_kernel():
     assert g.degree == 11
     assert g.out_degree(1) == 2
     assert g.in_degree(1) == 0
-    assert g.levels == [{3, 5}, {4, 6}, {7}, {2}, {1}]
+    assert g.levels == ({3, 5}, {4, 6}, {7}, {2}, {1})
     assert g.kernel == {3, 5}
 
 
 def test_cycle():
-    g = Graph("ABCD", "AB", "BC", "CA", "AD")
+    g = DirectedGraph("ABCD", "AB", "BC", "CA", "AD")
     assert g.has_cycle
     g.remove_nodes("C")
     assert not g.has_cycle
 
 
 def test_greedy_coloring():
-    g = Graph("ABCDE", "AB", "AE", "AD", "BD", "BC", "BE", "CD", "DE", directed=False)
+    g = Graph("ABCDE", "AB", "AE", "AD", "BD", "BC", "BE", "CD", "DE")
     coloring = g.greedy_coloring
     assert coloring["B"] == 0
     assert coloring["D"] == 1
@@ -107,7 +108,7 @@ def test_complete_eulerian():
 
 
 def test_graph_from_string():
-    g = Graph.from_string("A:B,C B:C C")
+    g = DirectedGraph.from_string("A:B,C B:C C")
     assert set(g.nodes) == {"A", "B", "C"}
     assert g.degree == 3
     assert set(g.edges) == {("A", "B"), ("A", "C"), ("B", "C")}
@@ -173,7 +174,7 @@ def test_random_graph2():
 
 
 def test_remove_edges():
-    g = Graph("ABCDE", "AB", "AB", "AC", "AD", "EA", "EC", directed=False)
+    g = Graph("ABCDE", "AB", "AB", "AC", "AD", "EA", "EC")
     assert g.degree == 6
     g.remove_edges("AB")
     assert g.degree == 5
@@ -187,7 +188,27 @@ def test_remove_edges():
 
 
 def test_simple():
-    g = Graph("ABCDE", "AB", "BA", "AC", "AD", "EA", "EC", directed=False)
+    g = Graph("ABCDE", "AB", "BA", "AC", "AD", "EA", "EC")
     assert not g.is_simple
     g.remove_edges("AB")
     assert g.is_simple
+
+
+def test_shortest_paths():
+    g = WeightedGraph.from_dict(AB=1, BG=9, FC=1, FD=5, AG=9, BC=8, AF=5, BF=7, BD=12, CD=3, FE=2, ED=7, GE=1, GD=2, AE=3)
+    assert {node: g.node_degree(node) for node in g.nodes} == {
+        "A": 4,
+        "B": 5,
+        "C": 3,
+        "D": 5,
+        "E": 4,
+        "F": 5,
+        "G": 4,
+    }
+    assert g.shortest_paths("D", "B") == (7, [["D", "G", "E", "A", "B"]])
+    assert g.shortest_paths("D", "A") == (6, [["D", "G", "E", "A"]])
+    assert g.shortest_paths("D", "C") == (3, [["D", "C"]])
+    assert g.shortest_paths("D", "E") == (3, [["D", "G", "E"]])
+    assert g.shortest_paths("D", "F") == (4, [["D", "C", "F"]])
+    assert g.shortest_paths("D", "G") == (2, [["D", "G"]])
+    assert g.shortest_paths("D", "D") == (0, [["D"]])

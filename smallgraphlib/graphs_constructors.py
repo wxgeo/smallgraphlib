@@ -3,13 +3,18 @@ from typing import List, Tuple
 
 from smallgraphlib import Graph
 from smallgraphlib.graph import _TIKZ_EXPORT_MAX_MULTIPLE_EDGES_SUPPORT, _TIKZ_EXPORT_MAX_MULTIPLE_LOOPS_SUPPORT, \
-    Counter
+    Counter, DirectedGraph
+
+
+def graph(nodes, *edges, directed=False):
+    cls = DirectedGraph if directed else Graph
+    return cls(nodes, *edges)
 
 
 def complete_graph(order: int):
     nodes = list(range(1, order + 1))
     edges = ((i, j) for i in nodes for j in nodes if i < j)
-    return Graph(nodes, *edges, directed=False)
+    return Graph(nodes, *edges)
 
 
 def random_graph(
@@ -100,4 +105,4 @@ def random_graph(
             # Don't select anymore this node as start point: we can't add any other edge to it.
             starts.remove(start)
         edges.append((start, end))  # Loop will always end. :)
-    return Graph(nodes, *edges, directed=directed)
+    return graph(nodes, *edges, directed=directed)
