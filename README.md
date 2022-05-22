@@ -8,10 +8,10 @@
 
 ## Usage
 
-Main class is `Graph`:
+Main classes are `Graph`, `DirectedGraph`, `WeightedGraph` and `WeightedDirectedGraph`:
 
-    >>> from smallgraphlib import Graph
-    >>> g = Graph(["A", "B", "C"], ("A", "B"), ("B", "A"), ("B", "C"))
+    >>> from smallgraphlib import DirectedGraph
+    >>> g = DirectedGraph(["A", "B", "C"], ("A", "B"), ("B", "A"), ("B", "C"))
     >>> g.is_simple
     True
     >>> g.is_complete
@@ -24,76 +24,57 @@ Main class is `Graph`:
     3
     >>> g.order
     3
+    >>> g.is_eulerian
+    False
+    >>> g.is_semi_eulerian
+    True
 
+Special graphs may be generated using factory functions:
     
-For the graph is not to complesikz code may be generated:
-
-## Writing a new script
-
-### Guidelines
-
-Each script should declare a new test class inheriting from class `WebsiteTest`.
-
-This subclass should implement a `.get_authors(self) -> List[str]` method, 
-which must return the list of the authors for each website.
-
-It may also add tests. Tests are `Website` methods decorated with `@test(title: str, coeff: float)`.
-
-Each test must return two values:
-- the score, which must be a float between 0 and 1
-- the log, which must be a list of strings (possibly empty)
-
-The main class for running tests is `CollectTestsResults`.
-It takes two arguments:
-- `paths` is a list of paths (strings or `Path` instances)
-- `test_class` is the class to be used for the test, i.e. the custom class
-  you wrote inheriting from WebsiteTest.
-
-It has 3 main methods:
-- `.run()` will return the tests results as a dict.
-- `.write_log(folder_path)` will create a `path/log/` folder, with a `.md` file 
-  for each author.
-- `.write_xlsx_file(file_path)` will create an XLSX (Excel) file
-   will all results (`file_path` may be omitted).
-
-However, you may simply call `run_and_collect()` function for convenience.
-
-
-### Full example
-
-1. Create file `mytest.py`:
-
-
-        from websites_test_framework import Website, CollectTestsResults, test
+    >>> from smallgraphlib import complete_graph, complete_bipartite_graph
+    >>> K5 = complete_graph(5)
+    >>> len(K5.greedy_coloring)
+    5
+    >>> K33 = complete_bipartite_graph(3, 3)
+    >>> K33.degree
+    6
+    >>> K33.diameter
+    2
     
-        PATH = "/websites/parent/directory"
-        # PATH may also be a glob, like "/home/*/*/www" or "/home/**/www".
+If the graph is not to complex, Tikz code may be generated:
+
+    >>> g.as_tikz()
+    ...
+
+## Development
+
+1. Get last version:
+   
+       $ git clone https://github.com/wxgeo/smallgraphlib
+
+2. Install Poetry.
     
-        class MyWebsiteTest(WebsiteTest):
-            def get_authors(self):
-                with open(self.path / "authors.txt") as file:
-                    return [line.strip() for line in file]
+   Poetry is a tool for dependency management and packaging in Python.
+
+   Installation instructions are here:
+   https://python-poetry.org/docs/#installation
+
+3. Install developments tools:
     
-            @test("css folder ?", coeff=0.5)
-            def test_css_folder(self):
-                if (self.path / "css").is_dir():
-                    return 1, []
-                elif (self.path / "styles").is_dir():
-                    return 0.5, ["folder `styles` should be named `css`"]:
-                else:
-                    return 0, ["folder css/ not found !"]
-    
-        if __file__ == "__main__":
-            # Write logs and output XLSX file in current directory.
-            run_and_collect(PATH, MyWebsiteTest)
+       $ poetry install
 
-2. Launch tests:
+4. Optionally, update development tools:
+      
+       $ poetry update
 
+5. Optionally, install library in editable mode:
 
-        $ python3 mytest.py
+       $ pip install -e smallgraphlib
 
+6. Make changes, add tests.
+  
+7. Launch tests:
 
-3. Results are exported to `scores.xlsx` by default.
- 
+        $ tox
 
-        $ libreoffice scores.xlsx
+8. Everything's OK ? Commit. :)
