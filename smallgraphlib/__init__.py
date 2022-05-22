@@ -1,3 +1,5 @@
+from importlib import metadata
+
 from smallgraphlib.graph import Graph, DirectedGraph
 from smallgraphlib.labeled_graph import (
     WeightedGraph,
@@ -7,7 +9,8 @@ from smallgraphlib.labeled_graph import (
 )
 from smallgraphlib.graphs_constructors import complete_graph, complete_bipartite_graph, graph, random_graph
 
-__version__ = "0.2.1"
+__version__ = metadata.version(__package__)
+
 __all__ = [
     "__version__",
     "Graph",
