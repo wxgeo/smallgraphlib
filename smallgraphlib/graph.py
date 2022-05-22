@@ -9,6 +9,7 @@ import collections
 from abc import abstractmethod, ABC
 from functools import wraps
 from itertools import chain
+from math import inf
 from typing import (
     Set,
     Union,
@@ -288,6 +289,9 @@ class AbstractGraph(ABC, Generic[Node]):
         """Count the number of edges from node1 to node2. Note that undirected loops are counted twice."""
         return self._successors[node1][node2]
 
+    def weight(self, node1, node2) -> float:
+        return 1
+
     def node_degree(self, node: Node) -> int:
         if self.is_directed:
             return self.in_degree(node) + self.out_degree(node)
@@ -392,6 +396,54 @@ class AbstractGraph(ABC, Generic[Node]):
         lines.append(r"\end{tikzpicture}")
         return "\n".join(lines)
 
+    def _dijkstra(self, start: Node, end: Node = None) -> Tuple[Dict[Node, float], Dict[Node, List[Node]]]:
+        """Implementation of Dijkstra Algorithm."""
+        if start not in self.nodes:
+            raise ValueError(f"Unknown node {start!r}.")
+        if end is not None and end not in self.nodes:
+            raise ValueError(f"Unknown node {end!r}.")
+        lengths: Dict[Node, float] = {node: (0 if node == start else inf) for node in self.nodes}
+        last_step: Dict[Node, List[Node]] = {node: [] for node in self.nodes}
+        never_selected_nodes = set(self.nodes)
+        selected_node = start
+        while selected_node != end and len(never_selected_nodes) > 1:
+            never_selected_nodes.remove(selected_node)
+            for successor in self.successors(selected_node) & never_selected_nodes:
+                weight = self.weight(selected_node, successor)
+                if weight < 0:
+                    raise ValueError("Can't find shortest paths with negative weights.")
+                new_length = lengths[selected_node] + weight
+                if new_length < lengths[successor]:
+                    lengths[successor] = new_length
+                    last_step[successor] = [selected_node]
+                elif new_length == lengths[successor]:
+                    last_step[successor].append(selected_node)
+            selected_node = min(never_selected_nodes, key=(lambda node_: lengths[node_]))
+        return lengths, last_step
+
+    def distance(self, start: Node, end: Node) -> float:
+        """Implementation of Dijkstra Algorithm."""
+        lengths, last_step = self._dijkstra(start, end)
+        return lengths[end]
+
+    @cached_property
+    def diameter(self) -> float:
+        return max(self.distance(node1, node2) for node1 in self.nodes for node2 in self.nodes)
+
+    def shortest_paths(self, start: Node, end: Node) -> Tuple[float, List[List[Node]]]:
+        """Implementation of Dijkstra Algorithm."""
+        lengths, last_step = self._dijkstra(start, end)
+
+        def generate_paths(path: List[Node]) -> List[List[Node]]:
+            if path[0] == start:
+                return [path]
+            paths = []
+            for predecessor in last_step[path[0]]:
+                paths.extend(generate_paths([predecessor] + path))
+            return paths
+
+        return lengths[end], generate_paths([end])
+
 
 class Graph(AbstractGraph):
     """A graph with undirected edges.
@@ -440,6 +492,29 @@ class Graph(AbstractGraph):
 
     def are_adjacents(self, node1: Node, node2: Node) -> bool:
         return node2 in self.successors(node1)
+
+    @property
+    def weighted_graph(self):
+        from smallgraphlib import WeightedGraph
+
+        def weighted_edge(edge):
+            start, end = self._get_edge_extremities(edge)
+            return start, end, 1
+
+        return WeightedGraph(self.nodes, *(weighted_edge(edge) for edge in self.edges))
+
+    def is_subgraph_stable(self, *nodes: Node) -> bool:
+        return not any(self.are_adjacents(node1, node2) for node1 in nodes for node2 in nodes)
+
+    @cached_property
+    def is_complete_bipartite(self) -> bool:
+        nodes_group = self.successors(self.nodes[0])
+        other_group = set(self.nodes) - nodes_group
+        if not self.is_subgraph_stable(*nodes_group):
+            return False
+        if not self.is_subgraph_stable(*other_group):
+            return False
+        return all(self.are_adjacents(node1, node2) for node1 in nodes_group for node2 in other_group)
 
 
 class DirectedGraph(AbstractGraph):
@@ -525,6 +600,12 @@ class DirectedGraph(AbstractGraph):
     @property
     def undirected_graph(self):
         return Graph(self.nodes, *self.edges)
+
+    @property
+    def weighted_graph(self):
+        from smallgraphlib import WeightedDirectedGraph
+
+        return WeightedDirectedGraph(self.nodes, *(edge + (1,) for edge in self.edges))
 
     @cached_property
     def is_strongly_connected(self):

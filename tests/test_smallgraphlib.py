@@ -2,12 +2,19 @@ import random
 
 from smallgraphlib.graph import DirectedGraph
 
-from smallgraphlib import __version__, Graph, random_graph, complete_graph
-from smallgraphlib.labeled_graph import WeightedGraph
+from smallgraphlib import (
+    __version__,
+    Graph,
+    WeightedGraph,
+    random_graph,
+    complete_graph,
+    complete_bipartite_graph,
+)
 
 
 def test_version():
-    assert __version__ == "0.1.0"
+    version = __version__.split(".")
+    assert len(version) == 3
 
 
 def test_properties():
@@ -195,7 +202,9 @@ def test_simple():
 
 
 def test_shortest_paths():
-    g = WeightedGraph.from_dict(AB=1, BG=9, FC=1, FD=5, AG=9, BC=8, AF=5, BF=7, BD=12, CD=3, FE=2, ED=7, GE=1, GD=2, AE=3)
+    g = WeightedGraph.from_dict(
+        AB=1, BG=9, FC=1, FD=5, AG=9, BC=8, AF=5, BF=7, BD=12, CD=3, FE=2, ED=7, GE=1, GD=2, AE=3
+    )
     assert {node: g.node_degree(node) for node in g.nodes} == {
         "A": 4,
         "B": 5,
@@ -212,3 +221,13 @@ def test_shortest_paths():
     assert g.shortest_paths("D", "F") == (4, [["D", "C", "F"]])
     assert g.shortest_paths("D", "G") == (2, [["D", "G"]])
     assert g.shortest_paths("D", "D") == (0, [["D"]])
+
+
+def test_complete_bipartite():
+    g = complete_bipartite_graph(3, 4)
+    assert g.order == 7
+    assert g.degree == 12
+    assert not g.is_directed
+    assert g.is_simple
+    assert g.is_complete_bipartite
+    assert g.diameter == 2

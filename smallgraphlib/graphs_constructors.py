@@ -2,19 +2,30 @@ import random
 from typing import List, Tuple
 
 from smallgraphlib import Graph
-from smallgraphlib.graph import _TIKZ_EXPORT_MAX_MULTIPLE_EDGES_SUPPORT, _TIKZ_EXPORT_MAX_MULTIPLE_LOOPS_SUPPORT, \
-    Counter, DirectedGraph
+from smallgraphlib.graph import (
+    _TIKZ_EXPORT_MAX_MULTIPLE_EDGES_SUPPORT,
+    _TIKZ_EXPORT_MAX_MULTIPLE_LOOPS_SUPPORT,
+    Counter,
+    DirectedGraph,
+)
 
 
 def graph(nodes, *edges, directed=False):
+    """Factory function to create graphs."""
     cls = DirectedGraph if directed else Graph
     return cls(nodes, *edges)
 
 
-def complete_graph(order: int):
-    nodes = list(range(1, order + 1))
+def complete_graph(n: int):
+    """Return complete graph K(n)."""
+    nodes = list(range(1, n + 1))
     edges = ((i, j) for i in nodes for j in nodes if i < j)
     return Graph(nodes, *edges)
+
+
+def complete_bipartite_graph(n: int, m: int):
+    """Return complete bipartite graph K(n, m)."""
+    return Graph(range(1, m + n + 1), *((i, j) for i in range(1, n + 1) for j in range(n + 1, n + 1 + m)))
 
 
 def random_graph(
@@ -42,7 +53,8 @@ def random_graph(
         if degree > max_degree_for_simple_graph:
             graph_type = "directed" if directed else "undirected"
             raise ValueError(
-                f"Degree is at most {max_degree_for_simple_graph} for a simple {graph_type} graph of order {order}."
+                f"Degree is at most {max_degree_for_simple_graph} "
+                f"for a simple {graph_type} graph of order {order}."
             )
     if simple:
         if max_multiple_edges is not None or max_multiple_loops is not None:
@@ -92,7 +104,8 @@ def random_graph(
         ).total()
         > 0
     }
-    # Keep only nodes which accept edges (all except the last one for undirected simple graph, since start < end).
+    # Keep only nodes which accept edges (all except the last one
+    # for undirected simple graph, since start < end).
     starts = list(counters)
 
     while len(edges) < degree:

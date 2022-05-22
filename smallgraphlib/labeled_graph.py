@@ -13,10 +13,10 @@ WeightedEdge = Tuple[Node, Node, float]
 
 class AbstractLabeledGraph(AbstractGraph, ABC, Generic[Label]):
     def __init__(
-        self,
-        nodes: Iterable[Node],
-        *labeled_edges: LabeledEdge,
-        sort_nodes: bool = True,
+            self,
+            nodes: Iterable[Node],
+            *labeled_edges: LabeledEdge,
+            sort_nodes: bool = True,
     ):
         edges: List[Edge] = []
         self.labels: Dict[UndirectedEdge, List[Label]] = {}
@@ -46,10 +46,10 @@ class LabeledDirectedGraph(AbstractLabeledGraph, DirectedGraph):
 
 class AbstractWeightedGraph(AbstractLabeledGraph, ABC):
     def __init__(
-        self,
-        nodes: Iterable[Node],
-        *weighted_edges: WeightedEdge,
-        sort_nodes: bool = True,
+            self,
+            nodes: Iterable[Node],
+            *weighted_edges: WeightedEdge,
+            sort_nodes: bool = True,
     ):
         super().__init__(nodes, *weighted_edges, sort_nodes=sort_nodes)
         self.weights: Dict[Edge, List[float]] = self.labels  # type: ignore
@@ -60,39 +60,6 @@ class AbstractWeightedGraph(AbstractLabeledGraph, ABC):
 
     def weight(self, node1, node2) -> float:
         return min(self.weights[self._edge(node1, node2)], default=inf)
-
-    def shortest_paths(self, start: Node, end: Node) -> Tuple[float, List[List[Node]]]:
-        """Implementation of Dijkstra Algorithm."""
-        for node in (start, end):
-            if node not in self.nodes:
-                raise ValueError(f"Unknown node {node!r}.")
-        lengths: Dict[Node, float] = {node: (0 if node == start else inf) for node in self.nodes}
-        last_step: Dict[Node, List[Node]] = {node: [] for node in self.nodes}
-        never_selected_nodes = set(self.nodes)
-        selected_node = start
-        while selected_node != end:
-            never_selected_nodes.remove(selected_node)
-            for successor in self.successors(selected_node):
-                weight = self.weight(selected_node, successor)
-                if weight < 0:
-                    raise ValueError("Can't find shortest paths with negative weights.")
-                new_length = lengths[selected_node] + weight
-                if new_length < lengths[successor]:
-                    lengths[successor] = new_length
-                    last_step[successor] = [selected_node]
-                elif new_length == lengths[successor]:
-                    last_step[successor].append(selected_node)
-            selected_node = min(never_selected_nodes, key=(lambda node_: lengths[node_]))
-
-        def generate_paths(path: List[Node]) -> List[List[Node]]:
-            if path[0] == start:
-                return [path]
-            paths = []
-            for predecessor in last_step[path[0]]:
-                paths.extend(generate_paths([predecessor] + path))
-            return paths
-
-        return lengths[end], generate_paths([end])
 
 
 class WeightedGraph(AbstractWeightedGraph, LabeledGraph):
