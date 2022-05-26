@@ -1,4 +1,5 @@
 import ast
+import math
 import re
 from abc import ABC
 from itertools import chain
@@ -39,18 +40,21 @@ class AbstractLabeledGraph(AbstractGraph, ABC, Generic[Label]):
 
     @classmethod
     def from_string(cls, string: str):
-        """LabeledGraph.from_string("A:B=label,C='other label' B:C=5 C")
+        """LabeledGraph.from_string("A:B=label,C='other label' B:C=5 C D:C")
         will generate a graph of 3 nodes, A, B and C, with edges A->B, A->C
         and B->C and respective labels 'label', 'other label' and 5.
 
         Note that labels containing a space must be surrounded by quotes.
         Labels containing only digits will be converted to numbers (integers or floats),
         except if surrounded by quotes.
+
+        If no label is given, `None` is stored by default.
         """
         # Convert spaces inside labels to null character, to make splitting easier.
         string = re.sub("""'[^']*'|"[^"]*""", (lambda m: m.group().replace(" ", "\x00")), string)
         nodes: List[str] = []
         edges: List[Tuple[str, str, Any]] = []
+        label: Any
         for substring in string.split():
             node, *remaining = substring.split(":", 1)
             nodes.append(node.strip())
@@ -58,13 +62,15 @@ class AbstractLabeledGraph(AbstractGraph, ABC, Generic[Label]):
                 for successor_and_label in remaining[0].split(","):
                     successor, *after_successor = successor_and_label.split("=", 1)
                     if after_successor:
-                        label = after_successor[0].replace(
-                            "\x00", " "
-                        )  # convert back null character to space.
+                        # convert back null character to space.
+                        label = after_successor[0].strip().replace("\x00", " ")
                         try:
                             label = ast.literal_eval(label)
                         except (ValueError, SyntaxError):
-                            pass
+                            if label == "inf":
+                                label = math.inf
+                            elif label == "-inf":
+                                label = -math.inf
                     else:
                         label = None
                     edges.append((node, successor.strip(), label))

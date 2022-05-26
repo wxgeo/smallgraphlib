@@ -1,3 +1,4 @@
+import math
 import random
 
 from smallgraphlib.graph import DirectedGraph
@@ -9,7 +10,9 @@ from smallgraphlib import (
     WeightedGraph,
     random_graph,
     complete_graph,
-    complete_bipartite_graph, LabeledGraph,
+    complete_bipartite_graph,
+    LabeledGraph,
+    graph,
 )
 
 
@@ -255,3 +258,22 @@ def test_LabeledGraph_from_string():
     assert g.labels[f("A", "C")] == ["other label"]
     assert g.labels[f("B", "C")] == [5]
     assert g.labels[f("D", "C")] == [None]
+
+
+def test_graph_constructor():
+    g = graph("A:B,C B:C C")
+    assert g.degree == 3
+    assert not g.is_directed
+    assert g.is_simple
+    g = graph(AB=5, BC=7, AC=8, directed=True)
+    assert g.degree == 3
+    assert g.weight("A", "B") == 5
+    assert g.weight("B", "C") == 7
+    assert g.weight("A", "C") == 8
+    assert g.is_directed
+    g = graph("A:B=5,C=8 B:C=inf C", directed=True)
+    assert g.is_directed
+    assert g.diameter == math.inf
+    g = graph("A:B='some text with space',C=text_without_space B:C=2.5 C D")
+    assert not g.is_directed
+    assert g.labels[frozenset(("A", "B"))]

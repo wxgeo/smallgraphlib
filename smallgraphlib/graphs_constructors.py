@@ -1,7 +1,7 @@
 import random
 from typing import List, Tuple
 
-from smallgraphlib import Graph
+from smallgraphlib import Graph, WeightedDirectedGraph, LabeledDirectedGraph, LabeledGraph, WeightedGraph
 from smallgraphlib.graph import (
     _TIKZ_EXPORT_MAX_MULTIPLE_EDGES_SUPPORT,
     _TIKZ_EXPORT_MAX_MULTIPLE_LOOPS_SUPPORT,
@@ -10,8 +10,38 @@ from smallgraphlib.graph import (
 )
 
 
-def graph(nodes, *edges, directed=False):
-    """Factory function to create graphs."""
+def graph(nodes=None, *edges, directed=False, **labeled_edges):
+    """Factory function to create graphs with various syntaxes.
+
+    >>> graph("A:B,C B:C C")
+    >>> graph(AB=5, BC=7, AC=8, directed=True)
+    >>> graph("A:B=5,C=8 B:C=inf", directed=True)
+    >>> graph("A:B='some text with space',C=text_without_space B:C=2.5 D")
+
+    This is intended mainly for quick interactive use (or one-time-use scripts),
+    since its interface is not very clean and may change frequently.
+
+    Use directly classes' constructors if you need a stable API.
+    """
+    if isinstance(nodes, str) and not edges:
+        classes = (DirectedGraph, WeightedDirectedGraph, LabeledDirectedGraph)
+        if not directed:
+            classes = (Graph, WeightedGraph, LabeledGraph)
+        error = None
+        for cls in classes:
+            try:
+                return cls.from_string(nodes)
+            except ValueError as e:
+                error = e
+        raise ValueError(f"Invalid argument value: {nodes!r}.") from error
+    elif isinstance(nodes, dict) or nodes is None and labeled_edges:
+        if isinstance(nodes, dict):
+            labeled_edges.update(nodes)
+        if all(isinstance(val, (float, int)) for val in labeled_edges.values()):
+            cls = WeightedDirectedGraph if directed else WeightedGraph
+        else:
+            cls = LabeledDirectedGraph if directed else LabeledGraph
+        return cls.from_dict(labeled_edges)
     cls = DirectedGraph if directed else Graph
     return cls(nodes, *edges)
 

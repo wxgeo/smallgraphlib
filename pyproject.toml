@@ -36,5 +36,5 @@ commands =
     poetry install -v
     poetry run pytest tests
     poetry run mypy .
-    poetry run flake8 --max-line-length 110 --ignore=E203,W503
+    poetry run flake8 --max-line-length 110 --ignore=E203,W503,W391
 """
