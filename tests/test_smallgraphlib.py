@@ -5,10 +5,11 @@ from smallgraphlib.graph import DirectedGraph
 from smallgraphlib import (
     __version__,
     Graph,
+    LabeledDirectedGraph,
     WeightedGraph,
     random_graph,
     complete_graph,
-    complete_bipartite_graph,
+    complete_bipartite_graph, LabeledGraph,
 )
 
 
@@ -231,3 +232,26 @@ def test_complete_bipartite():
     assert g.is_simple
     assert g.is_complete_bipartite
     assert g.diameter == 2
+
+
+def test_LabeledDirectedGraph_from_string():
+    g = LabeledDirectedGraph.from_string("A:B=label,C='other label' B:C=5 C D:C")
+    assert g.nodes == ("A", "B", "C", "D")
+    assert set(g.edges) == {("A", "B"), ("A", "C"), ("B", "C"), ("D", "C")}
+    assert g.labels[("A", "B")] == ["label"]
+    assert g.labels[("A", "C")] == ["other label"]
+    assert g.labels[("B", "C")] == [5]
+    assert g.labels[("D", "C")] == [None]
+
+
+def test_LabeledGraph_from_string():
+    def f(*nodes):
+        return frozenset(nodes)
+
+    g = LabeledGraph.from_string("A:B=label,C='other label' B:C=5 C D:C")
+    assert g.nodes == ("A", "B", "C", "D")
+    assert set(g.edges) == {f("A", "B"), f("A", "C"), f("B", "C"), f("D", "C")}
+    assert g.labels[f("A", "B")] == ["label"]
+    assert g.labels[f("A", "C")] == ["other label"]
+    assert g.labels[f("B", "C")] == [5]
+    assert g.labels[f("D", "C")] == [None]

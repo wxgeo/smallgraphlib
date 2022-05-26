@@ -423,7 +423,7 @@ class AbstractGraph(ABC, Generic[Node]):
 
     def distance(self, start: Node, end: Node) -> float:
         """Implementation of Dijkstra Algorithm."""
-        lengths, last_step = self._dijkstra(start, end)
+        lengths, _ = self._dijkstra(start, end)
         return lengths[end]
 
     @cached_property
