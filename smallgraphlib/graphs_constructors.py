@@ -5,9 +5,9 @@ from smallgraphlib import Graph, WeightedDirectedGraph, LabeledDirectedGraph, La
 from smallgraphlib.graph import (
     _TIKZ_EXPORT_MAX_MULTIPLE_EDGES_SUPPORT,
     _TIKZ_EXPORT_MAX_MULTIPLE_LOOPS_SUPPORT,
-    Counter,
-    DirectedGraph,
+    DirectedGraph, AbstractGraph,
 )
+from smallgraphlib.utilities import Multiset
 
 
 def graph(nodes=None, *edges, directed=False, **labeled_edges):
@@ -67,7 +67,8 @@ def random_graph(
     tikz_export_supported=True,
     max_multiple_edges: int = None,
     max_multiple_loops: int = None,
-):
+    shuffle_nodes=False,
+) -> AbstractGraph:
     """Create a random graph satisfying given constraints.
 
     Raise a ValueError if contraints can't be satisfied.
@@ -124,7 +125,7 @@ def random_graph(
         start: counter
         for start in nodes
         if (
-            counter := Counter(
+            counter := Multiset(
                 {
                     end: (max_multiple_loops if start == end else max_multiple_edges)
                     for end in nodes
@@ -148,4 +149,7 @@ def random_graph(
             # Don't select anymore this node as start point: we can't add any other edge to it.
             starts.remove(start)
         edges.append((start, end))  # Loop will always end. :)
-    return graph(nodes, *edges, directed=directed)
+    g = graph(nodes, *edges, directed=directed)
+    if shuffle_nodes:
+        g.shuffle_nodes()
+    return g

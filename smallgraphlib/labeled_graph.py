@@ -29,6 +29,9 @@ class AbstractLabeledGraph(AbstractGraph, ABC, Generic[Label]):
 
         super().__init__(nodes, *edges, sort_nodes=sort_nodes)
 
+    def __eq__(self, other: Any):
+        return super().__eq__(other) and all(self.labels[edge] == other.labels[edge] for edge in self.edges)
+
     @classmethod
     def from_dict(cls, edge_label_dict: dict = None, /, **edge_label):
         """LabeledUndirectedGraph.from_dict(AB=1, AC=3, BC=4)"""

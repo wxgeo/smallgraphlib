@@ -5,11 +5,10 @@ Created on Sat May  7 12:24:58 2022
 
 @author: nicolas
 """
-import collections
 from abc import abstractmethod, ABC
-from functools import wraps
 from itertools import chain
 from math import inf
+from collections import Counter
 from typing import (
     Set,
     Union,
@@ -20,30 +19,17 @@ from typing import (
     FrozenSet,
     Counter as CounterType,
     Any,
-    Protocol,
     TypeVar,
     Generic,
 )
 import random
 
+from smallgraphlib.utilities import cached_property, clear_cache, Multiset, CycleFoundError, ComparableAndHashable
 
 _TIKZ_EXPORT_MAX_MULTIPLE_EDGES_SUPPORT = 3
 _TIKZ_EXPORT_MAX_MULTIPLE_LOOPS_SUPPORT = 1
 
-
-class ComparableAndHashable(Protocol):
-    """Protocol for annotating comparable types."""
-
-    @abstractmethod
-    def __lt__(self, other) -> bool:
-        ...
-
-    @abstractmethod
-    def __hash__(self) -> int:
-        ...
-
-
-# Node = TypeVar("Node", bound=typing.Hashable)  # too subtile for Pycharm
+# Node = TypeVar("Node", bound=typing.Hashable)  # too subtile for Pycharm ? ;-(
 Node = TypeVar("Node", bound=ComparableAndHashable)
 DirectedEdge = Tuple[Node, Node]
 UndirectedEdge = FrozenSet[Node]
@@ -52,64 +38,6 @@ EdgeLike = Union[Edge, Set[Node], Iterable[Node]]
 
 Label = Any
 InternalGraphRepresentation = Dict[Node, Dict[Node, Union[int, List[Label]]]]
-
-
-def cached(f):
-    """Decorator used to cache results in `self._cache` dictionary."""
-
-    @wraps(f)
-    def cached_f(self=None, *args, **kw):
-        key = f.__name__
-        try:
-            if key in self._cache:
-                return self._cache[key]
-        except AttributeError:
-            self._cache = {}
-        result = f(self, *args, **kw)
-        self._cache[key] = result
-        return result
-
-    return cached_f
-
-
-def cached_property(f):
-    return property(cached(f))
-
-
-def clear_cache(f):
-    """Decorator to indicate that a function must invalidate the cache."""
-
-    @wraps(f)
-    def cached_f(self=None, *args, **kw):
-        result = f(self, *args, **kw)
-        try:
-            self._cache.clear()
-        except AttributeError:
-            self._cache = {}
-        return result
-
-    return cached_f
-
-
-# Subclass UserDict, not dict, to call __setitem__ on initialisation too.
-class Counter(collections.UserDict, collections.Counter):  # type: ignore
-    """A counter that automatically removes empty keys."""
-
-    def __setitem__(self, key, value):
-        if not isinstance(value, int):
-            raise ValueError(f"Counter value must be an integer, not {value!r}.")
-        super().__setitem__(key, value)
-        if self[key] == 0:
-            del self[key]
-        elif self[key] < 0:
-            raise ValueError(f"Counter value can't be negative for key {key!r}.")
-
-    def total(self) -> int:
-        return sum(self.values())
-
-
-class CycleFoundError(AttributeError):
-    pass
 
 
 class AbstractGraph(ABC, Generic[Node]):
@@ -138,6 +66,14 @@ class AbstractGraph(ABC, Generic[Node]):
         self.add_nodes(*nodes)
         self.add_edges(*edges)
 
+    def __eq__(self, other: Any):
+        # Attention, there may be multiple edges, so don't use sets to compare edges !
+        return (
+            type(self) == type(other)
+            and self.nodes_set == other.nodes_set
+            and Counter(self.edges) == Counter(other.edges)
+        )
+
     @classmethod
     def from_string(cls, string: str):
         """DirectedGraph.from_string("A:B,C B:C C") will generate a graph of 3 nodes, A, B and C, with
@@ -152,8 +88,8 @@ class AbstractGraph(ABC, Generic[Node]):
         return cls(nodes, *edges)  # type: ignore
 
     def _add_node(self, node: Node) -> None:
-        self._successors[node] = Counter()
-        self._predecessors[node] = Counter()
+        self._successors[node] = Multiset()
+        self._predecessors[node] = Multiset()
 
     @clear_cache
     def add_nodes(self, *new_nodes: Node) -> None:
@@ -174,6 +110,66 @@ class AbstractGraph(ABC, Generic[Node]):
             predecessors = self._predecessors.pop(node, ())
             for predecessor in predecessors:
                 self._successors.get(predecessor, {}).pop(node, None)  # type: ignore
+
+    @clear_cache
+    def rename_node(self, old_name: Node, new_name: Node) -> None:
+        """Rename node. New name must not be already present, else a `NameError` will be raised."""
+        if new_name in self.nodes:
+            raise NameError(f"Conflicting names: this graph already has a node named {new_name!r}")
+        for dictionary in (self._successors, self._predecessors):
+            for node, counter in list(dictionary.items()):  # make a copy, since we modify the dictionary.
+                if node == old_name:
+                    dictionary[new_name] = dictionary.pop(old_name)
+                if old_name in counter:
+                    counter[new_name] = counter.pop(old_name)
+
+    @clear_cache
+    def rename_nodes(self, node_names: Dict[Node, Node]) -> None:
+        if not node_names:
+            return
+        # First, we must assure the atomicity of the renaming operation:
+        # it should not fail half-way if a node is not found, or if two renaming rules will conflict...
+        # This is an incorrect renaming for example:
+        # {A -> E, B -> E}
+        # ({A -> E, A -> F} would be incorrect too, but can't occur with dict.)
+        # Eventually, the following operation is correct if and only if A is an existing node and C is not:
+        # {A -> C}
+        # Note that, if A and C are both already existing nodes, this is correct:
+        # {A -> C, C -> A}
+        # but this alone is not:
+        # {A -> C}
+        # Considering a V1 -> V2 renaming operation, let's call V1 the **start node** and V2 the **end node**.
+        # We'll use the following algorithm to detect those incorrect renaming operations.
+        # The renaming operation is correct if and only if:
+        #    1. All the **start** nodes exist.
+        #    2. All the **end** nodes appear only once, and don't conflict with any existing unchanged nodes.
+        unknown_nodes = set(node_names) - self.nodes_set
+        if unknown_nodes:
+            raise ValueError(f"Nodes not found: {unknown_nodes}")
+        new_names = Counter(node_names.values())
+        most_common, count = new_names.most_common(1)[0]
+        if count > 1:
+            raise ValueError(
+                f"Conflict in renaming: trying to rename {count} different nodes to {most_common} !"
+            )
+        unchanged_nodes = self.nodes_set - set(node_names)
+        conflicts = unchanged_nodes & set(new_names)
+        if conflicts:
+            raise ValueError(
+                f"Names conflict in renaming, when trying to apply the following names {conflicts}."
+            )
+
+        # The renaming operation must look simultaneous:
+        # for example, we must avoid that applying {A -> B, B -> C} will result in A −> C !
+        # The solution is to use temporary names when renaming.
+        # Something like {A -> tmp_B, B -> tmp_C} and then {tmp_B -> B, tmp_C -> C}.
+        remaining_translation: List[Node] = []
+        # Use list() to make a copy of the dictionary keys and values, since we modify the dictionary.
+        for i, (old_name, new_name) in enumerate(list(node_names.items())):
+            self.rename_node(old_name, "\00" + str(i))
+            remaining_translation.append(new_name)
+        for i, new_name in enumerate(remaining_translation):
+            self.rename_node("\00" + str(i), remaining_translation[i])
 
     @staticmethod
     def _get_edge_extremities(edge: EdgeLike) -> Tuple[Node, Node]:
@@ -239,8 +235,12 @@ class AbstractGraph(ABC, Generic[Node]):
         return tuple(self._successors)
 
     @cached_property
+    def nodes_set(self) -> FrozenSet[Node]:
+        return frozenset(self.nodes)
+
+    @cached_property
     def edges(self) -> Tuple[Edge, ...]:
-        edges_count: CounterType[Edge] = Counter()
+        edges_count: CounterType[Edge] = Multiset()
         for node in self.nodes:
             for successor in self.successors(node):
                 edge: Edge = self._edge(node, successor)
@@ -251,12 +251,16 @@ class AbstractGraph(ABC, Generic[Node]):
         return tuple(edges_count.elements())
 
     @cached_property
+    def edges_set(self) -> FrozenSet[Edge]:
+        return frozenset(self.edges)
+
+    @cached_property
     def has_loop(self) -> bool:
         return any(node in self.successors(node) for node in self.nodes)
 
     @cached_property
     def has_multiple_edges(self) -> bool:
-        return len(self.edges) != len(set(self.edges))
+        return len(self.edges) != len(self.edges_set)
 
     @cached_property
     def is_simple(self) -> bool:
@@ -509,7 +513,7 @@ class Graph(AbstractGraph):
     @cached_property
     def is_complete_bipartite(self) -> bool:
         nodes_group = self.successors(self.nodes[0])
-        other_group = set(self.nodes) - nodes_group
+        other_group = self.nodes_set - nodes_group
         if not self.is_subgraph_stable(*nodes_group):
             return False
         if not self.is_subgraph_stable(*other_group):

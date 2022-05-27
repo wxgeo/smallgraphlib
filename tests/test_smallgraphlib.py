@@ -1,7 +1,10 @@
 import math
 import random
 
+import pytest
+
 from smallgraphlib.graph import DirectedGraph
+from smallgraphlib.utilities import Multiset
 
 from smallgraphlib import (
     __version__,
@@ -62,7 +65,7 @@ def test_connected():
 def test_remove_nodes():
     g = DirectedGraph(["A", "B", "C"], ("A", "B"), ("B", "A"), ("B", "C"))
     g.remove_nodes("A")
-    assert set(g.nodes) == {"B", "C"}
+    assert g.nodes_set == {"B", "C"}
     assert len(g.edges) == 1
     assert g.edges == (("B", "C"),)
 
@@ -120,9 +123,9 @@ def test_complete_eulerian():
 
 def test_graph_from_string():
     g = DirectedGraph.from_string("A:B,C B:C C")
-    assert set(g.nodes) == {"A", "B", "C"}
+    assert g.nodes_set == {"A", "B", "C"}
     assert g.degree == 3
-    assert set(g.edges) == {("A", "B"), ("A", "C"), ("B", "C")}
+    assert g.edges_set == {("A", "B"), ("A", "C"), ("B", "C")}
 
 
 def test_simple_random_graph():
@@ -189,7 +192,7 @@ def test_remove_edges():
     assert g.degree == 6
     g.remove_edges("AB")
     assert g.degree == 5
-    assert set(g.edges) == {
+    assert g.edges_set == {
         frozenset({"A", "B"}),
         frozenset({"A", "C"}),
         frozenset({"A", "D"}),
@@ -240,7 +243,7 @@ def test_complete_bipartite():
 def test_LabeledDirectedGraph_from_string():
     g = LabeledDirectedGraph.from_string("A:B=label,C='other label' B:C=5 C D:C")
     assert g.nodes == ("A", "B", "C", "D")
-    assert set(g.edges) == {("A", "B"), ("A", "C"), ("B", "C"), ("D", "C")}
+    assert g.edges_set == {("A", "B"), ("A", "C"), ("B", "C"), ("D", "C")}
     assert g.labels[("A", "B")] == ["label"]
     assert g.labels[("A", "C")] == ["other label"]
     assert g.labels[("B", "C")] == [5]
@@ -253,7 +256,7 @@ def test_LabeledGraph_from_string():
 
     g = LabeledGraph.from_string("A:B=label,C='other label' B:C=5 C D:C")
     assert g.nodes == ("A", "B", "C", "D")
-    assert set(g.edges) == {f("A", "B"), f("A", "C"), f("B", "C"), f("D", "C")}
+    assert g.edges_set == {f("A", "B"), f("A", "C"), f("B", "C"), f("D", "C")}
     assert g.labels[f("A", "B")] == ["label"]
     assert g.labels[f("A", "C")] == ["other label"]
     assert g.labels[f("B", "C")] == [5]
@@ -277,3 +280,71 @@ def test_graph_constructor():
     g = graph("A:B='some text with space',C=text_without_space B:C=2.5 C D")
     assert not g.is_directed
     assert g.labels[frozenset(("A", "B"))]
+
+
+def test_single_node_renaming():
+    g = DirectedGraph("ABCDE", "AB", "AC", "BC", "CD", "DE", "EA", "ED")
+    g.rename_node("A", "F")
+    assert g.nodes_set == set("FBCDE")
+    assert g.edges_set == {
+        ("F", "B"),
+        ("F", "C"),
+        ("B", "C"),
+        ("C", "D"),
+        ("D", "E"),
+        ("E", "F"),
+        ("E", "D"),
+    }
+    assert g.successors("F") == {"B", "C"}
+    assert g.predecessors("F") == {"E"}
+    assert g.predecessors("C") == {"F", "B"}
+    assert g.successors("E") == {"F", "D"}
+
+
+def test_simultaneous_nodes_renaming():
+    g = DirectedGraph("ABCDE", "AB", "AC", "BC", "CD", "DE", "EA", "ED")
+    with pytest.raises(ValueError):
+        g.rename_nodes({"A": "E", "B": "E"})
+    assert g.nodes_set == set("ABCDE")
+    with pytest.raises(ValueError):
+        g.rename_nodes({"A": "B", "B": "C"})
+    assert g.nodes_set == set("ABCDE")
+    with pytest.raises(ValueError):
+        g.rename_nodes({"A": "G", "F": "C"})
+
+    g.rename_nodes({"A": "a", "B": "b", "C": "c", "D": "d", "E": "e"})
+    assert g.nodes_set == set("abcde")
+
+    g = DirectedGraph("ABCDE", "AB", "AC", "BC", "CD", "DE", "EA", "ED")
+    g_copy = g.copy()
+    translate = {"A": "B", "B": "C", "C": "D", "D": "E", "E": "A"}
+    g.rename_nodes(translate)
+    assert g.nodes_set == set("ABCDE")
+    assert g.edges_set == {
+        ("B", "C"),
+        ("B", "D"),
+        ("C", "D"),
+        ("D", "E"),
+        ("E", "A"),
+        ("A", "B"),
+        ("A", "E"),
+    }
+    assert g != g_copy
+    reverse_translate = {v: k for k, v in translate.items()}
+    g.rename_nodes(reverse_translate)
+    assert g == g_copy
+
+
+def test_Multiset():
+    with pytest.raises(ValueError) as _:
+        # Negative counts are not allowed.
+        Multiset({"a": 2, "b": 4, "c": 4, "d": 0, "e": -1})
+    s = Multiset({"a": 2, "b": 4, "c": 4, "d": 0})
+    # Automatically remove key 'd', since its count is zero.
+    assert set(s) == {"a", "b", "c"}
+    s["a"] -= 1
+    assert set(s) == {"a", "b", "c"}
+    s["a"] -= 1
+    assert set(s) == {"b", "c"}
+    with pytest.raises(ValueError) as _:
+        s["a"] -= 1
