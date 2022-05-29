@@ -21,10 +21,17 @@ from typing import (
     Any,
     TypeVar,
     Generic,
+    Optional, Literal,
 )
 import random
 
-from smallgraphlib.utilities import cached_property, clear_cache, Multiset, CycleFoundError, ComparableAndHashable
+from smallgraphlib.utilities import (
+    cached_property,
+    clear_cache,
+    Multiset,
+    CycleFoundError,
+    ComparableAndHashable,
+)
 
 _TIKZ_EXPORT_MAX_MULTIPLE_EDGES_SUPPORT = 3
 _TIKZ_EXPORT_MAX_MULTIPLE_LOOPS_SUPPORT = 1
@@ -66,13 +73,9 @@ class AbstractGraph(ABC, Generic[Node]):
         self.add_nodes(*nodes)
         self.add_edges(*edges)
 
-    def __eq__(self, other: Any):
-        # Attention, there may be multiple edges, so don't use sets to compare edges !
-        return (
-            type(self) == type(other)
-            and self.nodes_set == other.nodes_set
-            and Counter(self.edges) == Counter(other.edges)
-        )
+    # ------------------
+    # Other constructors
+    # ------------------
 
     @classmethod
     def from_string(cls, string: str):
@@ -86,6 +89,19 @@ class AbstractGraph(ABC, Generic[Node]):
             if remaining:
                 edges.extend((node, successor.strip()) for successor in remaining[0].split(","))
         return cls(nodes, *edges)  # type: ignore
+
+    # ------------
+    # Node methods
+    # ------------
+
+    # Nodes must be ordered, to generate the matrix, so do *not* return a set.
+    @cached_property
+    def nodes(self) -> Tuple[Node, ...]:
+        return tuple(self._successors)
+
+    @cached_property
+    def nodes_set(self) -> FrozenSet[Node]:
+        return frozenset(self.nodes)
 
     def _add_node(self, node: Node) -> None:
         self._successors[node] = Multiset()
@@ -171,6 +187,42 @@ class AbstractGraph(ABC, Generic[Node]):
         for i, new_name in enumerate(remaining_translation):
             self.rename_node("\00" + str(i), remaining_translation[i])
 
+    def shuffle_nodes(self):
+        """Shuffle nodes.
+
+        >>> from smallgraphlib import random_graph
+        >>> g = random_graph(4, 7)
+        >>> g2 = g.copy()
+        >>> g2.shuffle_nodes()
+        >>> g == g2
+        ...  # probably False
+        >>> g.is_isomorphic(g2)
+        True
+        """
+        nodes = list(self.nodes)
+        random.shuffle(nodes)
+        self.rename_nodes(dict((old_name, new_name) for old_name, new_name in zip(self.nodes, nodes)))
+
+    # ------------
+    # Edge methods
+    # ------------
+
+    @cached_property
+    def edges(self) -> Tuple[Edge, ...]:
+        edges_count: CounterType[Edge] = Multiset()
+        for node in self.nodes:
+            for successor in self.successors(node):
+                edge: Edge = self._edge(node, successor)
+                edges_count[edge] += self.count_edges(node, successor)
+        if not self.is_directed:
+            for key in edges_count:
+                edges_count[key] //= 2
+        return tuple(edges_count.elements())
+
+    @cached_property
+    def edges_set(self) -> FrozenSet[Edge]:
+        return frozenset(self.edges)
+
     @staticmethod
     def _get_edge_extremities(edge: EdgeLike) -> Tuple[Node, Node]:
         nodes = iter(edge)
@@ -216,10 +268,116 @@ class AbstractGraph(ABC, Generic[Node]):
             # if self.is_directed:
             #     self._successors[end][start] -= 1
 
-    @property
+    # ----------
+    # Comparison
+    # ----------
+
+    def __eq__(self, other: Any):
+        # Attention, there may be multiple edges, so don't use sets to compare edges !
+        return (
+            type(self) == type(other)
+            and self.nodes_set == other.nodes_set
+            and Counter(self.edges) == Counter(other.edges)
+        )
+
     @abstractmethod
-    def is_directed(self) -> bool:
-        ...
+    def is_isomorphic_to(self, other) -> Union[bool, NotImplemented]:
+        if not isinstance(other, AbstractGraph):
+            return False
+
+        if self.order == 0:
+            return other.order == 0
+
+        def count_in_and_out_degrees(graph: AbstractGraph) -> CounterType[Tuple[int, int], int]:
+            return Counter((graph.in_out_degree(node) for node in graph.nodes))
+
+        if count_in_and_out_degrees(self) != count_in_and_out_degrees(other):
+            return False
+        assert self.order == other.order and self.degree == other.degree
+
+        # def group_nodes_by_degree(graph: AbstractGraph) -> Dict[Tuple[int, int], Node]:
+        #     """Return a dictionary, associating to each (in-degree, out-degree) couple a list of corresponding nodes."""
+        #     degree_groups = {}
+        #     for node in graph.nodes:
+        #         degree_groups.setdefault((graph.in_degree(node), graph.out_degree(node)), []).append(node)
+        #     return degree_groups
+
+        degrees_to_nodes_for_other_graph = {}
+        for node in other.nodes:
+            degrees_to_nodes_for_other_graph.setdefault(other.in_out_degree(node), []).append(node)
+        nodes_to_degrees_for_self = {node: self.in_out_degree(node) for node in self.nodes}
+
+        remaining_nodes = set(self.nodes)
+        used_nodes: List[Node] = [remaining_nodes.pop()]
+        corresponding_nodes_possibilities: List[Optional[List[Node]]] = [None]
+        match: Dict[Node, Node] = {}
+        order = self.order
+        while len(match) < order and len(used_nodes) > 0:
+            assert len(corresponding_nodes_possibilities) == len(used_nodes) == len(match) + 1
+            node = used_nodes[-1]
+            possibilities = corresponding_nodes_possibilities[-1]
+            if possibilities is None:  # First time we test this node
+                # Test for any possibilities to go further in this direction.
+                possibilities = []
+                for possibility in degrees_to_nodes_for_other_graph[nodes_to_degrees_for_self[node]]:
+                    # Test for adjacents nodes, and remove non-matching possibilities
+                    could_match = True
+                    for next_node in self.successors(node):
+                        corresponding_node = match.get(next_node)
+                        if corresponding_node is not None and corresponding_node not in other.successors(
+                            possibility
+                        ):
+                            could_match = False
+                            break
+                    if could_match:
+                        for previous_node in self.predecessors(node):
+                            corresponding_node = match.get(previous_node)
+                            if (
+                                corresponding_node is not None
+                                and corresponding_node not in other.predecessors(possibility)
+                            ):
+                                could_match = False
+                                break
+                    if could_match:
+                        possibilities.append(possibility)
+                corresponding_nodes_possibilities[-1] = possibilities
+
+            if len(possibilities) == 0:
+                # This attempt failed, so go back to previous step.
+                corresponding_nodes_possibilities.pop()
+                used_nodes.pop()
+                remaining_nodes.add(node)
+                # match.pop(node)
+                if used_nodes:
+                    # Remove other graph node from possibilities, as this branch of possibilities failed.
+                    corresponding_nodes_possibilities[-1].pop(0)
+                    match.pop()
+                # match_possibilities[-1][1].pop(0)
+                # node = match_possibilities
+
+                # if len(match_possibilities) == 0:
+
+                # Try a parallel branch.
+                #
+                ...
+            else:
+                # Test for first possibility
+                match
+                node = possibilities[0]
+                match[node] = possibilities[0]
+                # Select another node
+                # TODO: improve selection process ?
+                node = remaining_nodes.pop()
+            # Choose another node in currently unused nodes.
+            ...
+        return len(match) == order
+
+    # def _match(self, other, dict, other, match:dict=None):
+    #     for
+
+    # --------------
+    # Classification
+    # --------------
 
     @property
     def order(self) -> int:
@@ -229,30 +387,10 @@ class AbstractGraph(ABC, Generic[Node]):
     def degree(self) -> int:
         return sum(self.node_degree(node) for node in self.nodes) // 2
 
-    # Nodes must be ordered, to generate the matrix, so do *not* return a set.
-    @cached_property
-    def nodes(self) -> Tuple[Node, ...]:
-        return tuple(self._successors)
-
-    @cached_property
-    def nodes_set(self) -> FrozenSet[Node]:
-        return frozenset(self.nodes)
-
-    @cached_property
-    def edges(self) -> Tuple[Edge, ...]:
-        edges_count: CounterType[Edge] = Multiset()
-        for node in self.nodes:
-            for successor in self.successors(node):
-                edge: Edge = self._edge(node, successor)
-                edges_count[edge] += self.count_edges(node, successor)
-        if not self.is_directed:
-            for key in edges_count:
-                edges_count[key] //= 2
-        return tuple(edges_count.elements())
-
-    @cached_property
-    def edges_set(self) -> FrozenSet[Edge]:
-        return frozenset(self.edges)
+    @property
+    @abstractmethod
+    def is_directed(self) -> bool:
+        ...
 
     @cached_property
     def has_loop(self) -> bool:
@@ -301,11 +439,26 @@ class AbstractGraph(ABC, Generic[Node]):
             return self.in_degree(node) + self.out_degree(node)
         return self.out_degree(node)
 
+    @property
+    def all_degrees(self) -> Dict[Node, int]:
+        return {node: self.node_degree(node) for node in self.nodes}
+
+    @property
+    def all_in_degrees(self) -> Dict[Node, int]:
+        return {node: self.in_degree(node) for node in self.nodes}
+
+    @property
+    def all_out_degrees(self) -> Dict[Node, int]:
+        return {node: self.out_degree(node) for node in self.nodes}
+
     def in_degree(self, node: Node) -> int:
         return sum(self._predecessors[node].values())
 
     def out_degree(self, node: Node) -> int:
         return sum(self._successors[node].values())
+
+    def in_out_degree(self, node: Node) -> Tuple[int, int]:
+        return self.in_degree(node), self.out_degree(node)
 
     def successors(self, node: Node) -> Set[Node]:
         return set(self._successors[node])
