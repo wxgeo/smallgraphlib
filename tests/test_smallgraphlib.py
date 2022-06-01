@@ -348,3 +348,19 @@ def test_Multiset():
     assert set(s) == {"b", "c"}
     with pytest.raises(ValueError) as _:
         s["a"] -= 1
+
+
+def test_isomorphic_basic_case():
+    g1 = Graph((1,2,3), (1,2))
+    g2 = Graph((4,5,6), (5,6))
+    assert g1.is_isomorphic_to(g2)
+
+def test_non_isomorphic_with_same_degrees():
+    k33 = complete_bipartite_graph(3, 3)
+    isomorphic_to_k33 = graph("s1:s2,s3,s6 s2:s4,s5 s3:s4,s5 s4:s6 s5:s6 s6")
+    other_graph_with_same_degrees = graph("t1:t2,t5,t4 t2:t6,t3 t3:t6,t4 t4:t5 t5:t6 t6")
+    assert k33.order == isomorphic_to_k33.order == other_graph_with_same_degrees.order
+    assert k33.degree == isomorphic_to_k33.degree == other_graph_with_same_degrees.degree
+    assert not isomorphic_to_k33.is_isomorphic_to(other_graph_with_same_degrees)
+    assert isomorphic_to_k33.is_isomorphic_to(k33)
+    assert not other_graph_with_same_degrees.is_isomorphic_to(k33)

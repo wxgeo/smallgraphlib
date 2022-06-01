@@ -21,7 +21,7 @@ from typing import (
     Any,
     TypeVar,
     Generic,
-    Optional, Literal,
+    Optional,
 )
 import random
 
@@ -196,7 +196,7 @@ class AbstractGraph(ABC, Generic[Node]):
         >>> g2.shuffle_nodes()
         >>> g == g2
         ...  # probably False
-        >>> g.is_isomorphic(g2)
+        >>> g.is_isomorphic_to(g2)
         True
         """
         nodes = list(self.nodes)
@@ -281,96 +281,104 @@ class AbstractGraph(ABC, Generic[Node]):
         )
 
     @abstractmethod
-    def is_isomorphic_to(self, other) -> Union[bool, NotImplemented]:
+    def is_isomorphic_to(self, other) -> bool:
         if not isinstance(other, AbstractGraph):
             return False
 
         if self.order == 0:
             return other.order == 0
 
-        def count_in_and_out_degrees(graph: AbstractGraph) -> CounterType[Tuple[int, int], int]:
-            return Counter((graph.in_out_degree(node) for node in graph.nodes))
+        def count_in_and_out_degrees(graph: AbstractGraph) -> CounterType[Tuple[int, int]]:
+            return Counter((graph.in_out_degree(node_) for node_ in graph.nodes))
 
         if count_in_and_out_degrees(self) != count_in_and_out_degrees(other):
             return False
         assert self.order == other.order and self.degree == other.degree
-
-        # def group_nodes_by_degree(graph: AbstractGraph) -> Dict[Tuple[int, int], Node]:
-        #     """Return a dictionary, associating to each (in-degree, out-degree) couple a list of corresponding nodes."""
-        #     degree_groups = {}
-        #     for node in graph.nodes:
-        #         degree_groups.setdefault((graph.in_degree(node), graph.out_degree(node)), []).append(node)
-        #     return degree_groups
 
         degrees_to_nodes_for_other_graph = {}
         for node in other.nodes:
             degrees_to_nodes_for_other_graph.setdefault(other.in_out_degree(node), []).append(node)
         nodes_to_degrees_for_self = {node: self.in_out_degree(node) for node in self.nodes}
 
-        remaining_nodes = set(self.nodes)
-        used_nodes: List[Node] = [remaining_nodes.pop()]
-        corresponding_nodes_possibilities: List[Optional[List[Node]]] = [None]
-        match: Dict[Node, Node] = {}
+        remaining_self_nodes = set(self.nodes)
+        remaining_other_nodes = set(other.nodes)
+        used_nodes: List[Node] = [remaining_self_nodes.pop()]
+        corresponding_nodes_possibilities: Dict[Node, Optional[List[Node]]] = {}
+        reversed_mapping = {}
         order = self.order
-        while len(match) < order and len(used_nodes) > 0:
-            assert len(corresponding_nodes_possibilities) == len(used_nodes) == len(match) + 1
+
+        def test_possibility(candidate: Node) -> bool:
+            """Test if this possibility matches with already detected corresponding nodes."""
+            for self_method, other_method in (
+                (self.successors, other.successors),
+                (self.predecessors, other.predecessors),
+            ):
+                for adjacent_node in self_method(node):
+                    try:
+                        corresponding_node = corresponding_nodes_possibilities[adjacent_node][0]
+                        if corresponding_node not in other_method(candidate):
+                            return False
+                    except KeyError:
+                        pass
+                for adjacent_node in other_method(candidate):
+                    try:
+                        corresponding_node = reversed_mapping[adjacent_node]
+                        if corresponding_node not in self_method(node):
+                            return False
+                    except KeyError:
+                        pass
+            return True
+
+        while len(used_nodes) > 0:
             node = used_nodes[-1]
-            possibilities = corresponding_nodes_possibilities[-1]
+            possibilities = corresponding_nodes_possibilities.get(node)
             if possibilities is None:  # First time we test this node
                 # Test for any possibilities to go further in this direction.
                 possibilities = []
                 for possibility in degrees_to_nodes_for_other_graph[nodes_to_degrees_for_self[node]]:
-                    # Test for adjacents nodes, and remove non-matching possibilities
-                    could_match = True
-                    for next_node in self.successors(node):
-                        corresponding_node = match.get(next_node)
-                        if corresponding_node is not None and corresponding_node not in other.successors(
-                            possibility
-                        ):
-                            could_match = False
-                            break
-                    if could_match:
-                        for previous_node in self.predecessors(node):
-                            corresponding_node = match.get(previous_node)
-                            if (
-                                corresponding_node is not None
-                                and corresponding_node not in other.predecessors(possibility)
-                            ):
-                                could_match = False
-                                break
-                    if could_match:
+                    if possibility in remaining_other_nodes and test_possibility(possibility):
                         possibilities.append(possibility)
-                corresponding_nodes_possibilities[-1] = possibilities
+                corresponding_nodes_possibilities[node] = possibilities
 
             if len(possibilities) == 0:
-                # This attempt failed, so go back to previous step.
-                corresponding_nodes_possibilities.pop()
+                # This branch of possibilities failed, so go back to previous step.
                 used_nodes.pop()
-                remaining_nodes.add(node)
-                # match.pop(node)
+                corresponding_nodes_possibilities.pop(node)
+                remaining_self_nodes.add(node)
                 if used_nodes:
                     # Remove other graph node from possibilities, as this branch of possibilities failed.
-                    corresponding_nodes_possibilities[-1].pop(0)
-                    match.pop()
-                # match_possibilities[-1][1].pop(0)
-                # node = match_possibilities
-
-                # if len(match_possibilities) == 0:
-
-                # Try a parallel branch.
-                #
-                ...
+                    previous_node = used_nodes[-1]
+                    registered_corresponding_node = corresponding_nodes_possibilities[previous_node].pop(0)
+                    remaining_other_nodes.add(registered_corresponding_node)
+                    del reversed_mapping[registered_corresponding_node]
             else:
-                # Test for first possibility
-                match
-                node = possibilities[0]
-                match[node] = possibilities[0]
-                # Select another node
-                # TODO: improve selection process ?
-                node = remaining_nodes.pop()
-            # Choose another node in currently unused nodes.
-            ...
-        return len(match) == order
+                # For now, assume that first possibility is correct.
+                remaining_other_nodes.remove(possibilities[0])
+                reversed_mapping[possibilities[0]] = node
+                # Select another node to go ahead in matching process.
+                # We'll choose a random node in currently unused nodes.
+                # TODO: improve selection process ? It may be better to select an adjacent node, if any ?
+                try:
+                    used_nodes.append(remaining_self_nodes.pop())
+                except KeyError:  # No remaining node
+                    assert len(corresponding_nodes_possibilities) == order
+                    assert len(reversed_mapping) == order
+                    assert len(remaining_self_nodes) == 0
+                    assert len(remaining_other_nodes) == 0
+                    # Test for correctness
+                    copy = self.copy()
+                    mapping = {
+                        node: possibilities[0]
+                        for node, possibilities in corresponding_nodes_possibilities.items()
+                    }
+                    copy.rename_nodes(mapping)
+                    assert copy == other
+                    return True
+        assert len(corresponding_nodes_possibilities) == 0
+        assert len(reversed_mapping) == 0
+        assert len(remaining_self_nodes) == order
+        assert len(remaining_other_nodes) == order
+        return False
 
     # def _match(self, other, dict, other, match:dict=None):
     #     for
@@ -608,6 +616,9 @@ class Graph(AbstractGraph):
     >>> G = Graph((1, 2, 3), {1, 3}, {1, 2}, {2, 1}, {1})
     """
 
+    def is_isomorphic_to(self, other) -> bool:
+        return super().is_isomorphic_to(other)
+
     def __repr__(self):
         edges = (repr(set(edge)) for edge in self.edges)
         return f"Graph({tuple(self.nodes)!r}, {', '.join(edges)})"
@@ -679,6 +690,9 @@ class DirectedGraph(AbstractGraph):
 
     >>> G = DirectedGraph((1, 2, 3), (1, 3), (1, 2), (2, 1), (1, 1))
     """
+
+    def is_isomorphic_to(self, other) -> bool:
+        return super().is_isomorphic_to(other)
 
     def __repr__(self):
         edges = (repr(edge) for edge in self.edges)
