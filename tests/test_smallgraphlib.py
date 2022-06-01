@@ -351,9 +351,10 @@ def test_Multiset():
 
 
 def test_isomorphic_basic_case():
-    g1 = Graph((1,2,3), (1,2))
-    g2 = Graph((4,5,6), (5,6))
+    g1 = Graph((1, 2, 3), (1, 2))
+    g2 = Graph((4, 5, 6), (5, 6))
     assert g1.is_isomorphic_to(g2)
+
 
 def test_non_isomorphic_with_same_degrees():
     k33 = complete_bipartite_graph(3, 3)

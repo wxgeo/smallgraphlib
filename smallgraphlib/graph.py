@@ -295,7 +295,7 @@ class AbstractGraph(ABC, Generic[Node]):
             return False
         assert self.order == other.order and self.degree == other.degree
 
-        degrees_to_nodes_for_other_graph = {}
+        degrees_to_nodes_for_other_graph: Dict[Tuple[int, int], List[Node]] = {}
         for node in other.nodes:
             degrees_to_nodes_for_other_graph.setdefault(other.in_out_degree(node), []).append(node)
         nodes_to_degrees_for_self = {node: self.in_out_degree(node) for node in self.nodes}
@@ -304,18 +304,22 @@ class AbstractGraph(ABC, Generic[Node]):
         remaining_other_nodes = set(other.nodes)
         used_nodes: List[Node] = [remaining_self_nodes.pop()]
         corresponding_nodes_possibilities: Dict[Node, Optional[List[Node]]] = {}
-        reversed_mapping = {}
+        reversed_mapping: Dict[Node, Node] = {}
         order = self.order
+
+        adjacency_test_methods = [(self.successors, other.successors)]
+        # If graph is undirected, predecessors are also successors, so no need to test twice.
+        if self.is_directed:
+            adjacency_test_methods.append((self.predecessors, other.predecessors))
 
         def test_possibility(candidate: Node) -> bool:
             """Test if this possibility matches with already detected corresponding nodes."""
-            for self_method, other_method in (
-                (self.successors, other.successors),
-                (self.predecessors, other.predecessors),
-            ):
+            for self_method, other_method in adjacency_test_methods:
                 for adjacent_node in self_method(node):
                     try:
-                        corresponding_node = corresponding_nodes_possibilities[adjacent_node][0]
+                        _possibilities = corresponding_nodes_possibilities[adjacent_node]
+                        assert _possibilities is not None and len(_possibilities) > 0
+                        corresponding_node = _possibilities[0]
                         if corresponding_node not in other_method(candidate):
                             return False
                     except KeyError:
@@ -348,7 +352,9 @@ class AbstractGraph(ABC, Generic[Node]):
                 if used_nodes:
                     # Remove other graph node from possibilities, as this branch of possibilities failed.
                     previous_node = used_nodes[-1]
-                    registered_corresponding_node = corresponding_nodes_possibilities[previous_node].pop(0)
+                    previous_possibilities = corresponding_nodes_possibilities[previous_node]
+                    assert previous_possibilities is not None and len(previous_possibilities) > 0
+                    registered_corresponding_node = previous_possibilities.pop(0)
                     remaining_other_nodes.add(registered_corresponding_node)
                     del reversed_mapping[registered_corresponding_node]
             else:
@@ -368,7 +374,7 @@ class AbstractGraph(ABC, Generic[Node]):
                     # Test for correctness
                     copy = self.copy()
                     mapping = {
-                        node: possibilities[0]
+                        node: possibilities[0]  # type: ignore
                         for node, possibilities in corresponding_nodes_possibilities.items()
                     }
                     copy.rename_nodes(mapping)
