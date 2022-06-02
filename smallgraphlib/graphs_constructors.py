@@ -1,11 +1,18 @@
 import random
 from typing import List, Tuple
 
-from smallgraphlib import Graph, WeightedDirectedGraph, LabeledDirectedGraph, LabeledGraph, WeightedGraph
+from smallgraphlib import (
+    Graph,
+    WeightedDirectedGraph,
+    LabeledDirectedGraph,
+    LabeledGraph,
+    WeightedGraph,
+)
 from smallgraphlib.graph import (
     _TIKZ_EXPORT_MAX_MULTIPLE_EDGES_SUPPORT,
     _TIKZ_EXPORT_MAX_MULTIPLE_LOOPS_SUPPORT,
-    DirectedGraph, AbstractGraph,
+    DirectedGraph,
+    AbstractGraph,
 )
 from smallgraphlib.utilities import Multiset
 
@@ -55,7 +62,10 @@ def complete_graph(n: int):
 
 def complete_bipartite_graph(n: int, m: int):
     """Return complete bipartite graph K(n, m)."""
-    return Graph(range(1, m + n + 1), *((i, j) for i in range(1, n + 1) for j in range(n + 1, n + 1 + m)))
+    return Graph(
+        range(1, m + n + 1),
+        *((i, j) for i in range(1, n + 1) for j in range(n + 1, n + 1 + m)),
+    )
 
 
 def random_graph(
@@ -112,7 +122,9 @@ def random_graph(
     if directed:
         max_degree = order * (max_multiple_loops + (order - 1) * max_multiple_edges)
     else:
-        max_degree = order * max_multiple_loops + (order * (order - 1) * max_multiple_edges) // 2
+        max_degree = (
+            order * max_multiple_loops + (order * (order - 1) * max_multiple_edges) // 2
+        )
 
     if degree > max_degree:
         raise ValueError(f"Degree must not exceed {max_degree} with given contraints.")
@@ -129,7 +141,8 @@ def random_graph(
                 {
                     end: (max_multiple_loops if start == end else max_multiple_edges)
                     for end in nodes
-                    if directed or start <= end  # for undirected graph, only keep start <= end
+                    if directed
+                    or start <= end  # for undirected graph, only keep start <= end
                 }
             )
         ).total()

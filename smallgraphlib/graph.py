@@ -87,7 +87,9 @@ class AbstractGraph(ABC, Generic[Node]):
             node, *remaining = substring.split(":", 1)
             nodes.append(node.strip())
             if remaining:
-                edges.extend((node, successor.strip()) for successor in remaining[0].split(","))
+                edges.extend(
+                    (node, successor.strip()) for successor in remaining[0].split(",")
+                )
         return cls(nodes, *edges)  # type: ignore
 
     # ------------
@@ -131,9 +133,13 @@ class AbstractGraph(ABC, Generic[Node]):
     def rename_node(self, old_name: Node, new_name: Node) -> None:
         """Rename node. New name must not be already present, else a `NameError` will be raised."""
         if new_name in self.nodes:
-            raise NameError(f"Conflicting names: this graph already has a node named {new_name!r}")
+            raise NameError(
+                f"Conflicting names: this graph already has a node named {new_name!r}"
+            )
         for dictionary in (self._successors, self._predecessors):
-            for node, counter in list(dictionary.items()):  # make a copy, since we modify the dictionary.
+            for node, counter in list(
+                dictionary.items()
+            ):  # make a copy, since we modify the dictionary.
                 if node == old_name:
                     dictionary[new_name] = dictionary.pop(old_name)
                 if old_name in counter:
@@ -201,7 +207,9 @@ class AbstractGraph(ABC, Generic[Node]):
         """
         nodes = list(self.nodes)
         random.shuffle(nodes)
-        self.rename_nodes(dict((old_name, new_name) for old_name, new_name in zip(self.nodes, nodes)))
+        self.rename_nodes(
+            dict((old_name, new_name) for old_name, new_name in zip(self.nodes, nodes))
+        )
 
     # ------------
     # Edge methods
@@ -288,7 +296,9 @@ class AbstractGraph(ABC, Generic[Node]):
         if self.order == 0:
             return other.order == 0
 
-        def count_in_and_out_degrees(graph: AbstractGraph) -> CounterType[Tuple[int, int]]:
+        def count_in_and_out_degrees(
+            graph: AbstractGraph,
+        ) -> CounterType[Tuple[int, int]]:
             return Counter((graph.in_out_degree(node_) for node_ in graph.nodes))
 
         if count_in_and_out_degrees(self) != count_in_and_out_degrees(other):
@@ -297,8 +307,12 @@ class AbstractGraph(ABC, Generic[Node]):
 
         degrees_to_nodes_for_other_graph: Dict[Tuple[int, int], List[Node]] = {}
         for node in other.nodes:
-            degrees_to_nodes_for_other_graph.setdefault(other.in_out_degree(node), []).append(node)
-        nodes_to_degrees_for_self = {node: self.in_out_degree(node) for node in self.nodes}
+            degrees_to_nodes_for_other_graph.setdefault(
+                other.in_out_degree(node), []
+            ).append(node)
+        nodes_to_degrees_for_self = {
+            node: self.in_out_degree(node) for node in self.nodes
+        }
 
         remaining_self_nodes = set(self.nodes)
         remaining_other_nodes = set(other.nodes)
@@ -317,7 +331,9 @@ class AbstractGraph(ABC, Generic[Node]):
             for self_method, other_method in adjacency_test_methods:
                 for adjacent_node in self_method(node):
                     try:
-                        _possibilities = corresponding_nodes_possibilities[adjacent_node]
+                        _possibilities = corresponding_nodes_possibilities[
+                            adjacent_node
+                        ]
                         assert _possibilities is not None and len(_possibilities) > 0
                         corresponding_node = _possibilities[0]
                         if corresponding_node not in other_method(candidate):
@@ -339,8 +355,12 @@ class AbstractGraph(ABC, Generic[Node]):
             if possibilities is None:  # First time we test this node
                 # Test for any possibilities to go further in this direction.
                 possibilities = []
-                for possibility in degrees_to_nodes_for_other_graph[nodes_to_degrees_for_self[node]]:
-                    if possibility in remaining_other_nodes and test_possibility(possibility):
+                for possibility in degrees_to_nodes_for_other_graph[
+                    nodes_to_degrees_for_self[node]
+                ]:
+                    if possibility in remaining_other_nodes and test_possibility(
+                        possibility
+                    ):
                         possibilities.append(possibility)
                 corresponding_nodes_possibilities[node] = possibilities
 
@@ -352,8 +372,13 @@ class AbstractGraph(ABC, Generic[Node]):
                 if used_nodes:
                     # Remove other graph node from possibilities, as this branch of possibilities failed.
                     previous_node = used_nodes[-1]
-                    previous_possibilities = corresponding_nodes_possibilities[previous_node]
-                    assert previous_possibilities is not None and len(previous_possibilities) > 0
+                    previous_possibilities = corresponding_nodes_possibilities[
+                        previous_node
+                    ]
+                    assert (
+                        previous_possibilities is not None
+                        and len(previous_possibilities) > 0
+                    )
                     registered_corresponding_node = previous_possibilities.pop(0)
                     remaining_other_nodes.add(registered_corresponding_node)
                     del reversed_mapping[registered_corresponding_node]
@@ -485,7 +510,10 @@ class AbstractGraph(ABC, Generic[Node]):
 
     @cached_property
     def adjacency_matrix(self) -> Tuple[Tuple[int, ...], ...]:
-        return tuple(tuple(self.count_edges(start, end) for end in self.nodes) for start in self.nodes)
+        return tuple(
+            tuple(self.count_edges(start, end) for end in self.nodes)
+            for start in self.nodes
+        )
 
     @abstractmethod
     def are_adjacents(self, node1: Node, node2: Node) -> bool:
@@ -567,13 +595,17 @@ class AbstractGraph(ABC, Generic[Node]):
         lines.append(r"\end{tikzpicture}")
         return "\n".join(lines)
 
-    def _dijkstra(self, start: Node, end: Node = None) -> Tuple[Dict[Node, float], Dict[Node, List[Node]]]:
+    def _dijkstra(
+        self, start: Node, end: Node = None
+    ) -> Tuple[Dict[Node, float], Dict[Node, List[Node]]]:
         """Implementation of Dijkstra Algorithm."""
         if start not in self.nodes:
             raise ValueError(f"Unknown node {start!r}.")
         if end is not None and end not in self.nodes:
             raise ValueError(f"Unknown node {end!r}.")
-        lengths: Dict[Node, float] = {node: (0 if node == start else inf) for node in self.nodes}
+        lengths: Dict[Node, float] = {
+            node: (0 if node == start else inf) for node in self.nodes
+        }
         last_step: Dict[Node, List[Node]] = {node: [] for node in self.nodes}
         never_selected_nodes = set(self.nodes)
         selected_node = start
@@ -589,7 +621,9 @@ class AbstractGraph(ABC, Generic[Node]):
                     last_step[successor] = [selected_node]
                 elif new_length == lengths[successor]:
                     last_step[successor].append(selected_node)
-            selected_node = min(never_selected_nodes, key=(lambda node_: lengths[node_]))
+            selected_node = min(
+                never_selected_nodes, key=(lambda node_: lengths[node_])
+            )
         return lengths, last_step
 
     def distance(self, start: Node, end: Node) -> float:
@@ -599,7 +633,9 @@ class AbstractGraph(ABC, Generic[Node]):
 
     @cached_property
     def diameter(self) -> float:
-        return max(self.distance(node1, node2) for node1 in self.nodes for node2 in self.nodes)
+        return max(
+            self.distance(node1, node2) for node1 in self.nodes for node2 in self.nodes
+        )
 
     def shortest_paths(self, start: Node, end: Node) -> Tuple[float, List[List[Node]]]:
         """Implementation of Dijkstra Algorithm."""
@@ -656,10 +692,15 @@ class Graph(AbstractGraph):
     def greedy_coloring(self) -> Dict[Node, int]:
         coloring: Dict[Node, int] = {}
         # Sort nodes by reversed degree, then alphabetically
-        nodes = sorted(self.nodes, key=(lambda _node: (-self.node_degree(_node), _node)))
+        nodes = sorted(
+            self.nodes, key=(lambda _node: (-self.node_degree(_node), _node))
+        )
         for node in nodes:
             color_num = 0
-            while any(coloring.get(adjacent) == color_num for adjacent in self.successors(node)):
+            while any(
+                coloring.get(adjacent) == color_num
+                for adjacent in self.successors(node)
+            ):
                 color_num += 1
             coloring[node] = color_num
         return coloring
@@ -678,7 +719,9 @@ class Graph(AbstractGraph):
         return WeightedGraph(self.nodes, *(weighted_edge(edge) for edge in self.edges))
 
     def is_subgraph_stable(self, *nodes: Node) -> bool:
-        return not any(self.are_adjacents(node1, node2) for node1 in nodes for node2 in nodes)
+        return not any(
+            self.are_adjacents(node1, node2) for node1 in nodes for node2 in nodes
+        )
 
     @cached_property
     def is_complete_bipartite(self) -> bool:
@@ -688,7 +731,11 @@ class Graph(AbstractGraph):
             return False
         if not self.is_subgraph_stable(*other_group):
             return False
-        return all(self.are_adjacents(node1, node2) for node1 in nodes_group for node2 in other_group)
+        return all(
+            self.are_adjacents(node1, node2)
+            for node1 in nodes_group
+            for node2 in other_group
+        )
 
 
 class DirectedGraph(AbstractGraph):
@@ -744,7 +791,9 @@ class DirectedGraph(AbstractGraph):
             graph.remove_nodes(*level)
             levels.append(frozenset(level))
         if graph.order != 0:
-            raise CycleFoundError("Can't split the graph into levels, since it has a closed path.")
+            raise CycleFoundError(
+                "Can't split the graph into levels, since it has a closed path."
+            )
         return tuple(levels)
 
     @cached_property
@@ -763,7 +812,9 @@ class DirectedGraph(AbstractGraph):
                 break
             graph.remove_nodes(*nodes_to_remove)
         if graph.order != 0:
-            raise CycleFoundError("Can't compute the graph's kernel, since it has a closed path.")
+            raise CycleFoundError(
+                "Can't compute the graph's kernel, since it has a closed path."
+            )
         return frozenset(kernel)
 
     @cached_property
@@ -787,7 +838,9 @@ class DirectedGraph(AbstractGraph):
     @cached_property
     def is_strongly_connected(self):
         node = next(iter(self.nodes))
-        return self._test_connection_from_node(node) and self.reversed_graph._test_connection_from_node(node)
+        return self._test_connection_from_node(
+            node
+        ) and self.reversed_graph._test_connection_from_node(node)
 
     @cached_property
     def is_connected(self):

@@ -210,7 +210,21 @@ def test_simple():
 
 def test_shortest_paths():
     g = WeightedGraph.from_dict(
-        AB=1, BG=9, FC=1, FD=5, AG=9, BC=8, AF=5, BF=7, BD=12, CD=3, FE=2, ED=7, GE=1, GD=2, AE=3
+        AB=1,
+        BG=9,
+        FC=1,
+        FD=5,
+        AG=9,
+        BC=8,
+        AF=5,
+        BF=7,
+        BD=12,
+        CD=3,
+        FE=2,
+        ED=7,
+        GE=1,
+        GD=2,
+        AE=3,
     )
     assert {node: g.node_degree(node) for node in g.nodes} == {
         "A": 4,
@@ -359,9 +373,13 @@ def test_isomorphic_basic_case():
 def test_non_isomorphic_with_same_degrees():
     k33 = complete_bipartite_graph(3, 3)
     isomorphic_to_k33 = graph("s1:s2,s3,s6 s2:s4,s5 s3:s4,s5 s4:s6 s5:s6 s6")
-    other_graph_with_same_degrees = graph("t1:t2,t5,t4 t2:t6,t3 t3:t6,t4 t4:t5 t5:t6 t6")
+    other_graph_with_same_degrees = graph(
+        "t1:t2,t5,t4 t2:t6,t3 t3:t6,t4 t4:t5 t5:t6 t6"
+    )
     assert k33.order == isomorphic_to_k33.order == other_graph_with_same_degrees.order
-    assert k33.degree == isomorphic_to_k33.degree == other_graph_with_same_degrees.degree
+    assert (
+        k33.degree == isomorphic_to_k33.degree == other_graph_with_same_degrees.degree
+    )
     assert not isomorphic_to_k33.is_isomorphic_to(other_graph_with_same_degrees)
     assert isomorphic_to_k33.is_isomorphic_to(k33)
     assert not other_graph_with_same_degrees.is_isomorphic_to(k33)

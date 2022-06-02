@@ -30,7 +30,9 @@ class AbstractLabeledGraph(AbstractGraph, ABC, Generic[Label]):
         super().__init__(nodes, *edges, sort_nodes=sort_nodes)
 
     def __eq__(self, other: Any):
-        return super().__eq__(other) and all(self.labels[edge] == other.labels[edge] for edge in self.edges)
+        return super().__eq__(other) and all(
+            self.labels[edge] == other.labels[edge] for edge in self.edges
+        )
 
     @classmethod
     def from_dict(cls, edge_label_dict: dict = None, /, **edge_label):
@@ -54,7 +56,9 @@ class AbstractLabeledGraph(AbstractGraph, ABC, Generic[Label]):
         If no label is given, `None` is stored by default.
         """
         # Convert spaces inside labels to null character, to make splitting easier.
-        string = re.sub("""'[^']*'|"[^"]*""", (lambda m: m.group().replace(" ", "\x00")), string)
+        string = re.sub(
+            """'[^']*'|"[^"]*""", (lambda m: m.group().replace(" ", "\x00")), string
+        )
         nodes: List[str] = []
         edges: List[Tuple[str, str, Any]] = []
         label: Any

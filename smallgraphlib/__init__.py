@@ -7,7 +7,12 @@ from smallgraphlib.labeled_graph import (
     LabeledGraph,
     LabeledDirectedGraph,
 )
-from smallgraphlib.graphs_constructors import complete_graph, complete_bipartite_graph, graph, random_graph
+from smallgraphlib.graphs_constructors import (
+    complete_graph,
+    complete_bipartite_graph,
+    graph,
+    random_graph,
+)
 
 __version__ = metadata.version(__package__)
 
