@@ -415,6 +415,11 @@ def test_dfs():
     assert tuple(g.depth_first_search(order=Traversal.INORDER)) == (2, 1, 3, 0, 5, 4, 6)
 
 
+def test_bfs():
+    g = Graph(range(7), (0, 1), (0, 4), (1, 2), (1, 3), (4, 5), (4, 6))
+    assert tuple(g.breadth_first_search()) == (0, 1, 4, 2, 3, 5, 6)
+
+
 def test_binary_tree_and_dfs():
     g = perfect_binary_tree(4)
     assert g.nodes_set == {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15}

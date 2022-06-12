@@ -1,6 +1,6 @@
 import random
 from abc import ABC, abstractmethod
-from collections import Counter
+from collections import Counter, deque
 from enum import Enum
 from itertools import chain
 from math import inf
@@ -729,3 +729,14 @@ class AbstractGraph(ABC, Generic[Node]):
             return self.nodes_set == set(self._iterative_depth_first_search(error_if_already_visited=True))
         except NodeAlreadyFoundError:
             return False
+
+    def breadth_first_search(self, start: Node = None) -> Iterator[Node]:
+        if start is None:
+            start = self.nodes[0]
+        queue = deque([start])
+        visited: Set[Node] = set()
+        while queue:
+            node = queue.popleft()
+            visited.add(node)
+            yield node
+            queue.extend(successor for successor in self._successors[node] if successor not in visited)
