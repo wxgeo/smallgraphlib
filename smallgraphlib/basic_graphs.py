@@ -59,15 +59,10 @@ class Graph(AbstractGraph):
     def greedy_coloring(self) -> Dict[Node, int]:
         coloring: Dict[Node, int] = {}
         # Sort nodes by reversed degree, then alphabetically
-        nodes = sorted(
-            self.nodes, key=(lambda _node: (-self.node_degree(_node), _node))
-        )
+        nodes = sorted(self.nodes, key=(lambda _node: (-self.node_degree(_node), _node)))
         for node in nodes:
             color_num = 0
-            while any(
-                coloring.get(adjacent) == color_num
-                for adjacent in self.successors(node)
-            ):
+            while any(coloring.get(adjacent) == color_num for adjacent in self.successors(node)):
                 color_num += 1
             coloring[node] = color_num
         return coloring
@@ -86,9 +81,7 @@ class Graph(AbstractGraph):
         return WeightedGraph(self.nodes, *(weighted_edge(edge) for edge in self.edges))
 
     def is_subgraph_stable(self, *nodes: Node) -> bool:
-        return not any(
-            self.are_adjacents(node1, node2) for node1 in nodes for node2 in nodes
-        )
+        return not any(self.are_adjacents(node1, node2) for node1 in nodes for node2 in nodes)
 
     @cached_property
     def is_complete_bipartite(self) -> bool:
@@ -106,11 +99,7 @@ class Graph(AbstractGraph):
             return False
         if not self.is_subgraph_stable(*other_group):
             return False
-        return all(
-            self.are_adjacents(node1, node2)
-            for node1 in nodes_group
-            for node2 in other_group
-        )
+        return all(self.are_adjacents(node1, node2) for node1 in nodes_group for node2 in other_group)
 
 
 class DirectedGraph(AbstractGraph):
@@ -166,9 +155,7 @@ class DirectedGraph(AbstractGraph):
             graph.remove_nodes(*level)
             levels.append(frozenset(level))
         if graph.order != 0:
-            raise CycleFoundError(
-                "Can't split the graph into levels, since it has a closed path."
-            )
+            raise CycleFoundError("Can't split the graph into levels, since it has a closed path.")
         return tuple(levels)
 
     @cached_property
@@ -187,9 +174,7 @@ class DirectedGraph(AbstractGraph):
                 break
             graph.remove_nodes(*nodes_to_remove)
         if graph.order != 0:
-            raise CycleFoundError(
-                "Can't compute the graph's kernel, since it has a closed path."
-            )
+            raise CycleFoundError("Can't compute the graph's kernel, since it has a closed path.")
         return frozenset(kernel)
 
     @cached_property
@@ -213,9 +198,7 @@ class DirectedGraph(AbstractGraph):
     @cached_property
     def is_strongly_connected(self):
         node = next(iter(self.nodes))
-        return self._test_connection_from_node(
-            node
-        ) and self.reversed_graph._test_connection_from_node(node)
+        return self._test_connection_from_node(node) and self.reversed_graph._test_connection_from_node(node)
 
     @cached_property
     def is_connected(self):

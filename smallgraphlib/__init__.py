@@ -31,5 +31,5 @@ __all__ = [
     "graph",
     "complete_bipartite_graph",
     "perfect_binary_tree",
-    "Traversal"
+    "Traversal",
 ]

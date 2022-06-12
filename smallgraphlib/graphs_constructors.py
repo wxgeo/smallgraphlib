@@ -15,6 +15,7 @@ from smallgraphlib.core import (
     _TIKZ_EXPORT_MAX_MULTIPLE_EDGES_SUPPORT,
     _TIKZ_EXPORT_MAX_MULTIPLE_LOOPS_SUPPORT,
     AbstractGraph,
+    Edge,
 )
 from smallgraphlib.utilities import Multiset
 
@@ -76,8 +77,8 @@ def perfect_binary_tree(height: int):
 
     In a perfect binary tree, each node has two children, except in last level.
     """
-    nodes = []
-    edges = []
+    nodes: List[int] = []
+    edges: List[Edge] = []
     i = 1
     for level in range(height):
         nodes.extend(range(1 << level, 1 << level + 1))
@@ -143,9 +144,7 @@ def random_graph(
     if directed:
         max_degree = order * (max_multiple_loops + (order - 1) * max_multiple_edges)
     else:
-        max_degree = (
-            order * max_multiple_loops + (order * (order - 1) * max_multiple_edges) // 2
-        )
+        max_degree = order * max_multiple_loops + (order * (order - 1) * max_multiple_edges) // 2
 
     if degree > max_degree:
         raise ValueError(f"Degree must not exceed {max_degree} with given contraints.")
@@ -162,8 +161,7 @@ def random_graph(
                 {
                     end: (max_multiple_loops if start == end else max_multiple_edges)
                     for end in nodes
-                    if directed
-                    or start <= end  # for undirected graph, only keep start <= end
+                    if directed or start <= end  # for undirected graph, only keep start <= end
                 }
             )
         ).total()

@@ -394,8 +394,24 @@ def test_dfs():
     assert tuple(g.depth_first_search(3, order=Traversal.POSTORDER)) == (4, 5, 1, 2, 3)
     assert tuple(g.depth_first_search(3, order=Traversal.INORDER)) == (4, 3, 5, 2, 1)
     g = Graph(range(7), (0, 1), (0, 4), (1, 2), (1, 3), (4, 5), (4, 6))
-    assert tuple(g.depth_first_search(order=Traversal.PREORDER)) == (0, 1, 2, 3, 4, 5, 6)
-    assert tuple(g.depth_first_search(order=Traversal.POSTORDER)) == (2, 3, 1, 5, 6, 4, 0)
+    assert tuple(g.depth_first_search(order=Traversal.PREORDER)) == (
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+    )
+    assert tuple(g.depth_first_search(order=Traversal.POSTORDER)) == (
+        2,
+        3,
+        1,
+        5,
+        6,
+        4,
+        0,
+    )
     assert tuple(g.depth_first_search(order=Traversal.INORDER)) == (2, 1, 3, 0, 5, 4, 6)
 
 
@@ -421,7 +437,23 @@ def test_binary_tree_and_dfs():
             {15, 7},
         )
     )
-    assert list(g._iterative_depth_first_search()) == [1, 2, 4, 8, 9, 5, 10, 11, 3, 6, 12, 13, 7, 14, 15]
+    assert list(g._iterative_depth_first_search()) == [
+        1,
+        2,
+        4,
+        8,
+        9,
+        5,
+        10,
+        11,
+        3,
+        6,
+        12,
+        13,
+        7,
+        14,
+        15,
+    ]
     assert g.is_a_tree
     assert g.is_acyclic
     g.add_edges((1, 15))

@@ -645,11 +645,11 @@ class AbstractGraph(ABC, Generic[Node]):
         if start is None:
             start = self.nodes[0]
         stack: List[Node] = [start]
-        previous_nodes: List[Node] = [None]
+        previous_nodes: List[Optional[Node]] = [None]
         # If the graph isn't a rooted tree, there is no notion of parent.
-        # If we want to use DFS to test if the graph is a tree, we must try to visit all adjacents nodes except the one
-        # we come from, and see if there were already visited. So we must keep track of the node we come from
-        # for each node of the stack.
+        # If we want to use DFS to test if the graph is a tree, we must try to visit all adjacents nodes
+        # except the one we come from, and see if there were already visited.
+        # So we must keep track of the node we come from for each node of the stack.
         visited: Set[Node] = set()
         while stack:
             node = stack.pop()
@@ -665,11 +665,12 @@ class AbstractGraph(ABC, Generic[Node]):
             elif error_if_already_visited:
                 raise NodeAlreadyFoundError
 
-    def depth_first_search(self, start: Node = None, *, order: Traversal = Traversal.PREORDER) -> Iterator[Node]:
+    def depth_first_search(
+        self, start: Node = None, *, order: Traversal = Traversal.PREORDER
+    ) -> Iterator[Node]:
         """Recursive implementation of DFS (Depth First Search)."""
         if start is None:
             start = self.nodes[0]
-        stack: List[Node] = [start]
         visited: Set[Node] = set()
         if not isinstance(order, Traversal):
             raise NotImplementedError(
@@ -693,7 +694,9 @@ class AbstractGraph(ABC, Generic[Node]):
         def inorder_dfs(node):
             visited.add(node)
             # Eliminate visited nodes from the list of successors *before* splitting it.
-            successors: List[Node] = [successor for successor in self._successors[node] if successor not in visited]
+            successors: List[Node] = [
+                successor for successor in self._successors[node] if successor not in visited
+            ]
             for successor in successors[:1]:
                 yield from inorder_dfs(successor)
             yield node
@@ -711,7 +714,7 @@ class AbstractGraph(ABC, Generic[Node]):
     def is_acyclic(self) -> bool:
         """Use DFS to test if the graph contains a cycle."""
         try:
-            for node in self._iterative_depth_first_search(error_if_already_visited=True):
+            for _ in self._iterative_depth_first_search(error_if_already_visited=True):
                 pass
         except NodeAlreadyFoundError:
             return False
