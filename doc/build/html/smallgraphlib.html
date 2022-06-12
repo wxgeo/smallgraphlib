@@ -1,0 +1,1203 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>smallgraphlib package &mdash; SmallGraphLib 0.4.0 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="_static/doctools.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="smallgraphlib" href="modules.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> SmallGraphLib
+          </a>
+              <div class="version">
+                0.4.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="readme.html">Small Graph Lib</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">smallgraphlib</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">smallgraphlib package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-smallgraphlib.basic_graphs">smallgraphlib.basic_graphs module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-smallgraphlib.core">smallgraphlib.core module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-smallgraphlib.graphs_constructors">smallgraphlib.graphs_constructors module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-smallgraphlib.labeled_graphs">smallgraphlib.labeled_graphs module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-smallgraphlib.utilities">smallgraphlib.utilities module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-smallgraphlib">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">SmallGraphLib</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="modules.html">smallgraphlib</a> &raquo;</li>
+      <li>smallgraphlib package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/smallgraphlib.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="smallgraphlib-package">
+<h1>smallgraphlib package<a class="headerlink" href="#smallgraphlib-package" title="Permalink to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading"></a></h2>
+</section>
+<section id="module-smallgraphlib.basic_graphs">
+<span id="smallgraphlib-basic-graphs-module"></span><h2>smallgraphlib.basic_graphs module<a class="headerlink" href="#module-smallgraphlib.basic_graphs" title="Permalink to this heading"></a></h2>
+<p>Created on Sat May  7 12:24:58 2022</p>
+<p>&#64;author: nicolas</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="smallgraphlib.basic_graphs.DirectedGraph">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">smallgraphlib.basic_graphs.</span></span><span class="sig-name descname"><span class="pre">DirectedGraph</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nodes</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">edges</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sort_nodes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#smallgraphlib.basic_graphs.DirectedGraph" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#smallgraphlib.core.AbstractGraph" title="smallgraphlib.core.AbstractGraph"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractGraph</span></code></a></p>
+<p>A graph with directed edges.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">G</span> <span class="o">=</span> <span class="n">DirectedGraph</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="smallgraphlib.basic_graphs.DirectedGraph.are_adjacents">
+<span class="sig-name descname"><span class="pre">are_adjacents</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">node2</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#smallgraphlib.basic_graphs.DirectedGraph.are_adjacents" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="smallgraphlib.basic_graphs.DirectedGraph.has_cycle">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">has_cycle</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#smallgraphlib.basic_graphs.DirectedGraph.has_cycle" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="smallgraphlib.basic_graphs.DirectedGraph.is_connected">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_connected</span></span><a class="headerlink" href="#smallgraphlib.basic_graphs.DirectedGraph.is_connected" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="smallgraphlib.basic_graphs.DirectedGraph.is_directed">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_directed</span></span><a class="headerlink" href="#smallgraphlib.basic_graphs.DirectedGraph.is_directed" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="smallgraphlib.basic_graphs.DirectedGraph.is_eulerian">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_eulerian</span></span><a class="headerlink" href="#smallgraphlib.basic_graphs.DirectedGraph.is_eulerian" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="smallgraphlib.basic_graphs.DirectedGraph.is_isomorphic_to">
+<span class="sig-name descname"><span class="pre">is_isomorphic_to</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#smallgraphlib.basic_graphs.DirectedGraph.is_isomorphic_to" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="smallgraphlib.basic_graphs.DirectedGraph.is_semi_eulerian">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_semi_eulerian</span></span><a class="headerlink" href="#smallgraphlib.basic_graphs.DirectedGraph.is_semi_eulerian" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="smallgraphlib.basic_graphs.DirectedGraph.is_strongly_connected">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_strongly_connected</span></span><a class="headerlink" href="#smallgraphlib.basic_graphs.DirectedGraph.is_strongly_connected" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="smallgraphlib.basic_graphs.DirectedGraph.kernel">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">kernel</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">FrozenSet</span><span class="p"><span class="pre">[</span></span><span class="pre">Node</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#smallgraphlib.basic_graphs.DirectedGraph.kernel" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">FrozenSet</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">TypeVar</span></code>(<code class="docutils literal notranslate"><span class="pre">Node</span></code>, bound= <a class="reference internal" href="#smallgraphlib.utilities.ComparableAndHashable" title="smallgraphlib.utilities.ComparableAndHashable"><code class="xref py py-class docutils literal notranslate"><span class="pre">ComparableAndHashable</span></code></a>)]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="smallgraphlib.basic_graphs.DirectedGraph.levels">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">levels</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">FrozenSet</span><span class="p"><span class="pre">[</span></span><span class="pre">Node</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#smallgraphlib.basic_graphs.DirectedGraph.levels" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">FrozenSet</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">TypeVar</span></code>(<code class="docutils literal notranslate"><span class="pre">Node</span></code>, bound= <a class="reference internal" href="#smallgraphlib.utilities.ComparableAndHashable" title="smallgraphlib.utilities.ComparableAndHashable"><code class="xref py py-class docutils literal notranslate"><span class="pre">ComparableAndHashable</span></code></a>)], <code class="xref py py-data docutils literal notranslate"><span class="pre">...</span></code>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="smallgraphlib.basic_graphs.DirectedGraph.reversed_graph">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">reversed_graph</span></span><a class="headerlink" href="#smallgraphlib.basic_graphs.DirectedGraph.reversed_graph" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="smallgraphlib.basic_graphs.DirectedGraph.undirected_graph">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">undirected_graph</span></span><a class="headerlink" href="#smallgraphlib.basic_graphs.DirectedGraph.undirected_graph" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="smallgraphlib.basic_graphs.DirectedGraph.weighted_graph">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">weighted_graph</span></span><a class="headerlink" href="#smallgraphlib.basic_graphs.DirectedGraph.weighted_graph" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="smallgraphlib.basic_graphs.Graph">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">smallgraphlib.basic_graphs.</span></span><span class="sig-name descname"><span class="pre">Graph</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nodes</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">edges</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sort_nodes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#smallgraphlib.basic_graphs.Graph" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#smallgraphlib.core.AbstractGraph" title="smallgraphlib.core.AbstractGraph"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractGraph</span></code></a></p>
+<p>A graph with undirected edges.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">G</span> <span class="o">=</span> <span class="n">Graph</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="p">{</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">},</span> <span class="p">{</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">},</span> <span class="p">{</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">},</span> <span class="p">{</span><span class="mi">1</span><span class="p">})</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="smallgraphlib.basic_graphs.Graph.are_adjacents">
+<span class="sig-name descname"><span class="pre">are_adjacents</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">node2</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#smallgraphlib.basic_graphs.Graph.are_adjacents" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="smallgraphlib.basic_graphs.Graph.greedy_coloring">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">greedy_coloring</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">Node</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#smallgraphlib.basic_graphs.Graph.greedy_coloring" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">TypeVar</span></code>(<code class="docutils literal notranslate"><span class="pre">Node</span></code>, bound= <a class="reference internal" href="#smallgraphlib.utilities.ComparableAndHashable" title="smallgraphlib.utilities.ComparableAndHashable"><code class="xref py py-class docutils literal notranslate"><span class="pre">ComparableAndHashable</span></code></a>), <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="smallgraphlib.basic_graphs.Graph.is_complete_bipartite">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_complete_bipartite</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#smallgraphlib.basic_graphs.Graph.is_complete_bipartite" title="Permalink to this definition"></a></dt>
+<dd><p>Is this graph a complete bipartite graph ?</p>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">smallgraphlib</span> <span class="kn">import</span> <span class="n">complete_bipartite_graph</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">K33</span> <span class="o">=</span> <span class="n">complete_bipartite_graph</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">K33</span><span class="o">.</span><span class="n">is_complete_bipartite</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="smallgraphlib.basic_graphs.Graph.is_connected">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_connected</span></span><a class="headerlink" href="#smallgraphlib.basic_graphs.Graph.is_connected" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="smallgraphlib.basic_graphs.Graph.is_directed">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_directed</span></span><a class="headerlink" href="#smallgraphlib.basic_graphs.Graph.is_directed" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="smallgraphlib.basic_graphs.Graph.is_eulerian">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_eulerian</span></span><a class="headerlink" href="#smallgraphlib.basic_graphs.Graph.is_eulerian" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="smallgraphlib.basic_graphs.Graph.is_isomorphic_to">
+<span class="sig-name descname"><span class="pre">is_isomorphic_to</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#smallgraphlib.basic_graphs.Graph.is_isomorphic_to" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="smallgraphlib.basic_graphs.Graph.is_semi_eulerian">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_semi_eulerian</span></span><a class="headerlink" href="#smallgraphlib.basic_graphs.Graph.is_semi_eulerian" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="smallgraphlib.basic_graphs.Graph.is_subgraph_stable">
+<span class="sig-name descname"><span class="pre">is_subgraph_stable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">nodes</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#smallgraphlib.basic_graphs.Graph.is_subgraph_stable" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="smallgraphlib.basic_graphs.Graph.weighted_graph">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">weighted_graph</span></span><a class="headerlink" href="#smallgraphlib.basic_graphs.Graph.weighted_graph" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-smallgraphlib.core">
+<span id="smallgraphlib-core-module"></span><h2>smallgraphlib.core module<a class="headerlink" href="#module-smallgraphlib.core" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="smallgraphlib.core.AbstractGraph">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">smallgraphlib.core.</span></span><span class="sig-name descname"><span class="pre">AbstractGraph</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nodes</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">edges</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sort_nodes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#smallgraphlib.core.AbstractGraph" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ABC</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Generic</span></code>[<code class="xref py py-obj docutils literal notranslate"><span class="pre">Node</span></code>]</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="smallgraphlib.core.AbstractGraph.add_edges">
+<span class="sig-name descname"><span class="pre">add_edges</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">new_edges</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#smallgraphlib.core.AbstractGraph.add_edges" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="smallgraphlib.core.AbstractGraph.add_nodes">
+<span class="sig-name descname"><span class="pre">add_nodes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">new_nodes</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#smallgraphlib.core.AbstractGraph.add_nodes" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="smallgraphlib.core.AbstractGraph.adjacency_matrix">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">adjacency_matrix</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#smallgraphlib.core.AbstractGraph.adjacency_matrix" title="Permalink to this definition"></a></dt>
+<dd><p>Get the adjacency matrix of the graph.</p>
+<p>If operations on the matrix are needed, the matrix should be converted to a <cite>numpy</cite> or <cite>sympy</cite> matrix:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span>  
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">smallgraphlib</span> <span class="kn">import</span> <span class="n">complete_graph</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">M</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">matrix</span><span class="p">(</span><span class="n">complete_graph</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="o">.</span><span class="n">adjacency_matrix</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">M</span><span class="o">**</span><span class="mi">2</span>
+<span class="go">matrix([[2, 1, 1],</span>
+<span class="go">        [1, 2, 1],</span>
+<span class="go">        [1, 1, 2]])</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">...</span></code>], <code class="xref py py-data docutils literal notranslate"><span class="pre">...</span></code>]</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A matrix of integers, as a tuple of tuples.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="smallgraphlib.core.AbstractGraph.all_degrees">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">all_degrees</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">Node</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#smallgraphlib.core.AbstractGraph.all_degrees" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">TypeVar</span></code>(<code class="docutils literal notranslate"><span class="pre">Node</span></code>, bound= <a class="reference internal" href="#smallgraphlib.utilities.ComparableAndHashable" title="smallgraphlib.utilities.ComparableAndHashable"><code class="xref py py-class docutils literal notranslate"><span class="pre">ComparableAndHashable</span></code></a>), <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="smallgraphlib.core.AbstractGraph.all_in_degrees">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">all_in_degrees</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">Node</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#smallgraphlib.core.AbstractGraph.all_in_degrees" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">TypeVar</span></code>(<code class="docutils literal notranslate"><span class="pre">Node</span></code>, bound= <a class="reference internal" href="#smallgraphlib.utilities.ComparableAndHashable" title="smallgraphlib.utilities.ComparableAndHashable"><code class="xref py py-class docutils literal notranslate"><span class="pre">ComparableAndHashable</span></code></a>), <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="smallgraphlib.core.AbstractGraph.all_out_degrees">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">all_out_degrees</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">Node</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#smallgraphlib.core.AbstractGraph.all_out_degrees" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">TypeVar</span></code>(<code class="docutils literal notranslate"><span class="pre">Node</span></code>, bound= <a class="reference internal" href="#smallgraphlib.utilities.ComparableAndHashable" title="smallgraphlib.utilities.ComparableAndHashable"><code class="xref py py-class docutils literal notranslate"><span class="pre">ComparableAndHashable</span></code></a>), <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="smallgraphlib.core.AbstractGraph.are_adjacents">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">are_adjacents</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">node2</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#smallgraphlib.core.AbstractGraph.are_adjacents" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="smallgraphlib.core.AbstractGraph.as_tikz">
+<span class="sig-name descname"><span class="pre">as_tikz</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">shuffle_nodes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#smallgraphlib.core.AbstractGraph.as_tikz" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="smallgraphlib.core.AbstractGraph.copy">
+<span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#smallgraphlib.core.AbstractGraph.copy" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="smallgraphlib.core.AbstractGraph.count_edges">
+<span class="sig-name descname"><span class="pre">count_edges</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">node2</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#smallgraphlib.core.AbstractGraph.count_edges" title="Permalink to this definition"></a></dt>
+<dd><p>Count the number of edges from node1 to node2. Note that undirected loops are counted twice.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="smallgraphlib.core.AbstractGraph.degree">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">degree</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#smallgraphlib.core.AbstractGraph.degree" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="smallgraphlib.core.AbstractGraph.depth_first_search">
+<span class="sig-name descname"><span class="pre">depth_first_search</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">start</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#smallgraphlib.core.AbstractGraph.depth_first_search" title="Permalink to this definition"></a></dt>
+<dd><p>Return a node iterator, using a prefix DFS.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="smallgraphlib.core.AbstractGraph.diameter">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">diameter</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#smallgraphlib.core.AbstractGraph.diameter" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="smallgraphlib.core.AbstractGraph.distance">
+<span class="sig-name descname"><span class="pre">distance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">start</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#smallgraphlib.core.AbstractGraph.distance" title="Permalink to this definition"></a></dt>
+<dd><p>Implementation of Dijkstra Algorithm.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="smallgraphlib.core.AbstractGraph.edges">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">edges</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Node</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Node</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">FrozenSet</span><span class="p"><span class="pre">[</span></span><span class="pre">Node</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#smallgraphlib.core.AbstractGraph.edges" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">TypeVar</span></code>(<code class="docutils literal notranslate"><span class="pre">Node</span></code>, bound= <a class="reference internal" href="#smallgraphlib.utilities.ComparableAndHashable" title="smallgraphlib.utilities.ComparableAndHashable"><code class="xref py py-class docutils literal notranslate"><span class="pre">ComparableAndHashable</span></code></a>), <code class="xref py py-class docutils literal notranslate"><span class="pre">TypeVar</span></code>(<code class="docutils literal notranslate"><span class="pre">Node</span></code>, bound= <a class="reference internal" href="#smallgraphlib.utilities.ComparableAndHashable" title="smallgraphlib.utilities.ComparableAndHashable"><code class="xref py py-class docutils literal notranslate"><span class="pre">ComparableAndHashable</span></code></a>)], <code class="xref py py-class docutils literal notranslate"><span class="pre">FrozenSet</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">TypeVar</span></code>(<code class="docutils literal notranslate"><span class="pre">Node</span></code>, bound= <a class="reference internal" href="#smallgraphlib.utilities.ComparableAndHashable" title="smallgraphlib.utilities.ComparableAndHashable"><code class="xref py py-class docutils literal notranslate"><span class="pre">ComparableAndHashable</span></code></a>)]], <code class="xref py py-data docutils literal notranslate"><span class="pre">...</span></code>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="smallgraphlib.core.AbstractGraph.edges_set">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">edges_set</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">FrozenSet</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Node</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Node</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">FrozenSet</span><span class="p"><span class="pre">[</span></span><span class="pre">Node</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#smallgraphlib.core.AbstractGraph.edges_set" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">FrozenSet</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">TypeVar</span></code>(<code class="docutils literal notranslate"><span class="pre">Node</span></code>, bound= <a class="reference internal" href="#smallgraphlib.utilities.ComparableAndHashable" title="smallgraphlib.utilities.ComparableAndHashable"><code class="xref py py-class docutils literal notranslate"><span class="pre">ComparableAndHashable</span></code></a>), <code class="xref py py-class docutils literal notranslate"><span class="pre">TypeVar</span></code>(<code class="docutils literal notranslate"><span class="pre">Node</span></code>, bound= <a class="reference internal" href="#smallgraphlib.utilities.ComparableAndHashable" title="smallgraphlib.utilities.ComparableAndHashable"><code class="xref py py-class docutils literal notranslate"><span class="pre">ComparableAndHashable</span></code></a>)], <code class="xref py py-class docutils literal notranslate"><span class="pre">FrozenSet</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">TypeVar</span></code>(<code class="docutils literal notranslate"><span class="pre">Node</span></code>, bound= <a class="reference internal" href="#smallgraphlib.utilities.ComparableAndHashable" title="smallgraphlib.utilities.ComparableAndHashable"><code class="xref py py-class docutils literal notranslate"><span class="pre">ComparableAndHashable</span></code></a>)]]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="smallgraphlib.core.AbstractGraph.from_string">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_string</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">string</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#smallgraphlib.core.AbstractGraph.from_string" title="Permalink to this definition"></a></dt>
+<dd><p>DirectedGraph.from_string(“A:B,C B:C C”) will generate a graph of 3 nodes, A, B and C, with
+edges A-&gt;B, A-&gt;C and B-&gt;C.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="smallgraphlib.core.AbstractGraph.has_loop">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">has_loop</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#smallgraphlib.core.AbstractGraph.has_loop" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="smallgraphlib.core.AbstractGraph.has_multiple_edges">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">has_multiple_edges</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#smallgraphlib.core.AbstractGraph.has_multiple_edges" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="smallgraphlib.core.AbstractGraph.in_degree">
+<span class="sig-name descname"><span class="pre">in_degree</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#smallgraphlib.core.AbstractGraph.in_degree" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="smallgraphlib.core.AbstractGraph.in_out_degree">
+<span class="sig-name descname"><span class="pre">in_out_degree</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#smallgraphlib.core.AbstractGraph.in_out_degree" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="smallgraphlib.core.AbstractGraph.is_complete">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_complete</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#smallgraphlib.core.AbstractGraph.is_complete" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="smallgraphlib.core.AbstractGraph.is_connected">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_connected</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#smallgraphlib.core.AbstractGraph.is_connected" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="smallgraphlib.core.AbstractGraph.is_directed">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_directed</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#smallgraphlib.core.AbstractGraph.is_directed" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="smallgraphlib.core.AbstractGraph.is_eulerian">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_eulerian</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#smallgraphlib.core.AbstractGraph.is_eulerian" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="smallgraphlib.core.AbstractGraph.is_isomorphic_to">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_isomorphic_to</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#smallgraphlib.core.AbstractGraph.is_isomorphic_to" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="smallgraphlib.core.AbstractGraph.is_semi_eulerian">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_semi_eulerian</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#smallgraphlib.core.AbstractGraph.is_semi_eulerian" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="smallgraphlib.core.AbstractGraph.is_simple">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_simple</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#smallgraphlib.core.AbstractGraph.is_simple" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="smallgraphlib.core.AbstractGraph.node_degree">
+<span class="sig-name descname"><span class="pre">node_degree</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#smallgraphlib.core.AbstractGraph.node_degree" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="smallgraphlib.core.AbstractGraph.nodes">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">nodes</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Node</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#smallgraphlib.core.AbstractGraph.nodes" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">TypeVar</span></code>(<code class="docutils literal notranslate"><span class="pre">Node</span></code>, bound= <a class="reference internal" href="#smallgraphlib.utilities.ComparableAndHashable" title="smallgraphlib.utilities.ComparableAndHashable"><code class="xref py py-class docutils literal notranslate"><span class="pre">ComparableAndHashable</span></code></a>), <code class="xref py py-data docutils literal notranslate"><span class="pre">...</span></code>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="smallgraphlib.core.AbstractGraph.nodes_set">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">nodes_set</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">FrozenSet</span><span class="p"><span class="pre">[</span></span><span class="pre">Node</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#smallgraphlib.core.AbstractGraph.nodes_set" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">FrozenSet</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">TypeVar</span></code>(<code class="docutils literal notranslate"><span class="pre">Node</span></code>, bound= <a class="reference internal" href="#smallgraphlib.utilities.ComparableAndHashable" title="smallgraphlib.utilities.ComparableAndHashable"><code class="xref py py-class docutils literal notranslate"><span class="pre">ComparableAndHashable</span></code></a>)]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="smallgraphlib.core.AbstractGraph.order">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">order</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#smallgraphlib.core.AbstractGraph.order" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="smallgraphlib.core.AbstractGraph.out_degree">
+<span class="sig-name descname"><span class="pre">out_degree</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#smallgraphlib.core.AbstractGraph.out_degree" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="smallgraphlib.core.AbstractGraph.predecessors">
+<span class="sig-name descname"><span class="pre">predecessors</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#smallgraphlib.core.AbstractGraph.predecessors" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Set</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">TypeVar</span></code>(<code class="docutils literal notranslate"><span class="pre">Node</span></code>, bound= <a class="reference internal" href="#smallgraphlib.utilities.ComparableAndHashable" title="smallgraphlib.utilities.ComparableAndHashable"><code class="xref py py-class docutils literal notranslate"><span class="pre">ComparableAndHashable</span></code></a>)]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="smallgraphlib.core.AbstractGraph.remove_edges">
+<span class="sig-name descname"><span class="pre">remove_edges</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">edges</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#smallgraphlib.core.AbstractGraph.remove_edges" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="smallgraphlib.core.AbstractGraph.remove_nodes">
+<span class="sig-name descname"><span class="pre">remove_nodes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">nodes</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#smallgraphlib.core.AbstractGraph.remove_nodes" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="smallgraphlib.core.AbstractGraph.rename_node">
+<span class="sig-name descname"><span class="pre">rename_node</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">old_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#smallgraphlib.core.AbstractGraph.rename_node" title="Permalink to this definition"></a></dt>
+<dd><p>Rename node. New name must not be already present, else a <cite>NameError</cite> will be raised.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="smallgraphlib.core.AbstractGraph.rename_nodes">
+<span class="sig-name descname"><span class="pre">rename_nodes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node_names</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#smallgraphlib.core.AbstractGraph.rename_nodes" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="smallgraphlib.core.AbstractGraph.shortest_paths">
+<span class="sig-name descname"><span class="pre">shortest_paths</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">start</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#smallgraphlib.core.AbstractGraph.shortest_paths" title="Permalink to this definition"></a></dt>
+<dd><p>Implementation of Dijkstra Algorithm.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">TypeVar</span></code>(<code class="docutils literal notranslate"><span class="pre">Node</span></code>, bound= <a class="reference internal" href="#smallgraphlib.utilities.ComparableAndHashable" title="smallgraphlib.utilities.ComparableAndHashable"><code class="xref py py-class docutils literal notranslate"><span class="pre">ComparableAndHashable</span></code></a>)]]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="smallgraphlib.core.AbstractGraph.shuffle_nodes">
+<span class="sig-name descname"><span class="pre">shuffle_nodes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#smallgraphlib.core.AbstractGraph.shuffle_nodes" title="Permalink to this definition"></a></dt>
+<dd><p>Shuffle nodes.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">smallgraphlib</span> <span class="kn">import</span> <span class="n">random_graph</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">g</span> <span class="o">=</span> <span class="n">random_graph</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">7</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">g2</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">g2</span><span class="o">.</span><span class="n">shuffle_nodes</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">g</span> <span class="o">==</span> <span class="n">g2</span>
+<span class="gp">... </span> <span class="c1"># probably False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">g</span><span class="o">.</span><span class="n">is_isomorphic_to</span><span class="p">(</span><span class="n">g2</span><span class="p">)</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="smallgraphlib.core.AbstractGraph.successors">
+<span class="sig-name descname"><span class="pre">successors</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#smallgraphlib.core.AbstractGraph.successors" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Set</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">TypeVar</span></code>(<code class="docutils literal notranslate"><span class="pre">Node</span></code>, bound= <a class="reference internal" href="#smallgraphlib.utilities.ComparableAndHashable" title="smallgraphlib.utilities.ComparableAndHashable"><code class="xref py py-class docutils literal notranslate"><span class="pre">ComparableAndHashable</span></code></a>)]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="smallgraphlib.core.AbstractGraph.weight">
+<span class="sig-name descname"><span class="pre">weight</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">node2</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#smallgraphlib.core.AbstractGraph.weight" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-smallgraphlib.graphs_constructors">
+<span id="smallgraphlib-graphs-constructors-module"></span><h2>smallgraphlib.graphs_constructors module<a class="headerlink" href="#module-smallgraphlib.graphs_constructors" title="Permalink to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="smallgraphlib.graphs_constructors.complete_bipartite_graph">
+<span class="sig-prename descclassname"><span class="pre">smallgraphlib.graphs_constructors.</span></span><span class="sig-name descname"><span class="pre">complete_bipartite_graph</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">m</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#smallgraphlib.graphs_constructors.complete_bipartite_graph" title="Permalink to this definition"></a></dt>
+<dd><p>Return complete bipartite graph K(n, m).</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="smallgraphlib.graphs_constructors.complete_graph">
+<span class="sig-prename descclassname"><span class="pre">smallgraphlib.graphs_constructors.</span></span><span class="sig-name descname"><span class="pre">complete_graph</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#smallgraphlib.graphs_constructors.complete_graph" title="Permalink to this definition"></a></dt>
+<dd><p>Return complete graph K(n).</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="smallgraphlib.graphs_constructors.graph">
+<span class="sig-prename descclassname"><span class="pre">smallgraphlib.graphs_constructors.</span></span><span class="sig-name descname"><span class="pre">graph</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nodes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">edges</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">directed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">labeled_edges</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#smallgraphlib.graphs_constructors.graph" title="Permalink to this definition"></a></dt>
+<dd><p>Factory function to create graphs with various syntaxes.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">graph</span><span class="p">(</span><span class="s2">&quot;A:B,C B:C C&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">graph</span><span class="p">(</span><span class="n">AB</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">BC</span><span class="o">=</span><span class="mi">7</span><span class="p">,</span> <span class="n">AC</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">directed</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">graph</span><span class="p">(</span><span class="s2">&quot;A:B=5,C=8 B:C=inf&quot;</span><span class="p">,</span> <span class="n">directed</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">graph</span><span class="p">(</span><span class="s2">&quot;A:B=&#39;some text with space&#39;,C=text_without_space B:C=2.5 D&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This is intended mainly for quick interactive use (or one-time-use scripts),
+since its interface is not very clean and may change frequently.</p>
+<p>You should use the constructors provided by the various graph classes
+if you need a stable API.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="smallgraphlib.graphs_constructors.random_graph">
+<span class="sig-prename descclassname"><span class="pre">smallgraphlib.graphs_constructors.</span></span><span class="sig-name descname"><span class="pre">random_graph</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">order</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">degree</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">directed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">simple</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tikz_export_supported</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_multiple_edges</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_multiple_loops</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shuffle_nodes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#smallgraphlib.graphs_constructors.random_graph" title="Permalink to this definition"></a></dt>
+<dd><p>Create a random graph satisfying given constraints.</p>
+<p>Raise a ValueError if contraints can’t be satisfied.</p>
+<p>If <cite>simple</cite> is True, ignore remaining keyword arguments.
+Similarly, if <cite>tikz_export_supported</cite> is True, all remaining keyword arguments will be ignored.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#smallgraphlib.core.AbstractGraph" title="smallgraphlib.core.AbstractGraph"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractGraph</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-smallgraphlib.labeled_graphs">
+<span id="smallgraphlib-labeled-graphs-module"></span><h2>smallgraphlib.labeled_graphs module<a class="headerlink" href="#module-smallgraphlib.labeled_graphs" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="smallgraphlib.labeled_graphs.AbstractLabeledGraph">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">smallgraphlib.labeled_graphs.</span></span><span class="sig-name descname"><span class="pre">AbstractLabeledGraph</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nodes</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">labeled_edges</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sort_nodes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#smallgraphlib.labeled_graphs.AbstractLabeledGraph" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#smallgraphlib.core.AbstractGraph" title="smallgraphlib.core.AbstractGraph"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractGraph</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ABC</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Generic</span></code>[<code class="xref py py-obj docutils literal notranslate"><span class="pre">Label</span></code>]</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="smallgraphlib.labeled_graphs.AbstractLabeledGraph.from_dict">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">edge_label_dict</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">edge_label</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#smallgraphlib.labeled_graphs.AbstractLabeledGraph.from_dict" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="smallgraphlib.labeled_graphs.AbstractLabeledGraph.from_string">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_string</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">string</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#smallgraphlib.labeled_graphs.AbstractLabeledGraph.from_string" title="Permalink to this definition"></a></dt>
+<dd><p>will generate a graph of 3 nodes, A, B and C, with edges A-&gt;B, A-&gt;C
+and B-&gt;C and respective labels ‘label’, ‘other label’ and 5.</p>
+<p>Note that labels containing a space must be surrounded by quotes.
+Labels containing only digits will be converted to numbers (integers or floats),
+except if surrounded by quotes.</p>
+<p>If no label is given, <cite>None</cite> is stored by default.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="smallgraphlib.labeled_graphs.AbstractWeightedGraph">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">smallgraphlib.labeled_graphs.</span></span><span class="sig-name descname"><span class="pre">AbstractWeightedGraph</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nodes</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">weighted_edges</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sort_nodes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#smallgraphlib.labeled_graphs.AbstractWeightedGraph" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#smallgraphlib.labeled_graphs.AbstractLabeledGraph" title="smallgraphlib.labeled_graphs.AbstractLabeledGraph"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractLabeledGraph</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ABC</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="smallgraphlib.labeled_graphs.AbstractWeightedGraph.weight">
+<span class="sig-name descname"><span class="pre">weight</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">node2</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#smallgraphlib.labeled_graphs.AbstractWeightedGraph.weight" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="smallgraphlib.labeled_graphs.LabeledDirectedGraph">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">smallgraphlib.labeled_graphs.</span></span><span class="sig-name descname"><span class="pre">LabeledDirectedGraph</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nodes</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">labeled_edges</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sort_nodes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#smallgraphlib.labeled_graphs.LabeledDirectedGraph" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#smallgraphlib.labeled_graphs.AbstractLabeledGraph" title="smallgraphlib.labeled_graphs.AbstractLabeledGraph"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractLabeledGraph</span></code></a>, <a class="reference internal" href="#smallgraphlib.basic_graphs.DirectedGraph" title="smallgraphlib.basic_graphs.DirectedGraph"><code class="xref py py-class docutils literal notranslate"><span class="pre">DirectedGraph</span></code></a></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="smallgraphlib.labeled_graphs.LabeledGraph">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">smallgraphlib.labeled_graphs.</span></span><span class="sig-name descname"><span class="pre">LabeledGraph</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nodes</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">labeled_edges</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sort_nodes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#smallgraphlib.labeled_graphs.LabeledGraph" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#smallgraphlib.labeled_graphs.AbstractLabeledGraph" title="smallgraphlib.labeled_graphs.AbstractLabeledGraph"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractLabeledGraph</span></code></a>, <a class="reference internal" href="#smallgraphlib.basic_graphs.Graph" title="smallgraphlib.basic_graphs.Graph"><code class="xref py py-class docutils literal notranslate"><span class="pre">Graph</span></code></a></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="smallgraphlib.labeled_graphs.WeightedDirectedGraph">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">smallgraphlib.labeled_graphs.</span></span><span class="sig-name descname"><span class="pre">WeightedDirectedGraph</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nodes</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">weighted_edges</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sort_nodes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#smallgraphlib.labeled_graphs.WeightedDirectedGraph" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#smallgraphlib.labeled_graphs.AbstractWeightedGraph" title="smallgraphlib.labeled_graphs.AbstractWeightedGraph"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractWeightedGraph</span></code></a>, <a class="reference internal" href="#smallgraphlib.labeled_graphs.LabeledDirectedGraph" title="smallgraphlib.labeled_graphs.LabeledDirectedGraph"><code class="xref py py-class docutils literal notranslate"><span class="pre">LabeledDirectedGraph</span></code></a></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="smallgraphlib.labeled_graphs.WeightedGraph">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">smallgraphlib.labeled_graphs.</span></span><span class="sig-name descname"><span class="pre">WeightedGraph</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nodes</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">weighted_edges</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sort_nodes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#smallgraphlib.labeled_graphs.WeightedGraph" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#smallgraphlib.labeled_graphs.AbstractWeightedGraph" title="smallgraphlib.labeled_graphs.AbstractWeightedGraph"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractWeightedGraph</span></code></a>, <a class="reference internal" href="#smallgraphlib.labeled_graphs.LabeledGraph" title="smallgraphlib.labeled_graphs.LabeledGraph"><code class="xref py py-class docutils literal notranslate"><span class="pre">LabeledGraph</span></code></a></p>
+</dd></dl>
+
+</section>
+<section id="module-smallgraphlib.utilities">
+<span id="smallgraphlib-utilities-module"></span><h2>smallgraphlib.utilities module<a class="headerlink" href="#module-smallgraphlib.utilities" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="smallgraphlib.utilities.ComparableAndHashable">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">smallgraphlib.utilities.</span></span><span class="sig-name descname"><span class="pre">ComparableAndHashable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#smallgraphlib.utilities.ComparableAndHashable" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Protocol</span></code></p>
+<p>Protocol for annotating comparable types.</p>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="smallgraphlib.utilities.CycleFoundError">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">smallgraphlib.utilities.</span></span><span class="sig-name descname"><span class="pre">CycleFoundError</span></span><a class="headerlink" href="#smallgraphlib.utilities.CycleFoundError" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">AttributeError</span></code></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="smallgraphlib.utilities.Multiset">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">smallgraphlib.utilities.</span></span><span class="sig-name descname"><span class="pre">Multiset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">iterable</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwds</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#smallgraphlib.utilities.Multiset" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Counter</span></code></p>
+<p>A <cite>collections.Counter</cite> subclass that only accept positive values,
+and automatically removes empty keys (i.e. keys for which the count is zero).</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">s</span> <span class="o">=</span> <span class="n">Multiset</span><span class="p">((</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="s2">&quot;b&quot;</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span>
+<span class="go">Multiset({&#39;a&#39;: 2, &#39;b&#39;: 1})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span><span class="p">[</span><span class="s2">&quot;b&quot;</span><span class="p">]</span> <span class="o">-=</span> <span class="mi">1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span>
+<span class="go">Multiset({&#39;a&#39;: 2})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span><span class="p">[</span><span class="s2">&quot;b&quot;</span><span class="p">]</span> <span class="o">-=</span> <span class="mi">1</span>
+<span class="gp">...</span>
+<span class="go">ValueError: Multiset value can&#39;t be negative for key &#39;b&#39;.</span>
+</pre></div>
+</div>
+<p>Trying to set negative values will raise a ValueError.</p>
+<p>Like <cite>Counter</cite>, <cite>Multiset</cite> is a <cite>dict</cite> subclass, so you may use dict methods on it.</p>
+<p>If you access it using the <cite>dict</cite> interface, be careful when iterating over keys.
+Modifying values when iterating over keys is unsafe, since if a value becomes zero,
+the corresponding key will be automatically removed.</p>
+<p>So, if you plan to modify values when iterating, you should use
+<cite>list(_.keys())</cite> or <cite>list(_.items())</cite> instead of <cite>_.keys()</cite> or <cite>_.items()</cite>.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="smallgraphlib.utilities.Multiset.total">
+<span class="sig-name descname"><span class="pre">total</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#smallgraphlib.utilities.Multiset.total" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="smallgraphlib.utilities.cached">
+<span class="sig-prename descclassname"><span class="pre">smallgraphlib.utilities.</span></span><span class="sig-name descname"><span class="pre">cached</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#smallgraphlib.utilities.cached" title="Permalink to this definition"></a></dt>
+<dd><p>Decorator used to cache results in <cite>self._cache</cite> dictionary.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="smallgraphlib.utilities.cached_property">
+<span class="sig-prename descclassname"><span class="pre">smallgraphlib.utilities.</span></span><span class="sig-name descname"><span class="pre">cached_property</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#smallgraphlib.utilities.cached_property" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="smallgraphlib.utilities.clear_cache">
+<span class="sig-prename descclassname"><span class="pre">smallgraphlib.utilities.</span></span><span class="sig-name descname"><span class="pre">clear_cache</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#smallgraphlib.utilities.clear_cache" title="Permalink to this definition"></a></dt>
+<dd><p>Decorator to indicate that a function must invalidate the cache.</p>
+</dd></dl>
+
+</section>
+<section id="module-smallgraphlib">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-smallgraphlib" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="smallgraphlib.DirectedGraph">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">smallgraphlib.</span></span><span class="sig-name descname"><span class="pre">DirectedGraph</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nodes</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">edges</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sort_nodes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#smallgraphlib.DirectedGraph" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#smallgraphlib.core.AbstractGraph" title="smallgraphlib.core.AbstractGraph"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractGraph</span></code></a></p>
+<p>A graph with directed edges.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">G</span> <span class="o">=</span> <span class="n">DirectedGraph</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="smallgraphlib.DirectedGraph.are_adjacents">
+<span class="sig-name descname"><span class="pre">are_adjacents</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">node2</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#smallgraphlib.DirectedGraph.are_adjacents" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="smallgraphlib.DirectedGraph.has_cycle">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">has_cycle</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#smallgraphlib.DirectedGraph.has_cycle" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="smallgraphlib.DirectedGraph.is_connected">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_connected</span></span><a class="headerlink" href="#smallgraphlib.DirectedGraph.is_connected" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="smallgraphlib.DirectedGraph.is_directed">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_directed</span></span><a class="headerlink" href="#smallgraphlib.DirectedGraph.is_directed" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="smallgraphlib.DirectedGraph.is_eulerian">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_eulerian</span></span><a class="headerlink" href="#smallgraphlib.DirectedGraph.is_eulerian" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="smallgraphlib.DirectedGraph.is_isomorphic_to">
+<span class="sig-name descname"><span class="pre">is_isomorphic_to</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#smallgraphlib.DirectedGraph.is_isomorphic_to" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="smallgraphlib.DirectedGraph.is_semi_eulerian">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_semi_eulerian</span></span><a class="headerlink" href="#smallgraphlib.DirectedGraph.is_semi_eulerian" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="smallgraphlib.DirectedGraph.is_strongly_connected">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_strongly_connected</span></span><a class="headerlink" href="#smallgraphlib.DirectedGraph.is_strongly_connected" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="smallgraphlib.DirectedGraph.kernel">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">kernel</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">FrozenSet</span><span class="p"><span class="pre">[</span></span><span class="pre">Node</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#smallgraphlib.DirectedGraph.kernel" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">FrozenSet</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">TypeVar</span></code>(<code class="docutils literal notranslate"><span class="pre">Node</span></code>, bound= <a class="reference internal" href="#smallgraphlib.utilities.ComparableAndHashable" title="smallgraphlib.utilities.ComparableAndHashable"><code class="xref py py-class docutils literal notranslate"><span class="pre">ComparableAndHashable</span></code></a>)]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="smallgraphlib.DirectedGraph.levels">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">levels</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">FrozenSet</span><span class="p"><span class="pre">[</span></span><span class="pre">Node</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#smallgraphlib.DirectedGraph.levels" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">FrozenSet</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">TypeVar</span></code>(<code class="docutils literal notranslate"><span class="pre">Node</span></code>, bound= <a class="reference internal" href="#smallgraphlib.utilities.ComparableAndHashable" title="smallgraphlib.utilities.ComparableAndHashable"><code class="xref py py-class docutils literal notranslate"><span class="pre">ComparableAndHashable</span></code></a>)], <code class="xref py py-data docutils literal notranslate"><span class="pre">...</span></code>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="smallgraphlib.DirectedGraph.reversed_graph">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">reversed_graph</span></span><a class="headerlink" href="#smallgraphlib.DirectedGraph.reversed_graph" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="smallgraphlib.DirectedGraph.undirected_graph">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">undirected_graph</span></span><a class="headerlink" href="#smallgraphlib.DirectedGraph.undirected_graph" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="smallgraphlib.DirectedGraph.weighted_graph">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">weighted_graph</span></span><a class="headerlink" href="#smallgraphlib.DirectedGraph.weighted_graph" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="smallgraphlib.Graph">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">smallgraphlib.</span></span><span class="sig-name descname"><span class="pre">Graph</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nodes</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">edges</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sort_nodes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#smallgraphlib.Graph" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#smallgraphlib.core.AbstractGraph" title="smallgraphlib.core.AbstractGraph"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractGraph</span></code></a></p>
+<p>A graph with undirected edges.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">G</span> <span class="o">=</span> <span class="n">Graph</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="p">{</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">},</span> <span class="p">{</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">},</span> <span class="p">{</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">},</span> <span class="p">{</span><span class="mi">1</span><span class="p">})</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="smallgraphlib.Graph.are_adjacents">
+<span class="sig-name descname"><span class="pre">are_adjacents</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">node2</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#smallgraphlib.Graph.are_adjacents" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="smallgraphlib.Graph.greedy_coloring">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">greedy_coloring</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">Node</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#smallgraphlib.Graph.greedy_coloring" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">TypeVar</span></code>(<code class="docutils literal notranslate"><span class="pre">Node</span></code>, bound= <a class="reference internal" href="#smallgraphlib.utilities.ComparableAndHashable" title="smallgraphlib.utilities.ComparableAndHashable"><code class="xref py py-class docutils literal notranslate"><span class="pre">ComparableAndHashable</span></code></a>), <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="smallgraphlib.Graph.is_complete_bipartite">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_complete_bipartite</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#smallgraphlib.Graph.is_complete_bipartite" title="Permalink to this definition"></a></dt>
+<dd><p>Is this graph a complete bipartite graph ?</p>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">smallgraphlib</span> <span class="kn">import</span> <span class="n">complete_bipartite_graph</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">K33</span> <span class="o">=</span> <span class="n">complete_bipartite_graph</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">K33</span><span class="o">.</span><span class="n">is_complete_bipartite</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="smallgraphlib.Graph.is_connected">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_connected</span></span><a class="headerlink" href="#smallgraphlib.Graph.is_connected" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="smallgraphlib.Graph.is_directed">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_directed</span></span><a class="headerlink" href="#smallgraphlib.Graph.is_directed" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="smallgraphlib.Graph.is_eulerian">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_eulerian</span></span><a class="headerlink" href="#smallgraphlib.Graph.is_eulerian" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="smallgraphlib.Graph.is_isomorphic_to">
+<span class="sig-name descname"><span class="pre">is_isomorphic_to</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#smallgraphlib.Graph.is_isomorphic_to" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="smallgraphlib.Graph.is_semi_eulerian">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_semi_eulerian</span></span><a class="headerlink" href="#smallgraphlib.Graph.is_semi_eulerian" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="smallgraphlib.Graph.is_subgraph_stable">
+<span class="sig-name descname"><span class="pre">is_subgraph_stable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">nodes</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#smallgraphlib.Graph.is_subgraph_stable" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="smallgraphlib.Graph.weighted_graph">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">weighted_graph</span></span><a class="headerlink" href="#smallgraphlib.Graph.weighted_graph" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="smallgraphlib.LabeledDirectedGraph">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">smallgraphlib.</span></span><span class="sig-name descname"><span class="pre">LabeledDirectedGraph</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nodes</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">labeled_edges</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sort_nodes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#smallgraphlib.LabeledDirectedGraph" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#smallgraphlib.labeled_graphs.AbstractLabeledGraph" title="smallgraphlib.labeled_graphs.AbstractLabeledGraph"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractLabeledGraph</span></code></a>, <a class="reference internal" href="#smallgraphlib.basic_graphs.DirectedGraph" title="smallgraphlib.basic_graphs.DirectedGraph"><code class="xref py py-class docutils literal notranslate"><span class="pre">DirectedGraph</span></code></a></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="smallgraphlib.LabeledGraph">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">smallgraphlib.</span></span><span class="sig-name descname"><span class="pre">LabeledGraph</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nodes</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">labeled_edges</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sort_nodes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#smallgraphlib.LabeledGraph" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#smallgraphlib.labeled_graphs.AbstractLabeledGraph" title="smallgraphlib.labeled_graphs.AbstractLabeledGraph"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractLabeledGraph</span></code></a>, <a class="reference internal" href="#smallgraphlib.basic_graphs.Graph" title="smallgraphlib.basic_graphs.Graph"><code class="xref py py-class docutils literal notranslate"><span class="pre">Graph</span></code></a></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="smallgraphlib.WeightedDirectedGraph">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">smallgraphlib.</span></span><span class="sig-name descname"><span class="pre">WeightedDirectedGraph</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nodes</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">weighted_edges</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sort_nodes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#smallgraphlib.WeightedDirectedGraph" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#smallgraphlib.labeled_graphs.AbstractWeightedGraph" title="smallgraphlib.labeled_graphs.AbstractWeightedGraph"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractWeightedGraph</span></code></a>, <a class="reference internal" href="#smallgraphlib.labeled_graphs.LabeledDirectedGraph" title="smallgraphlib.labeled_graphs.LabeledDirectedGraph"><code class="xref py py-class docutils literal notranslate"><span class="pre">LabeledDirectedGraph</span></code></a></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="smallgraphlib.WeightedGraph">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">smallgraphlib.</span></span><span class="sig-name descname"><span class="pre">WeightedGraph</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nodes</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">weighted_edges</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sort_nodes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#smallgraphlib.WeightedGraph" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#smallgraphlib.labeled_graphs.AbstractWeightedGraph" title="smallgraphlib.labeled_graphs.AbstractWeightedGraph"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractWeightedGraph</span></code></a>, <a class="reference internal" href="#smallgraphlib.labeled_graphs.LabeledGraph" title="smallgraphlib.labeled_graphs.LabeledGraph"><code class="xref py py-class docutils literal notranslate"><span class="pre">LabeledGraph</span></code></a></p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="smallgraphlib.complete_bipartite_graph">
+<span class="sig-prename descclassname"><span class="pre">smallgraphlib.</span></span><span class="sig-name descname"><span class="pre">complete_bipartite_graph</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">m</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#smallgraphlib.complete_bipartite_graph" title="Permalink to this definition"></a></dt>
+<dd><p>Return complete bipartite graph K(n, m).</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="smallgraphlib.complete_graph">
+<span class="sig-prename descclassname"><span class="pre">smallgraphlib.</span></span><span class="sig-name descname"><span class="pre">complete_graph</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#smallgraphlib.complete_graph" title="Permalink to this definition"></a></dt>
+<dd><p>Return complete graph K(n).</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="smallgraphlib.graph">
+<span class="sig-prename descclassname"><span class="pre">smallgraphlib.</span></span><span class="sig-name descname"><span class="pre">graph</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nodes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">edges</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">directed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">labeled_edges</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#smallgraphlib.graph" title="Permalink to this definition"></a></dt>
+<dd><p>Factory function to create graphs with various syntaxes.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">graph</span><span class="p">(</span><span class="s2">&quot;A:B,C B:C C&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">graph</span><span class="p">(</span><span class="n">AB</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">BC</span><span class="o">=</span><span class="mi">7</span><span class="p">,</span> <span class="n">AC</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">directed</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">graph</span><span class="p">(</span><span class="s2">&quot;A:B=5,C=8 B:C=inf&quot;</span><span class="p">,</span> <span class="n">directed</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">graph</span><span class="p">(</span><span class="s2">&quot;A:B=&#39;some text with space&#39;,C=text_without_space B:C=2.5 D&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This is intended mainly for quick interactive use (or one-time-use scripts),
+since its interface is not very clean and may change frequently.</p>
+<p>You should use the constructors provided by the various graph classes
+if you need a stable API.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="smallgraphlib.random_graph">
+<span class="sig-prename descclassname"><span class="pre">smallgraphlib.</span></span><span class="sig-name descname"><span class="pre">random_graph</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">order</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">degree</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">directed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">simple</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tikz_export_supported</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_multiple_edges</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_multiple_loops</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shuffle_nodes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#smallgraphlib.random_graph" title="Permalink to this definition"></a></dt>
+<dd><p>Create a random graph satisfying given constraints.</p>
+<p>Raise a ValueError if contraints can’t be satisfied.</p>
+<p>If <cite>simple</cite> is True, ignore remaining keyword arguments.
+Similarly, if <cite>tikz_export_supported</cite> is True, all remaining keyword arguments will be ignored.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#smallgraphlib.core.AbstractGraph" title="smallgraphlib.core.AbstractGraph"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractGraph</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="modules.html" class="btn btn-neutral float-left" title="smallgraphlib" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Nicolas Pourcelot.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

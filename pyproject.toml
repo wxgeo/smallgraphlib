@@ -17,6 +17,9 @@ mypy = "^0.960"
 flake8 = "^4.0.1"
 black = "^22.1.0"
 tox = "^3.24.5"
+sphinx-autodoc-typehints = "^1.18.3"
+sphinx-rtd-theme = "^1.0.0"
+myst-parser = "^0.18.0"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
@@ -35,6 +38,6 @@ whitelist_externals = poetry
 commands =
     poetry install -v
     poetry run pytest tests
-    poetry run mypy .
+    poetry run mypy smallgraphlib tests
     poetry run flake8 --max-line-length 110 --ignore=E203,W503,W391
 """
