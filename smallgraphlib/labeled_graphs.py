@@ -6,7 +6,8 @@ from itertools import chain
 from numbers import Real
 from typing import Iterable, Tuple, Dict, List, TypeVar, Generic, Any
 
-from smallgraphlib.graph import Graph, Node, Edge, AbstractGraph, DirectedGraph
+from smallgraphlib.basic_graphs import Graph, DirectedGraph
+from smallgraphlib.core import Node, Edge, AbstractGraph
 from math import inf
 
 Label = TypeVar("Label")

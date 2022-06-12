@@ -8,10 +8,12 @@ from smallgraphlib import (
     LabeledGraph,
     WeightedGraph,
 )
-from smallgraphlib.graph import (
+from smallgraphlib.basic_graphs import (
+    DirectedGraph,
+)
+from smallgraphlib.core import (
     _TIKZ_EXPORT_MAX_MULTIPLE_EDGES_SUPPORT,
     _TIKZ_EXPORT_MAX_MULTIPLE_LOOPS_SUPPORT,
-    DirectedGraph,
     AbstractGraph,
 )
 from smallgraphlib.utilities import Multiset
@@ -28,7 +30,8 @@ def graph(nodes=None, *edges, directed=False, **labeled_edges):
     This is intended mainly for quick interactive use (or one-time-use scripts),
     since its interface is not very clean and may change frequently.
 
-    Use directly classes' constructors if you need a stable API.
+    You should use the constructors provided by the various graph classes
+    if you need a stable API.
     """
     if isinstance(nodes, str) and not edges:
         classes = (DirectedGraph, WeightedDirectedGraph, LabeledDirectedGraph)
@@ -66,6 +69,24 @@ def complete_bipartite_graph(n: int, m: int):
         range(1, m + n + 1),
         *((i, j) for i in range(1, n + 1) for j in range(n + 1, n + 1 + m)),
     )
+
+
+def perfect_binary_tree(height: int):
+    """Return a perfect binary tree of given height.
+
+    In a perfect binary tree, each node has two children, except in last level.
+    """
+    nodes = []
+    edges = []
+    i = 1
+    for level in range(height):
+        nodes.extend(range(1 << level, 1 << level + 1))
+    for level in range(height - 1):
+        for i in range(1 << level, 1 << level + 1):
+            edges.append((i, i << 1))
+            edges.append((i, (i << 1) + 1))
+
+    return Graph(nodes, *edges)
 
 
 def random_graph(

@@ -1,36 +1,30 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Created on Sat May  7 12:24:58 2022
-
-@author: nicolas
-"""
-from abc import abstractmethod, ABC
+import random
+from abc import ABC, abstractmethod
+from collections import Counter
+from enum import Enum
 from itertools import chain
 from math import inf
-from collections import Counter
 from typing import (
-    Set,
-    Union,
+    TypeVar,
     Tuple,
+    FrozenSet,
+    Union,
+    Set,
+    Iterable,
+    Any,
     Dict,
     List,
-    Iterable,
-    FrozenSet,
-    Counter as CounterType,
-    Any,
-    TypeVar,
     Generic,
+    Counter as CounterType,
     Optional,
+    Iterator,
 )
-import random
 
 from smallgraphlib.utilities import (
-    cached_property,
-    clear_cache,
-    Multiset,
-    CycleFoundError,
     ComparableAndHashable,
+    cached_property,
+    Multiset,
+    clear_cache,
 )
 
 _TIKZ_EXPORT_MAX_MULTIPLE_EDGES_SUPPORT = 3
@@ -42,9 +36,18 @@ DirectedEdge = Tuple[Node, Node]
 UndirectedEdge = FrozenSet[Node]
 Edge = Union[DirectedEdge, UndirectedEdge]
 EdgeLike = Union[Edge, Set[Node], Iterable[Node]]
-
 Label = Any
 InternalGraphRepresentation = Dict[Node, Dict[Node, Union[int, List[Label]]]]
+
+
+class Traversal(Enum):
+    PREORDER = 0
+    POSTORDER = 1
+    INORDER = 2
+
+
+class NodeAlreadyFoundError(RuntimeError):
+    pass
 
 
 class AbstractGraph(ABC, Generic[Node]):
@@ -87,9 +90,7 @@ class AbstractGraph(ABC, Generic[Node]):
             node, *remaining = substring.split(":", 1)
             nodes.append(node.strip())
             if remaining:
-                edges.extend(
-                    (node, successor.strip()) for successor in remaining[0].split(",")
-                )
+                edges.extend((node, successor.strip()) for successor in remaining[0].split(","))
         return cls(nodes, *edges)  # type: ignore
 
     # ------------
@@ -133,13 +134,9 @@ class AbstractGraph(ABC, Generic[Node]):
     def rename_node(self, old_name: Node, new_name: Node) -> None:
         """Rename node. New name must not be already present, else a `NameError` will be raised."""
         if new_name in self.nodes:
-            raise NameError(
-                f"Conflicting names: this graph already has a node named {new_name!r}"
-            )
+            raise NameError(f"Conflicting names: this graph already has a node named {new_name!r}")
         for dictionary in (self._successors, self._predecessors):
-            for node, counter in list(
-                dictionary.items()
-            ):  # make a copy, since we modify the dictionary.
+            for node, counter in list(dictionary.items()):  # make a copy, since we modify the dictionary.
                 if node == old_name:
                     dictionary[new_name] = dictionary.pop(old_name)
                 if old_name in counter:
@@ -207,9 +204,7 @@ class AbstractGraph(ABC, Generic[Node]):
         """
         nodes = list(self.nodes)
         random.shuffle(nodes)
-        self.rename_nodes(
-            dict((old_name, new_name) for old_name, new_name in zip(self.nodes, nodes))
-        )
+        self.rename_nodes(dict((old_name, new_name) for old_name, new_name in zip(self.nodes, nodes)))
 
     # ------------
     # Edge methods
@@ -307,12 +302,8 @@ class AbstractGraph(ABC, Generic[Node]):
 
         degrees_to_nodes_for_other_graph: Dict[Tuple[int, int], List[Node]] = {}
         for node in other.nodes:
-            degrees_to_nodes_for_other_graph.setdefault(
-                other.in_out_degree(node), []
-            ).append(node)
-        nodes_to_degrees_for_self = {
-            node: self.in_out_degree(node) for node in self.nodes
-        }
+            degrees_to_nodes_for_other_graph.setdefault(other.in_out_degree(node), []).append(node)
+        nodes_to_degrees_for_self = {node: self.in_out_degree(node) for node in self.nodes}
 
         remaining_self_nodes = set(self.nodes)
         remaining_other_nodes = set(other.nodes)
@@ -331,9 +322,7 @@ class AbstractGraph(ABC, Generic[Node]):
             for self_method, other_method in adjacency_test_methods:
                 for adjacent_node in self_method(node):
                     try:
-                        _possibilities = corresponding_nodes_possibilities[
-                            adjacent_node
-                        ]
+                        _possibilities = corresponding_nodes_possibilities[adjacent_node]
                         assert _possibilities is not None and len(_possibilities) > 0
                         corresponding_node = _possibilities[0]
                         if corresponding_node not in other_method(candidate):
@@ -355,12 +344,8 @@ class AbstractGraph(ABC, Generic[Node]):
             if possibilities is None:  # First time we test this node
                 # Test for any possibilities to go further in this direction.
                 possibilities = []
-                for possibility in degrees_to_nodes_for_other_graph[
-                    nodes_to_degrees_for_self[node]
-                ]:
-                    if possibility in remaining_other_nodes and test_possibility(
-                        possibility
-                    ):
+                for possibility in degrees_to_nodes_for_other_graph[nodes_to_degrees_for_self[node]]:
+                    if possibility in remaining_other_nodes and test_possibility(possibility):
                         possibilities.append(possibility)
                 corresponding_nodes_possibilities[node] = possibilities
 
@@ -372,13 +357,8 @@ class AbstractGraph(ABC, Generic[Node]):
                 if used_nodes:
                     # Remove other graph node from possibilities, as this branch of possibilities failed.
                     previous_node = used_nodes[-1]
-                    previous_possibilities = corresponding_nodes_possibilities[
-                        previous_node
-                    ]
-                    assert (
-                        previous_possibilities is not None
-                        and len(previous_possibilities) > 0
-                    )
+                    previous_possibilities = corresponding_nodes_possibilities[previous_node]
+                    assert previous_possibilities is not None and len(previous_possibilities) > 0
                     registered_corresponding_node = previous_possibilities.pop(0)
                     remaining_other_nodes.add(registered_corresponding_node)
                     del reversed_mapping[registered_corresponding_node]
@@ -463,10 +443,10 @@ class AbstractGraph(ABC, Generic[Node]):
 
     @property
     @abstractmethod
-    def is_connected(self):
+    def is_connected(self) -> bool:
         ...
 
-    def count_edges(self, node1: Node, node2: Node):
+    def count_edges(self, node1: Node, node2: Node) -> int:
         """Count the number of edges from node1 to node2. Note that undirected loops are counted twice."""
         return self._successors[node1][node2]
 
@@ -510,10 +490,22 @@ class AbstractGraph(ABC, Generic[Node]):
 
     @cached_property
     def adjacency_matrix(self) -> Tuple[Tuple[int, ...], ...]:
-        return tuple(
-            tuple(self.count_edges(start, end) for end in self.nodes)
-            for start in self.nodes
-        )
+        """Get the adjacency matrix of the graph.
+
+        If operations on the matrix are needed, the matrix should be converted to a `numpy` or `sympy` matrix:
+
+            >>> import numpy  # doctest: +SKIP
+            >>> from smallgraphlib import complete_graph
+            >>> M = numpy.matrix(complete_graph(3).adjacency_matrix)
+            >>> M**2
+            matrix([[2, 1, 1],
+                    [1, 2, 1],
+                    [1, 1, 2]])
+
+        Return:
+            A matrix of integers, as a tuple of tuples.
+        """
+        return tuple(tuple(self.count_edges(start, end) for end in self.nodes) for start in self.nodes)
 
     @abstractmethod
     def are_adjacents(self, node1: Node, node2: Node) -> bool:
@@ -595,17 +587,13 @@ class AbstractGraph(ABC, Generic[Node]):
         lines.append(r"\end{tikzpicture}")
         return "\n".join(lines)
 
-    def _dijkstra(
-        self, start: Node, end: Node = None
-    ) -> Tuple[Dict[Node, float], Dict[Node, List[Node]]]:
+    def _dijkstra(self, start: Node, end: Node = None) -> Tuple[Dict[Node, float], Dict[Node, List[Node]]]:
         """Implementation of Dijkstra Algorithm."""
         if start not in self.nodes:
             raise ValueError(f"Unknown node {start!r}.")
         if end is not None and end not in self.nodes:
             raise ValueError(f"Unknown node {end!r}.")
-        lengths: Dict[Node, float] = {
-            node: (0 if node == start else inf) for node in self.nodes
-        }
+        lengths: Dict[Node, float] = {node: (0 if node == start else inf) for node in self.nodes}
         last_step: Dict[Node, List[Node]] = {node: [] for node in self.nodes}
         never_selected_nodes = set(self.nodes)
         selected_node = start
@@ -621,9 +609,7 @@ class AbstractGraph(ABC, Generic[Node]):
                     last_step[successor] = [selected_node]
                 elif new_length == lengths[successor]:
                     last_step[successor].append(selected_node)
-            selected_node = min(
-                never_selected_nodes, key=(lambda node_: lengths[node_])
-            )
+            selected_node = min(never_selected_nodes, key=(lambda node_: lengths[node_]))
         return lengths, last_step
 
     def distance(self, start: Node, end: Node) -> float:
@@ -633,9 +619,7 @@ class AbstractGraph(ABC, Generic[Node]):
 
     @cached_property
     def diameter(self) -> float:
-        return max(
-            self.distance(node1, node2) for node1 in self.nodes for node2 in self.nodes
-        )
+        return max(self.distance(node1, node2) for node1 in self.nodes for node2 in self.nodes)
 
     def shortest_paths(self, start: Node, end: Node) -> Tuple[float, List[List[Node]]]:
         """Implementation of Dijkstra Algorithm."""
@@ -651,200 +635,94 @@ class AbstractGraph(ABC, Generic[Node]):
 
         return lengths[end], generate_paths([end])
 
+    def _iterative_depth_first_search(
+        self,
+        start: Node = None,
+        *,
+        error_if_already_visited=False,
+    ) -> Iterator[Node]:
+        """Return a node iterator, using a prefix DFS."""
+        if start is None:
+            start = self.nodes[0]
+        stack: List[Node] = [start]
+        previous_nodes: List[Node] = [None]
+        # If the graph isn't a rooted tree, there is no notion of parent.
+        # If we want to use DFS to test if the graph is a tree, we must try to visit all adjacents nodes except the one
+        # we come from, and see if there were already visited. So we must keep track of the node we come from
+        # for each node of the stack.
+        visited: Set[Node] = set()
+        while stack:
+            node = stack.pop()
+            previous = previous_nodes.pop()
+            if node not in visited:
+                visited.add(node)
+                yield node
+                for successor in reversed(self._successors[node]):
+                    # Don't go backward, especially if `error_if_already_visited` is True !
+                    if successor != previous:
+                        stack.append(successor)
+                        previous_nodes.append(node)
+            elif error_if_already_visited:
+                raise NodeAlreadyFoundError
 
-class Graph(AbstractGraph):
-    """A graph with undirected edges.
+    def depth_first_search(self, start: Node = None, *, order: Traversal = Traversal.PREORDER) -> Iterator[Node]:
+        """Recursive implementation of DFS (Depth First Search)."""
+        if start is None:
+            start = self.nodes[0]
+        stack: List[Node] = [start]
+        visited: Set[Node] = set()
+        if not isinstance(order, Traversal):
+            raise NotImplementedError(
+                f"Order must be Traversal.PREORDER, Traversal.POSTORDER or Traversal.INORDER, not {order!r}."
+            )
 
-    >>> G = Graph((1, 2, 3), {1, 3}, {1, 2}, {2, 1}, {1})
-    """
+        def preorder_dfs(node):
+            if node not in visited:
+                yield node
+                visited.add(node)
+                for successor in self._successors[node]:
+                    yield from preorder_dfs(successor)
 
-    def is_isomorphic_to(self, other) -> bool:
-        return super().is_isomorphic_to(other)
+        def postorder_dfs(node):
+            if node not in visited:
+                visited.add(node)
+                for successor in self._successors[node]:
+                    yield from postorder_dfs(successor)
+                yield node
 
-    def __repr__(self):
-        edges = (repr(set(edge)) for edge in self.edges)
-        return f"Graph({tuple(self.nodes)!r}, {', '.join(edges)})"
+        def inorder_dfs(node):
+            visited.add(node)
+            # Eliminate visited nodes from the list of successors *before* splitting it.
+            successors: List[Node] = [successor for successor in self._successors[node] if successor not in visited]
+            for successor in successors[:1]:
+                yield from inorder_dfs(successor)
+            yield node
+            for successor in successors[1:]:
+                yield from inorder_dfs(successor)
 
-    @property
-    def is_directed(self):
-        return False
-
-    @staticmethod
-    def _edge(node1, node2) -> UndirectedEdge:
-        return frozenset((node1, node2))
-
-    def _count_odd_degrees(self):
-        return sum(self.node_degree(node) % 2 for node in self.nodes)
+        traversals = {
+            Traversal.PREORDER: preorder_dfs,
+            Traversal.POSTORDER: postorder_dfs,
+            Traversal.INORDER: inorder_dfs,
+        }
+        return traversals[order](start)
 
     @cached_property
-    def is_eulerian(self):
-        return self._count_odd_degrees() == 0
-
-    @cached_property
-    def is_semi_eulerian(self):
-        return self._count_odd_degrees() == 2
-
-    @cached_property
-    def is_connected(self):
-        return self._test_connection_from_node(next(iter(self.nodes)))
-
-    @cached_property
-    def greedy_coloring(self) -> Dict[Node, int]:
-        coloring: Dict[Node, int] = {}
-        # Sort nodes by reversed degree, then alphabetically
-        nodes = sorted(
-            self.nodes, key=(lambda _node: (-self.node_degree(_node), _node))
-        )
-        for node in nodes:
-            color_num = 0
-            while any(
-                coloring.get(adjacent) == color_num
-                for adjacent in self.successors(node)
-            ):
-                color_num += 1
-            coloring[node] = color_num
-        return coloring
-
-    def are_adjacents(self, node1: Node, node2: Node) -> bool:
-        return node2 in self.successors(node1)
-
-    @property
-    def weighted_graph(self):
-        from smallgraphlib import WeightedGraph
-
-        def weighted_edge(edge):
-            start, end = self._get_edge_extremities(edge)
-            return start, end, 1
-
-        return WeightedGraph(self.nodes, *(weighted_edge(edge) for edge in self.edges))
-
-    def is_subgraph_stable(self, *nodes: Node) -> bool:
-        return not any(
-            self.are_adjacents(node1, node2) for node1 in nodes for node2 in nodes
-        )
-
-    @cached_property
-    def is_complete_bipartite(self) -> bool:
-        nodes_group = self.successors(self.nodes[0])
-        other_group = self.nodes_set - nodes_group
-        if not self.is_subgraph_stable(*nodes_group):
+    def is_acyclic(self) -> bool:
+        """Use DFS to test if the graph contains a cycle."""
+        try:
+            for node in self._iterative_depth_first_search(error_if_already_visited=True):
+                pass
+        except NodeAlreadyFoundError:
             return False
-        if not self.is_subgraph_stable(*other_group):
-            return False
-        return all(
-            self.are_adjacents(node1, node2)
-            for node1 in nodes_group
-            for node2 in other_group
-        )
-
-
-class DirectedGraph(AbstractGraph):
-    """A graph with directed edges.
-
-    >>> G = DirectedGraph((1, 2, 3), (1, 3), (1, 2), (2, 1), (1, 1))
-    """
-
-    def is_isomorphic_to(self, other) -> bool:
-        return super().is_isomorphic_to(other)
-
-    def __repr__(self):
-        edges = (repr(edge) for edge in self.edges)
-        return f"DirectedGraph({tuple(self.nodes)!r}, {', '.join(edges)})"
-
-    @property
-    def is_directed(self):
         return True
 
-    @staticmethod
-    def _edge(node1, node2) -> DirectedEdge:
-        return node1, node2
-
     @cached_property
-    def is_eulerian(self):
-        return all(self.out_degree(node) == self.in_degree(node) for node in self.nodes)
-
-    @cached_property
-    def is_semi_eulerian(self):
-        start_found = end_found = False
-        for node in self.nodes:
-            out_degree = self.out_degree(node)
-            in_degree = self.in_degree(node)
-            if out_degree == in_degree + 1 and not start_found:
-                start_found = True
-            elif out_degree == in_degree - 1 and not end_found:
-                end_found = True
-            elif out_degree != in_degree:
-                return False
-        return start_found and end_found
-
-    @cached_property
-    def levels(self) -> Tuple[FrozenSet[Node], ...]:
-        graph = self.copy()
-        levels: List[FrozenSet] = []
-        while True:
-            level = set()
-            for node in graph.nodes:
-                if graph.out_degree(node) == 0:  # is node a sink ?
-                    level.add(node)
-            if len(level) == 0:
-                break
-            graph.remove_nodes(*level)
-            levels.append(frozenset(level))
-        if graph.order != 0:
-            raise CycleFoundError(
-                "Can't split the graph into levels, since it has a closed path."
-            )
-        return tuple(levels)
-
-    @cached_property
-    def kernel(self) -> FrozenSet[Node]:
-        graph = self.copy()
-        kernel = set()
-        while True:
-            nodes_to_remove = set()
-            for node in graph.nodes:
-                if graph.out_degree(node) == 0:  # is node a sink ?
-                    kernel.add(node)
-                    nodes_to_remove.add(node)
-                    nodes_to_remove |= self.predecessors(node)
-
-            if len(nodes_to_remove) == 0:
-                break
-            graph.remove_nodes(*nodes_to_remove)
-        if graph.order != 0:
-            raise CycleFoundError(
-                "Can't compute the graph's kernel, since it has a closed path."
-            )
-        return frozenset(kernel)
-
-    @cached_property
-    def has_cycle(self) -> bool:
-        return not hasattr(self, "levels")
-
-    @property
-    def reversed_graph(self):
-        return DirectedGraph(self.nodes, *(edge[::-1] for edge in self.edges))
-
-    @property
-    def undirected_graph(self):
-        return Graph(self.nodes, *self.edges)
-
-    @property
-    def weighted_graph(self):
-        from smallgraphlib import WeightedDirectedGraph
-
-        return WeightedDirectedGraph(self.nodes, *(edge + (1,) for edge in self.edges))
-
-    @cached_property
-    def is_strongly_connected(self):
-        node = next(iter(self.nodes))
-        return self._test_connection_from_node(
-            node
-        ) and self.reversed_graph._test_connection_from_node(node)
-
-    @cached_property
-    def is_connected(self):
-        return self.undirected_graph.is_connected
-
-    def are_adjacents(self, node1: Node, node2: Node) -> bool:
-        return node2 in (self.successors(node1) | self.predecessors(node1))
+    def is_a_tree(self) -> bool:
+        if self.order != self.degree + 1:
+            return False
+        try:
+            # All nodes must be visited once.
+            return self.nodes_set == set(self._iterative_depth_first_search(error_if_already_visited=True))
+        except NodeAlreadyFoundError:
+            return False

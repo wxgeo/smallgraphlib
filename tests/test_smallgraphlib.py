@@ -3,7 +3,8 @@ import random
 
 import pytest
 
-from smallgraphlib.graph import DirectedGraph
+from smallgraphlib.basic_graphs import DirectedGraph
+from smallgraphlib.core import Traversal
 from smallgraphlib.utilities import Multiset
 
 from smallgraphlib import (
@@ -16,6 +17,7 @@ from smallgraphlib import (
     complete_bipartite_graph,
     LabeledGraph,
     graph,
+    perfect_binary_tree,
 )
 
 
@@ -373,13 +375,63 @@ def test_isomorphic_basic_case():
 def test_non_isomorphic_with_same_degrees():
     k33 = complete_bipartite_graph(3, 3)
     isomorphic_to_k33 = graph("s1:s2,s3,s6 s2:s4,s5 s3:s4,s5 s4:s6 s5:s6 s6")
-    other_graph_with_same_degrees = graph(
-        "t1:t2,t5,t4 t2:t6,t3 t3:t6,t4 t4:t5 t5:t6 t6"
-    )
+    other_graph_with_same_degrees = graph("t1:t2,t5,t4 t2:t6,t3 t3:t6,t4 t4:t5 t5:t6 t6")
     assert k33.order == isomorphic_to_k33.order == other_graph_with_same_degrees.order
-    assert (
-        k33.degree == isomorphic_to_k33.degree == other_graph_with_same_degrees.degree
-    )
+    assert k33.degree == isomorphic_to_k33.degree == other_graph_with_same_degrees.degree
     assert not isomorphic_to_k33.is_isomorphic_to(other_graph_with_same_degrees)
     assert isomorphic_to_k33.is_isomorphic_to(k33)
     assert not other_graph_with_same_degrees.is_isomorphic_to(k33)
+
+
+def test_dfs():
+    g = Graph(range(1, 6), (3, 4), (3, 2), (2, 5), (2, 1))
+    assert g.is_a_tree
+    assert g.is_acyclic
+    assert not g.is_directed
+    assert g.is_connected
+    assert g.diameter == 3
+    assert tuple(g.depth_first_search(3, order=Traversal.PREORDER)) == (3, 4, 2, 5, 1)
+    assert tuple(g.depth_first_search(3, order=Traversal.POSTORDER)) == (4, 5, 1, 2, 3)
+    assert tuple(g.depth_first_search(3, order=Traversal.INORDER)) == (4, 3, 5, 2, 1)
+    g = Graph(range(7), (0, 1), (0, 4), (1, 2), (1, 3), (4, 5), (4, 6))
+    assert tuple(g.depth_first_search(order=Traversal.PREORDER)) == (0, 1, 2, 3, 4, 5, 6)
+    assert tuple(g.depth_first_search(order=Traversal.POSTORDER)) == (2, 3, 1, 5, 6, 4, 0)
+    assert tuple(g.depth_first_search(order=Traversal.INORDER)) == (2, 1, 3, 0, 5, 4, 6)
+
+
+def test_binary_tree_and_dfs():
+    g = perfect_binary_tree(4)
+    assert g.nodes_set == {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15}
+    assert g.edges_set == set(
+        frozenset(s)
+        for s in (
+            {1, 2},
+            {1, 3},
+            {2, 4},
+            {2, 5},
+            {3, 6},
+            {3, 7},
+            {8, 4},
+            {9, 4},
+            {11, 5},
+            {10, 5},
+            {12, 6},
+            {13, 6},
+            {14, 7},
+            {15, 7},
+        )
+    )
+    assert list(g._iterative_depth_first_search()) == [1, 2, 4, 8, 9, 5, 10, 11, 3, 6, 12, 13, 7, 14, 15]
+    assert g.is_a_tree
+    assert g.is_acyclic
+    g.add_edges((1, 15))
+    assert g.order == 15
+    assert g.degree == 15
+    assert not g.is_a_tree
+    assert not g.is_acyclic
+    g.remove_edges((1, 15))
+    g.add_edges((4, 14))
+    assert g.order == 15
+    assert g.degree == 15
+    assert not g.is_a_tree
+    assert not g.is_acyclic

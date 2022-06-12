@@ -1,7 +1,7 @@
 from importlib import metadata
 
-from smallgraphlib.graph import Graph, DirectedGraph
-from smallgraphlib.labeled_graph import (
+from smallgraphlib.basic_graphs import Graph, DirectedGraph
+from smallgraphlib.labeled_graphs import (
     WeightedGraph,
     WeightedDirectedGraph,
     LabeledGraph,
@@ -12,7 +12,9 @@ from smallgraphlib.graphs_constructors import (
     complete_bipartite_graph,
     graph,
     random_graph,
+    perfect_binary_tree,
 )
+from smallgraphlib.core import Traversal
 
 __version__ = metadata.version(__package__)
 
@@ -28,4 +30,6 @@ __all__ = [
     "complete_graph",
     "graph",
     "complete_bipartite_graph",
+    "perfect_binary_tree",
+    "Traversal"
 ]
