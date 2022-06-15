@@ -3,12 +3,13 @@ import math
 import re
 from abc import ABC
 from itertools import chain
+from math import inf
 from numbers import Real
-from typing import Iterable, Tuple, Dict, List, TypeVar, Generic, Any
+from typing import Iterable, Tuple, Dict, List, TypeVar, Generic, Any, Optional
 
 from smallgraphlib.basic_graphs import Graph, DirectedGraph
 from smallgraphlib.core import Node, Edge, AbstractGraph
-from math import inf
+from smallgraphlib.utilities import cached_property
 
 Label = TypeVar("Label")
 LabeledEdge = Tuple[Node, Node, Label]
@@ -35,7 +36,18 @@ class AbstractLabeledGraph(AbstractGraph, ABC, Generic[Label]):
 
     @classmethod
     def from_dict(cls, edge_label_dict: dict = None, /, **edge_label):
-        """LabeledUndirectedGraph.from_dict(AB=1, AC=3, BC=4)"""
+        """Construct a directed graph using a {edge_name: label} dictionnary (or keywords).
+
+        All edges' names must be two letters strings (like "AB"), each letter representing a node.
+        Nodes' names are automatically deduced from edges' names.
+
+        >>> g1 = LabeledUndirectedGraph.from_dict(AB=1, AC=3, BC=4)
+        >>> g2 = LabeledUndirectedGraph.from_dict({"AB": 1, "AC": 3, "BC": 4})
+        >>> g1 == g2
+        True
+        >>> g1.nodes
+        ('A', 'B', 'C')
+        """
         if edge_label_dict is None:
             edge_label_dict = {}
         edge_label_dict.update(edge_label)
@@ -103,12 +115,72 @@ class AbstractWeightedGraph(AbstractLabeledGraph, ABC):
                 if not isinstance(weight, Real):
                     raise ValueError(f"Edge weight {weight!r} is not a real number.")
 
-    def weight(self, node1, node2) -> float:
-        return min(self.weights[self._edge(node1, node2)], default=inf)
+    def weight(self, node1: Node, node2: Node, *, aggregator=min, default: float = inf) -> float:
+        """
+        Return the weight of the edge joining node1 and node2.
+        Args:
+            node1: Node
+            node2: Node
+            aggregator: function used to aggregate values if there are several edges
+                        between `node1` and `node2` (default is `min`)
+            default: value returned if `node1` and `node2` are not adjacents (default is `inf`).
+        Return:
+            float
+        """
+        values = self.weights[self._edge(node1, node2)]
+        return aggregator(values) if values else default
+
+    @cached_property
+    def total_weight(self) -> float:
+        """Return the sum of all edges weights."""
+        return sum(sum(values) for values in self.weights.values())
 
 
 class WeightedGraph(AbstractWeightedGraph, LabeledGraph):
-    pass
+    """A weighted graph, i.e. a graph where all edges have a weight."""
+
+    def minimum_spanning_tree(self) -> Optional[Graph]:
+        """Use Prim's algorithm to return a minimum weight spanning tree.
+
+        A spanning tree of a graph G is a subgraph of G who is a tree and contains all the nodes of G.
+
+        If the graph is not connected, return `None`.
+        """
+        # Nodes and edges of the spanning tree.
+        last_connected_node = self.nodes[0]
+        connected_nodes: List[Node] = [last_connected_node]  # type: ignore
+        weighted_edges: List[WeightedEdge] = []
+
+        # Nodes which may be connected, with the current cost of connection, i.e. the minimal edge's weight
+        # enabling to connect it to the spanning tree.
+        cheapest_cost: Dict[Node, float] = {}  # type: ignore
+        cheapest_edge: Dict[Node, Node] = {}  # type: ignore
+        unreached_nodes = set(self.nodes) - set(connected_nodes)
+
+        while True:
+            # Update frontier
+            for successor in self.successors(last_connected_node):
+                if successor not in connected_nodes:
+                    cost = self.weight(last_connected_node, successor)
+                    if cost < cheapest_cost.get(successor, inf):
+                        # This a cheaper way to connect the node, so update.
+                        cheapest_cost[successor] = cost
+                        cheapest_edge[successor] = last_connected_node
+
+            if not cheapest_cost:
+                break
+
+            # connect one more node at minimal cost
+            last_connected_node = min(cheapest_cost, key=cheapest_cost.get)  # type: ignore
+            connected_nodes.append(last_connected_node)
+            unreached_nodes.remove(last_connected_node)
+            weighted_edges.append(
+                (cheapest_edge[last_connected_node], last_connected_node, cheapest_cost[last_connected_node])
+            )
+            cheapest_cost.pop(last_connected_node)
+            cheapest_edge.pop(last_connected_node)
+
+        return None if unreached_nodes else WeightedGraph(connected_nodes, *weighted_edges)
 
 
 class WeightedDirectedGraph(AbstractWeightedGraph, LabeledDirectedGraph):

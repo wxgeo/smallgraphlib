@@ -472,3 +472,53 @@ def test_binary_tree_and_dfs():
     assert g.degree == 15
     assert not g.is_a_tree
     assert not g.is_acyclic
+
+
+def test_weighted_graph():
+    g = WeightedGraph([1, 2, 3, 4, 5], (1, 2, 10.0), (2, 3, 9.0), (2, 4, 7.0), (4, 5, 8.0))
+    assert g.successors(1) == {2}
+    assert g.weight(2, 1) == 10.0
+    assert g.total_weight == 10.0 + 9.0 + 7.0 + 8.0
+
+
+def test_minimum_spanning_tree():
+    g = WeightedGraph([1])
+    assert g.minimum_spanning_tree() == g
+    g = WeightedGraph([1, 2, 3, 4, 5], (1, 2, 10.0), (2, 3, 9.0), (2, 4, 7.0), (4, 5, 8.0))
+    assert g.minimum_spanning_tree() == g
+    g = WeightedGraph.from_dict(
+        AB=15,
+        AE=8,
+        AG=6,
+        AF=13,
+        BC=10,
+        BD=13,
+        BG=14,
+        CD=12,
+        CF=11,
+        DE=11,
+        DF=5,
+        DG=12,
+        EF=5,
+        EG=10,
+    )
+    assert g.degree == 14
+    assert g.minimum_spanning_tree().total_weight == 45
+    g = WeightedGraph.from_dict(
+        AB=12,
+        AC=20,
+        AD=9,
+        BF=13,
+        CD=8,
+        CF=2,
+        CG=11,
+        DG=21,
+        EF=9,
+        EG=3,
+        FG=5,
+    )
+    assert g.degree == 11
+    assert g.minimum_spanning_tree().total_weight == 39
+    # Not connected graph
+    g = WeightedGraph((1, 2))
+    assert g.minimum_spanning_tree() is None
