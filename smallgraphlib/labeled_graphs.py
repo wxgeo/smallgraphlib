@@ -5,10 +5,10 @@ from abc import ABC
 from itertools import chain
 from math import inf
 from numbers import Real
-from typing import Iterable, Tuple, Dict, List, TypeVar, Generic, Any, Optional
+from typing import Iterable, Tuple, Dict, List, TypeVar, Generic, Any
 
 from smallgraphlib.basic_graphs import Graph, DirectedGraph
-from smallgraphlib.core import Node, Edge, AbstractGraph
+from smallgraphlib.core import Node, Edge, AbstractGraph, InvalidGraphAttribute
 from smallgraphlib.utilities import cached_property
 
 Label = TypeVar("Label")
@@ -41,8 +41,8 @@ class AbstractLabeledGraph(AbstractGraph, ABC, Generic[Label]):
         All edges' names must be two letters strings (like "AB"), each letter representing a node.
         Nodes' names are automatically deduced from edges' names.
 
-        >>> g1 = LabeledUndirectedGraph.from_dict(AB=1, AC=3, BC=4)
-        >>> g2 = LabeledUndirectedGraph.from_dict({"AB": 1, "AC": 3, "BC": 4})
+        >>> g1 = LabeledGraph.from_dict(AB=1, AC=3, BC=4)
+        >>> g2 = LabeledGraph.from_dict({"AB": 1, "AC": 3, "BC": 4})
         >>> g1 == g2
         True
         >>> g1.nodes
@@ -139,12 +139,12 @@ class AbstractWeightedGraph(AbstractLabeledGraph, ABC):
 class WeightedGraph(AbstractWeightedGraph, LabeledGraph):
     """A weighted graph, i.e. a graph where all edges have a weight."""
 
-    def minimum_spanning_tree(self) -> Optional[Graph]:
+    def minimum_spanning_tree(self) -> Graph:
         """Use Prim's algorithm to return a minimum weight spanning tree.
 
         A spanning tree of a graph G is a subgraph of G who is a tree and contains all the nodes of G.
 
-        If the graph is not connected, return `None`.
+        If the graph is not connected, raise an `InvalidGraphAttribute`.
         """
         # Nodes and edges of the spanning tree.
         last_connected_node = self.nodes[0]
@@ -180,7 +180,10 @@ class WeightedGraph(AbstractWeightedGraph, LabeledGraph):
             cheapest_cost.pop(last_connected_node)
             cheapest_edge.pop(last_connected_node)
 
-        return None if unreached_nodes else WeightedGraph(connected_nodes, *weighted_edges)
+        if unreached_nodes:
+            raise InvalidGraphAttribute("This graph has no spanning tree since it is not connected.")
+
+        return WeightedGraph(connected_nodes, *weighted_edges)
 
 
 class WeightedDirectedGraph(AbstractWeightedGraph, LabeledDirectedGraph):

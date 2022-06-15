@@ -740,3 +740,7 @@ class AbstractGraph(ABC, Generic[Node]):
             visited.add(node)
             yield node
             queue.extend(successor for successor in self._successors[node] if successor not in visited)
+
+
+class InvalidGraphAttribute(AttributeError):
+    """This error is raised when a method or property can't return a value for a particular graph."""

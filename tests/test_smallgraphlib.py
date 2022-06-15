@@ -4,7 +4,7 @@ import random
 import pytest
 
 from smallgraphlib.basic_graphs import DirectedGraph
-from smallgraphlib.core import Traversal
+from smallgraphlib.core import Traversal, InvalidGraphAttribute
 from smallgraphlib.utilities import Multiset
 
 from smallgraphlib import (
@@ -93,6 +93,17 @@ def test_levels_and_kernel():
     assert g.in_degree(1) == 0
     assert g.levels == ({3, 5}, {4, 6}, {7}, {2}, {1})
     assert g.kernel == {3, 5}
+    g = DirectedGraph((1, 2, 3), (1, 2), (2, 3), (3, 1))
+    with pytest.raises(InvalidGraphAttribute):
+        _ = g.levels
+
+
+def test_kernel():
+    g = DirectedGraph(
+        (1, 2, 3, 4, 5, 6, 7), (1, 3), (1, 4), (1, 5), (1, 6), (2, 3), (2, 5), (3, 6), (5, 3), (7, 4)
+    )
+    assert not g.has_cycle
+    assert g.kernel == {4, 5, 6}
 
 
 def test_cycle():
@@ -521,4 +532,5 @@ def test_minimum_spanning_tree():
     assert g.minimum_spanning_tree().total_weight == 39
     # Not connected graph
     g = WeightedGraph((1, 2))
-    assert g.minimum_spanning_tree() is None
+    with pytest.raises(InvalidGraphAttribute):
+        g.minimum_spanning_tree()

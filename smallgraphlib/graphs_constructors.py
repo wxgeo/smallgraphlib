@@ -79,7 +79,6 @@ def perfect_binary_tree(height: int):
     """
     nodes: List[int] = []
     edges: List[Edge] = []
-    i = 1
     for level in range(height):
         nodes.extend(range(1 << level, 1 << level + 1))
     for level in range(height - 1):

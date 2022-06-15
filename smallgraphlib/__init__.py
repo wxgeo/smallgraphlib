@@ -14,7 +14,7 @@ from smallgraphlib.graphs_constructors import (
     random_graph,
     perfect_binary_tree,
 )
-from smallgraphlib.core import Traversal
+from smallgraphlib.core import Traversal, InvalidGraphAttribute
 
 __version__ = metadata.version(__package__)
 
@@ -32,4 +32,5 @@ __all__ = [
     "complete_bipartite_graph",
     "perfect_binary_tree",
     "Traversal",
+    "InvalidGraphAttribute",
 ]

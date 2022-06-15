@@ -89,10 +89,6 @@ class Multiset(Counter):
         return sum(self.values())
 
 
-class CycleFoundError(AttributeError):
-    pass
-
-
 class ComparableAndHashable(Protocol):
     """Protocol for annotating comparable types."""
 

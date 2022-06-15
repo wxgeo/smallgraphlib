@@ -12,10 +12,9 @@ from typing import (
     FrozenSet,
 )
 
-from smallgraphlib.core import Node, DirectedEdge, UndirectedEdge, AbstractGraph
+from smallgraphlib.core import Node, DirectedEdge, UndirectedEdge, AbstractGraph, InvalidGraphAttribute
 from smallgraphlib.utilities import (
     cached_property,
-    CycleFoundError,
 )
 
 
@@ -155,7 +154,7 @@ class DirectedGraph(AbstractGraph):
             graph.remove_nodes(*level)
             levels.append(frozenset(level))
         if graph.order != 0:
-            raise CycleFoundError("Can't split the graph into levels, since it has a closed path.")
+            raise InvalidGraphAttribute("Can't split the graph into levels, since it has a closed path.")
         return tuple(levels)
 
     @cached_property
@@ -168,13 +167,13 @@ class DirectedGraph(AbstractGraph):
                 if graph.out_degree(node) == 0:  # is node a sink ?
                     kernel.add(node)
                     nodes_to_remove.add(node)
-                    nodes_to_remove |= self.predecessors(node)
+                    nodes_to_remove |= graph.predecessors(node)
 
             if len(nodes_to_remove) == 0:
                 break
             graph.remove_nodes(*nodes_to_remove)
         if graph.order != 0:
-            raise CycleFoundError("Can't compute the graph's kernel, since it has a closed path.")
+            raise InvalidGraphAttribute("Can't compute the graph's kernel, since it has a closed path.")
         return frozenset(kernel)
 
     @cached_property

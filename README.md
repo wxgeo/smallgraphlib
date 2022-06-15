@@ -41,7 +41,7 @@ Special graphs may be generated using factory functions:
     >>> K33.diameter
     2
     
-If the graph is not to complex, Tikz code may be generated:
+If the graph is not too complex, Tikz code may be generated:
 
     >>> g.as_tikz()
     ...
