@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 from collections import Counter, deque
 from enum import Enum
 from itertools import chain
-from math import inf
+from math import inf, cos, radians, sin
 from typing import (
     TypeVar,
     Tuple,
@@ -25,6 +25,7 @@ from smallgraphlib.utilities import (
     cached_property,
     Multiset,
     clear_cache,
+    segments_intersection,
 )
 
 _TIKZ_EXPORT_MAX_MULTIPLE_EDGES_SUPPORT = 3
@@ -446,12 +447,21 @@ class AbstractGraph(ABC, Generic[Node]):
     def is_connected(self) -> bool:
         ...
 
-    def count_edges(self, node1: Node, node2: Node) -> int:
-        """Count the number of edges from node1 to node2. Note that undirected loops are counted twice."""
-        return self._successors[node1][node2]
+    def count_edges(self, node1: Node, node2: Node, count_undirected_loops_twice=True) -> int:
+        """Count the number of edges from node1 to node2.
 
-    def weight(self, node1, node2) -> float:
+        Warning: by default, undirected loops are counted twice."""
+        n = self._successors[node1][node2]
+        if not count_undirected_loops_twice and node1 == node2 and not self.is_directed:
+            n //= 2
+        return n
+
+    def weight(self, node1: Node, node2: Node) -> float:
         return 1
+
+    def labels(self, node1: Node, node2: Node) -> List[str]:
+        n = self.count_edges(node1, node2, count_undirected_loops_twice=False)
+        return n * [""]
 
     def node_degree(self, node: Node) -> int:
         if self.is_directed:
@@ -525,67 +535,6 @@ class AbstractGraph(ABC, Generic[Node]):
     @abstractmethod
     def _edge(node1, node2) -> Edge:
         ...
-
-    def as_tikz(self, shuffle_nodes=False) -> str:
-        lines: List[str] = [
-            r"\begin{tikzpicture}["
-            r"every node/.style = {draw, circle,font={\scriptsize},inner sep=2},"
-            "directed/.style = {-{Stealth[scale=1.1]}},"
-            "reversed/.style = {{Stealth[scale=1.1]}-},"
-            "undirected/.style = {},"
-            "]"
-        ]
-        theta = 360 / self.order
-        angles = {}
-        nodes = list(self.nodes)
-        if shuffle_nodes:
-            random.shuffle(nodes)
-        for i, node in enumerate(nodes):
-            angle = angles[node] = i * theta
-            lines.append(rf"\node ({node}) at ({angle}:1cm) {{${node}$}};")
-        nodes_pairs = {frozenset((node1, node2)) for node1 in nodes for node2 in nodes}
-        pair: FrozenSet[Node]
-        for pair in nodes_pairs:
-            style = "directed" if self.is_directed else "undirected"
-            if len(pair) == 1:
-                (node,) = pair
-                n: int = self.count_edges(node, node)
-                if not self.is_directed:
-                    assert n % 2 == 0, n
-                    n //= 2
-                if n > _TIKZ_EXPORT_MAX_MULTIPLE_LOOPS_SUPPORT:
-                    raise NotImplementedError(n)
-                if n == 1:
-                    lines.append(
-                        rf"\draw[{style}] ({node}) to "
-                        f"[out={angles[node] - 45},in={angles[node] + 45},looseness=5] ({node});"
-                    )
-            else:
-                node1, node2 = pair
-                if self.is_directed:
-                    n1 = self.count_edges(node1, node2)
-                    n2 = self.count_edges(node2, node1)
-                    n = n1 + n2
-                    styles = n1 * ["directed"] + n2 * ["reversed"]
-                else:
-                    n = self.count_edges(node1, node2)
-                    styles = n * ["undirected"]
-                if n == 0:
-                    curves = []
-                elif n == 1:
-                    curves = [""]
-                elif n == 2:
-                    curves = ["bend left", "bend right"]
-                elif n == 3:
-                    curves = ["bend left", "", "bend right"]
-                else:
-                    assert n > _TIKZ_EXPORT_MAX_MULTIPLE_EDGES_SUPPORT
-                    raise NotImplementedError(n)
-                for style, curve in zip(styles, curves):
-                    lines.append(rf"\draw[{style}] ({node1}) to[{curve}] ({node2});")
-
-        lines.append(r"\end{tikzpicture}")
-        return "\n".join(lines)
 
     def _dijkstra(self, start: Node, end: Node = None) -> Tuple[Dict[Node, float], Dict[Node, List[Node]]]:
         """Implementation of Dijkstra Algorithm."""
@@ -740,6 +689,153 @@ class AbstractGraph(ABC, Generic[Node]):
             visited.add(node)
             yield node
             queue.extend(successor for successor in self._successors[node] if successor not in visited)
+
+    def as_tikz(self, *, shuffle_nodes=False, options="") -> str:
+        r"""Generate tikz code corresponding to this graph.
+
+        `Tikz` package must be loaded in the latex preamble, with `arrows.meta` library::
+
+            \usepackage{tikz}
+            \usetikzlibrary{arrows.meta}
+
+        For labeled graphs, it is recommended to load `contour` package too::
+
+            \usepackage[outline]{contour}
+            \contourlength{0.5pt}
+
+        """
+        lines: List[str] = [
+            r"\providecommand{\contour}[2]{#2}"  # avoid an error if package contour is not loaded.
+            r"\begin{tikzpicture}["
+            r"every node/.style = {font={\scriptsize}},"
+            r"vertex/.style = {draw, circle,font={\scriptsize},inner sep=2},"
+            "directed/.style = {-{Stealth[scale=1.1]}},"
+            "reversed/.style = {{Stealth[scale=1.1]}-},"
+            "undirected/.style = {},"
+            f"{options}"
+            "]"
+        ]
+        theta = 360 / self.order
+        angles = {}
+        nodes = list(self.nodes)
+        if shuffle_nodes:
+            random.shuffle(nodes)
+        index: Dict[Node, int] = {node: i for i, node in enumerate(nodes)}
+        # All nodes are placed around a circle, creating a regular polygon.
+        for i, node in enumerate(nodes):
+            angle = angles[node] = i * theta
+            lines.append(rf"\node[vertex] ({node}) at ({angle}:1cm) {{${node}$}};")
+
+        # Store nodes' cartesian coordinates.
+        nodes_positions: Dict[Node, Tuple[float, float]] = {}
+        for node in nodes:
+            alpha = radians(angles[node])
+            nodes_positions[node] = cos(alpha), sin(alpha)
+
+        def label_position(node1_, node2_, k):
+            """Return label cartesian coordinates for position `k`.
+
+            Position `k` is a barycentric coefficient between 0 and 1."""
+            x1, y1 = nodes_positions[node1_]
+            x2, y2 = nodes_positions[node2_]
+            return k * x2 + (1 - k) * x1, k * y2 + (1 - k) * y1
+
+        # Store the places already occupied by labels, to avoid storing another label there.
+        labels_positions: List[Tuple[float, float]] = []
+        # Detect edges' intersections, to avoid positioning labels there.
+        for node1 in nodes:
+            for node2 in self.successors(node1) | self.predecessors(node1):
+                if index[node1] < index[node2]:
+                    for node3 in nodes:
+                        for node4 in self.successors(node3) | self.predecessors(node3):
+                            if index[node3] < index[node4] and len({node1, node2, node3, node4}) == 4:
+                                A, B, C, D = (nodes_positions[node] for node in (node1, node2, node3, node4))
+                                intersection = segments_intersection((A, B), (C, D))
+                                if intersection is not None:
+                                    labels_positions.append(intersection)
+
+        for node1 in nodes:
+            # If the graph is undirected, draw only i -> j edge and not j -> i edge,
+            # since it is in fact the same edge.
+            # An easy way to do that is to keep index[node2] always superior or equal to index[node1].
+            for node2 in nodes if self.is_directed else nodes[index[node1] :]:
+                if node1 == node2:
+                    # This is a loop.
+                    node = node1
+                    style = "directed" if self.is_directed else "undirected"
+                    n: int = self.count_edges(node, node, count_undirected_loops_twice=False)
+                    if n > _TIKZ_EXPORT_MAX_MULTIPLE_LOOPS_SUPPORT:
+                        raise NotImplementedError(n)
+                    if n == 1:
+                        (label,) = self.labels(node, node)
+                        lines.append(
+                            rf"\draw[{style}] ({node}) to "
+                            f"[out={angles[node] - 45},in={angles[node] + 45},looseness=5] "
+                            f"node[midway] {{{label}}} "
+                            f"({node});"
+                        )
+                else:
+                    # This is a normal edge, joining two different nodes.
+                    styles: List[str] = []
+                    labels: List[str] = []
+                    # Detect if node1 and node2 are neighbours on the circle.
+                    node2_is_right_neighbour = (index[node1] - index[node2] - 1) % len(nodes) == 0
+                    node2_is_left_neighbour = (index[node1] - index[node2] + 1) % len(nodes) == 0
+
+                    if self.is_directed:
+                        data = [("directed", node1, node2), ("reversed", node2, node1)]
+                    else:
+                        data = [("undirected", node1, node2)]
+                    for direction, nodeA, nodeB in data:
+                        labels.extend(self.labels(nodeA, nodeB))
+                        styles += self.count_edges(nodeA, nodeB) * [direction]
+                    n = len(styles)
+                    assert len(labels) == n, f"len(styles)={n} != len(labels)={len(labels)}"
+                    if n == 0:
+                        bendings = []
+                    elif n == 1:
+                        bendings = [""]  # strait line by default
+                        if len(nodes) >= 6:
+                            if node2_is_left_neighbour:
+                                bendings[0] = "bend right=30"
+                            elif node2_is_right_neighbour:
+                                bendings[0] = "bend left=30"
+                    elif n == 2:
+                        bendings = ["bend left=15", "bend right=15"]
+                    elif n == 3:
+                        bendings = ["bend left", "", "bend right"]
+                    else:
+                        assert n > _TIKZ_EXPORT_MAX_MULTIPLE_EDGES_SUPPORT
+                        raise NotImplementedError(
+                            f"Too much multiple edges : {n} > {_TIKZ_EXPORT_MAX_MULTIPLE_EDGES_SUPPORT} "
+                            f"for graph {self}."
+                        )
+                    for style, bending, label in zip(styles, bendings, labels):
+                        label_tikz_code = ""
+                        if label:
+                            pos = 0.5
+                            if node2_is_right_neighbour or node2_is_left_neighbour:
+                                pass
+                            else:
+                                # Try to minimize collisions between two labels.
+                                # This dict will store the distance between the nearest labels
+                                # for each position.
+                                min_dists: Dict[float, float] = {}
+                                # This one will store the coordinates of the label for each position.
+                                coordinates: Dict[float, Tuple[float, float]] = {}
+                                for pos in (0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9):
+                                    new_x, new_y = label_position(node1, node2, pos)
+                                    min_dists[pos] = min(
+                                        (new_x - x) ** 2 + (new_y - y) ** 2 for (x, y) in labels_positions
+                                    )
+                                    coordinates[pos] = new_x, new_y
+                                pos = max(min_dists, key=min_dists.get)  # type: ignore
+                                labels_positions.append(coordinates[pos])
+                            label_tikz_code = rf"node[pos={pos}] {{\contour{{white}}{{{label}}}}}"
+                        lines.append(rf"\draw[{style}] ({node1}) to[{bending}] {label_tikz_code} ({node2});")
+
+        lines.append(r"\end{tikzpicture}")
+        return "\n".join(lines)
 
 
 class InvalidGraphAttribute(AttributeError):

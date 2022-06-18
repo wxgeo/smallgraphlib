@@ -5,7 +5,7 @@ import pytest
 
 from smallgraphlib.basic_graphs import DirectedGraph
 from smallgraphlib.core import Traversal, InvalidGraphAttribute
-from smallgraphlib.utilities import Multiset
+from smallgraphlib.utilities import Multiset, segments_intersection
 
 from smallgraphlib import (
     __version__,
@@ -271,10 +271,10 @@ def test_LabeledDirectedGraph_from_string():
     g = LabeledDirectedGraph.from_string("A:B=label,C='other label' B:C=5 C D:C")
     assert g.nodes == ("A", "B", "C", "D")
     assert g.edges_set == {("A", "B"), ("A", "C"), ("B", "C"), ("D", "C")}
-    assert g.labels[("A", "B")] == ["label"]
-    assert g.labels[("A", "C")] == ["other label"]
-    assert g.labels[("B", "C")] == [5]
-    assert g.labels[("D", "C")] == [None]
+    assert g.labels("A", "B") == ["label"]
+    assert g.labels("A", "C") == ["other label"]
+    assert g.labels("B", "C") == ["5"]
+    assert g.labels("D", "C") == [""]
 
 
 def test_LabeledGraph_from_string():
@@ -284,10 +284,10 @@ def test_LabeledGraph_from_string():
     g = LabeledGraph.from_string("A:B=label,C='other label' B:C=5 C D:C")
     assert g.nodes == ("A", "B", "C", "D")
     assert g.edges_set == {f("A", "B"), f("A", "C"), f("B", "C"), f("D", "C")}
-    assert g.labels[f("A", "B")] == ["label"]
-    assert g.labels[f("A", "C")] == ["other label"]
-    assert g.labels[f("B", "C")] == [5]
-    assert g.labels[f("D", "C")] == [None]
+    assert g.labels("A", "B") == ["label"]
+    assert g.labels("A", "C") == ["other label"]
+    assert g.labels("B", "C") == ["5"]
+    assert g.labels("D", "C") == [""]
 
 
 def test_graph_constructor():
@@ -306,7 +306,7 @@ def test_graph_constructor():
     assert g.diameter == math.inf
     g = graph("A:B='some text with space',C=text_without_space B:C=2.5 C D")
     assert not g.is_directed
-    assert g.labels[frozenset(("A", "B"))]
+    assert g.labels("A", "B") == ["some text with space"]
 
 
 def test_single_node_renaming():
@@ -534,3 +534,15 @@ def test_minimum_spanning_tree():
     g = WeightedGraph((1, 2))
     with pytest.raises(InvalidGraphAttribute):
         g.minimum_spanning_tree()
+
+
+def test_intersection():
+    A = (-4.191374663072777, -0.4986522911051212)
+    B = (-0.41778975741239854, 1.495956873315364)
+    C = (-3.4905660377358494, 2.035040431266846)
+    D = (0.8760107816711589, -0.12129380053908356)
+    expected_intersection = (-1.374693295677149, 0.9901650030897102)
+    M = segments_intersection((A, B), (C, D))
+    assert math.hypot(M[0] - expected_intersection[0], M[1] - expected_intersection[1]) < 10 ** -8
+    A = (-2.0572283216093616, 1.544030635724147)
+    assert segments_intersection((A, B), (C, D)) is None

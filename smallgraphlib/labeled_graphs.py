@@ -24,15 +24,17 @@ class AbstractLabeledGraph(AbstractGraph, ABC, Generic[Label]):
         sort_nodes: bool = True,
     ):
         edges: List[Edge] = []
-        self.labels: Dict[Edge, List[Label]] = {}
+        self._labels: Dict[Edge, List[Label]] = {}
         for *edge, label in labeled_edges:
             edges.append(edge)  # type: ignore
-            self.labels.setdefault(self._edge(*edge), []).append(label)
+            self._labels.setdefault(self._edge(*edge), []).append(label)
 
         super().__init__(nodes, *edges, sort_nodes=sort_nodes)
 
     def __eq__(self, other: Any):
-        return super().__eq__(other) and all(self.labels[edge] == other.labels[edge] for edge in self.edges)
+        return super().__eq__(other) and all(
+            sorted(self.labels(*edge)) == sorted(other.labels(*edge)) for edge in self.edges
+        )
 
     @classmethod
     def from_dict(cls, edge_label_dict: dict = None, /, **edge_label):
@@ -66,7 +68,7 @@ class AbstractLabeledGraph(AbstractGraph, ABC, Generic[Label]):
 
         If no label is given, `None` is stored by default.
         """
-        # Convert spaces inside labels to null character, to make splitting easier.
+        # Convert spaces inside labels to null characters, to make splitting easier.
         string = re.sub("""'[^']*'|"[^"]*""", (lambda m: m.group().replace(" ", "\x00")), string)
         nodes: List[str] = []
         edges: List[Tuple[str, str, Any]] = []
@@ -78,7 +80,7 @@ class AbstractLabeledGraph(AbstractGraph, ABC, Generic[Label]):
                 for successor_and_label in remaining[0].split(","):
                     successor, *after_successor = successor_and_label.split("=", 1)
                     if after_successor:
-                        # convert back null character to space.
+                        # Convert back null characters inside labels to spaces.
                         label = after_successor[0].strip().replace("\x00", " ")
                         try:
                             label = ast.literal_eval(label)
@@ -91,6 +93,11 @@ class AbstractLabeledGraph(AbstractGraph, ABC, Generic[Label]):
                         label = None
                     edges.append((node, successor.strip(), label))
         return cls(nodes, *edges)  # type: ignore
+
+    def labels(self, node1: Node, node2: Node) -> List[str]:
+        labels = self._labels.get(self._edge(node1, node2), [])
+        assert len(labels) == self.count_edges(node1, node2, count_undirected_loops_twice=False)
+        return [str(label if label is not None else "") for label in labels]
 
 
 class LabeledGraph(AbstractLabeledGraph, Graph):
@@ -109,7 +116,7 @@ class AbstractWeightedGraph(AbstractLabeledGraph, ABC):
         sort_nodes: bool = True,
     ):
         super().__init__(nodes, *weighted_edges, sort_nodes=sort_nodes)
-        self.weights: Dict[Edge, List[float]] = self.labels  # type: ignore
+        self.weights: Dict[Edge, List[float]] = self._labels  # type: ignore
         for weights in self.weights.values():
             for weight in weights:
                 if not isinstance(weight, Real):

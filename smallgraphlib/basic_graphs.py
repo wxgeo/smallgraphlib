@@ -70,7 +70,7 @@ class Graph(AbstractGraph):
         return node2 in self.successors(node1)
 
     @property
-    def weighted_graph(self):
+    def as_weighted_graph(self):
         from smallgraphlib import WeightedGraph
 
         def weighted_edge(edge):
