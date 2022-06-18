@@ -36,6 +36,14 @@ smallgraphlib.labeled\_graphs module
    :undoc-members:
    :show-inheritance:
 
+smallgraphlib.trees module
+--------------------------
+
+.. automodule:: smallgraphlib.trees
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 smallgraphlib.utilities module
 ------------------------------
 
