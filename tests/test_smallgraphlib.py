@@ -535,6 +535,7 @@ def test_minimum_spanning_tree():
     with pytest.raises(InvalidGraphAttribute):
         g.minimum_spanning_tree()
 
+
 def test_intersection():
     A = (-4.191374663072777, -0.4986522911051212)
     B = (-0.41778975741239854, 1.495956873315364)
@@ -542,10 +543,9 @@ def test_intersection():
     D = (0.8760107816711589, -0.12129380053908356)
     expected_intersection = (-1.374693295677149, 0.9901650030897102)
     M = segments_intersection((A, B), (C, D))
-    assert math.hypot(M[0] - expected_intersection[0], M[1] - expected_intersection[1]) < 10 ** -8
+    assert math.hypot(M[0] - expected_intersection[0], M[1] - expected_intersection[1]) < 10**-8
     A = (-2.0572283216093616, 1.544030635724147)
     assert segments_intersection((A, B), (C, D)) is None
-
 
 
 def test_tikz_support():
@@ -553,3 +553,21 @@ def test_tikz_support():
         random.seed(seed)
         g = random_graph(4, 6, directed=True)
         g.as_tikz()
+
+
+def test_graph_from_matrix():
+    for seed in range(10):
+        random.seed(seed)
+        g = random_graph(5, 8, directed=False)
+        assert Graph.from_matrix(g.adjacency_matrix) == g
+
+        g = random_graph(5, 8, directed=True)
+        assert DirectedGraph.from_matrix(g.adjacency_matrix) == g
+
+
+def test_transitivity():
+    M = [[0, 1, 0, 0], [0, 0, 0, 1], [0, 0, 0, 0], [0, 0, 1, 0]]
+    g = DirectedGraph.from_matrix(M)
+    assert not g.is_transitive
+    assert g.transitive_closure_matrix == ((0, 1, 1, 1), (0, 0, 1, 1), (0, 0, 0, 0), (0, 0, 1, 0))
+    assert DirectedGraph.from_matrix(g.transitive_closure_matrix).is_transitive

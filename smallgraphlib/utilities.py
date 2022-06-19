@@ -41,6 +41,22 @@ def clear_cache(f):
     return cached_f
 
 
+# class HasInternalCache:
+#     def put_in_cache(self, key, value):
+#         try:
+#             cache = self._cache
+#         except AttributeError:
+#             # noinspection PyAttributeOutsideInit
+#             cache = self._cache = {}
+#         cache[key] = value
+#
+#     def get_from_cache(self, key):
+#         return self._cache[key]
+#
+#     def clear_cache(self):
+#         self._cache.clear()
+
+
 class Multiset(Counter):
     """
     A `collections.Counter` subclass that only accept positive values,

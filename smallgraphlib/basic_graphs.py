@@ -10,6 +10,7 @@ from typing import (
     Dict,
     List,
     FrozenSet,
+    Sequence,
 )
 
 from smallgraphlib.core import Node, DirectedEdge, UndirectedEdge, AbstractGraph, InvalidGraphAttribute
@@ -23,6 +24,29 @@ class Graph(AbstractGraph):
 
     >>> G = Graph((1, 2, 3), {1, 3}, {1, 2}, {2, 1}, {1})
     """
+
+    @staticmethod
+    def _get_edges_from_adjacency_matrix(matrix: Sequence[Sequence[int]]) -> List[Tuple[int, int]]:
+        edges = []
+        for i in range(len(matrix)):
+            for j in range(i + 1):  # we must only deal with i <= j, since it is an undirected graph.
+                if i == j:
+                    if matrix[i][i] % 2 == 1:
+                        raise ValueError(
+                            "The adjacency matrix of an undirected graph must have "
+                            "even diagonal coefficients, "
+                            f"but matrix[{i}][{i}]={matrix[i][i]}."
+                        )
+                    edge_multiplicity = matrix[i][i] // 2
+                else:
+                    if matrix[i][j] != matrix[j][i]:
+                        raise ValueError(
+                            "The adjacency matrix of an undirected graph must be symmetric, "
+                            f"but matrix[{i}][{j}]={matrix[i][j]} != matrix[{j}][{i}]={matrix[j][i]}"
+                        )
+                    edge_multiplicity = matrix[i][j]
+                edges.extend(edge_multiplicity * [(i + 1, j + 1)])
+        return edges
 
     def is_isomorphic_to(self, other) -> bool:
         return super().is_isomorphic_to(other)
@@ -106,6 +130,15 @@ class DirectedGraph(AbstractGraph):
 
     >>> G = DirectedGraph((1, 2, 3), (1, 3), (1, 2), (2, 1), (1, 1))
     """
+
+    @staticmethod
+    def _get_edges_from_adjacency_matrix(matrix: Sequence[Sequence[int]]) -> List[Tuple[int, int]]:
+        edges = []
+        for i in range(len(matrix)):
+            for j in range(len(matrix)):
+                edge_multiplicity = matrix[i][j]
+                edges.extend(edge_multiplicity * [(i + 1, j + 1)])
+        return edges
 
     def is_isomorphic_to(self, other) -> bool:
         return super().is_isomorphic_to(other)
@@ -205,3 +238,35 @@ class DirectedGraph(AbstractGraph):
 
     def are_adjacents(self, node1: Node, node2: Node) -> bool:
         return node2 in (self.successors(node1) | self.predecessors(node1))
+
+    @staticmethod
+    def _apply_transitivity_to(M):
+        # Make a mutable copy of M
+        M = [list(line) for line in M]
+        n = len(M)
+        for i in range(n):
+            for j in range(n):
+                for k in range(n):
+                    M[i][j] = M[i][j] or (M[i][k] and M[k][j])
+        return M
+
+    @cached_property
+    def transitive_closure_matrix(self) -> Tuple[Tuple[float, ...], ...]:
+        """Return the matrix of the transitive closure."""
+        # Make a mutable copy of the adjacency matrix.
+        M = [list(line) for line in self.adjacency_matrix]
+
+        while True:
+            new_M = self._apply_transitivity_to(M)
+            if new_M == M:
+                # Must be immutable, because of caching.
+                return tuple(tuple(line) for line in M)
+            M = new_M
+
+    @cached_property
+    def is_transitive(self) -> bool:
+        """Test if the graph is transitive.
+
+        A directed graph is transitive if for every i->j and j->k edges,
+        there is also an i->k edge."""
+        return self.adjacency_matrix == self.transitive_closure_matrix

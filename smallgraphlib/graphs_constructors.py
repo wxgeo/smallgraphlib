@@ -1,4 +1,3 @@
-import math
 import random
 from typing import List, Tuple
 
@@ -108,7 +107,6 @@ def random_graph(
     If `simple` is True, ignore remaining keyword arguments.
     Similarly, if `tikz_export_supported` is True, all remaining keyword arguments will be ignored.
     """
-    max_any_direction_edges = math.inf
     # Test for feasibility: is it possible to satisfy all constraints ?
     if simple:
         max_degree_for_simple_graph = order * (order - 1)
@@ -147,9 +145,6 @@ def random_graph(
             )
             max_multiple_loops = _TIKZ_EXPORT_MAX_MULTIPLE_LOOPS_SUPPORT
 
-        # For Tikz support, edges in both directions are counted as multiple edges.
-        max_any_direction_edges = _TIKZ_EXPORT_MAX_MULTIPLE_EDGES_SUPPORT
-
     else:
         if max_multiple_edges is None:
             max_multiple_edges = degree
@@ -172,11 +167,11 @@ def random_graph(
         start: counter
         for start in nodes
         if (counter := Multiset(
-                {
-                    end: (max_multiple_loops if start == end else max_multiple_edges)
-                    for end in nodes
-                    if directed or start <= end  # for undirected graph, only keep start <= end
-                })).total() > 0
+            {
+                end: (max_multiple_loops if start == end else max_multiple_edges)
+                for end in nodes
+                if directed or start <= end  # for undirected graph, only keep start <= end
+            })).total() > 0
     }
     # fmt: on
     starts = list(counters)

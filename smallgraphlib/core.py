@@ -17,7 +17,7 @@ from typing import (
     Generic,
     Counter as CounterType,
     Optional,
-    Iterator,
+    Iterator, Sequence,
 )
 
 from smallgraphlib.utilities import (
@@ -93,6 +93,28 @@ class AbstractGraph(ABC, Generic[Node]):
             if remaining:
                 edges.extend((node, successor.strip()) for successor in remaining[0].split(","))
         return cls(nodes, *edges)  # type: ignore
+
+    @staticmethod
+    @abstractmethod
+    def _get_edges_from_adjacency_matrix(matrix: Sequence[Sequence[int]]) -> List[Tuple[int, int]]:
+        ...
+
+    @classmethod
+    def from_matrix(cls, matrix: Iterable[Iterable[int]]) -> "AbstractGraph":
+        """Construct the graph corresponding to the given adjacency matrix.
+        """
+        # Convert iterable to matrix.
+        M = tuple(tuple(iterable) for iterable in matrix)
+        # Test if M is correct
+        n = len(M)
+        if any(len(line) != n for line in M):
+            raise ValueError("All matrix lines must be the same length.")
+        if not all(isinstance(val, int) and val >= 0 for line in M for val in line):
+            raise ValueError("All matrix values must be positive integers.")
+
+        edges = cls._get_edges_from_adjacency_matrix(M)
+
+        return cls(range(1, n + 1), *edges)  # type: ignore
 
     # ------------
     # Node methods
@@ -561,6 +583,8 @@ class AbstractGraph(ABC, Generic[Node]):
             selected_node = min(never_selected_nodes, key=(lambda node_: lengths[node_]))
         return lengths, last_step
 
+    # TODO: put in cache all distances from `start` node when running Dijkstra algorithm.
+    #
     def distance(self, start: Node, end: Node) -> float:
         """Implementation of Dijkstra Algorithm."""
         lengths, _ = self._dijkstra(start, end)
