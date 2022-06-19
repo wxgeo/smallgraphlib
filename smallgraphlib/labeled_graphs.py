@@ -17,6 +17,7 @@ WeightedEdge = Tuple[Node, Node, float]
 
 
 class AbstractLabeledGraph(AbstractGraph, ABC, Generic[Label]):
+    """Abstract class for all labeled graphs, don't use it directly."""
     def __init__(
         self,
         nodes: Iterable[Node],
@@ -101,7 +102,7 @@ class AbstractLabeledGraph(AbstractGraph, ABC, Generic[Label]):
 
 
 class LabeledGraph(AbstractLabeledGraph, Graph):
-    pass
+    """A labeled undirected graph."""
 
 
 class LabeledDirectedGraph(AbstractLabeledGraph, DirectedGraph):
@@ -109,6 +110,7 @@ class LabeledDirectedGraph(AbstractLabeledGraph, DirectedGraph):
 
 
 class AbstractWeightedGraph(AbstractLabeledGraph, ABC):
+    """Abstract class for all weighted graphs, don't use it directly."""
     def __init__(
         self,
         nodes: Iterable[Node],
@@ -125,11 +127,12 @@ class AbstractWeightedGraph(AbstractLabeledGraph, ABC):
     def weight(self, node1: Node, node2: Node, *, aggregator=min, default: float = inf) -> float:
         """
         Return the weight of the edge joining node1 and node2.
+
         Args:
             node1: Node
             node2: Node
             aggregator: function used to aggregate values if there are several edges
-                        between `node1` and `node2` (default is `min`)
+            between `node1` and `node2` (default is `min`)
             default: value returned if `node1` and `node2` are not adjacents (default is `inf`).
         Return:
             float
@@ -144,7 +147,7 @@ class AbstractWeightedGraph(AbstractLabeledGraph, ABC):
 
 
 class WeightedGraph(AbstractWeightedGraph, LabeledGraph):
-    """A weighted graph, i.e. a graph where all edges have a weight."""
+    """A weighted undirected graph, i.e. an undirected graph where all edges have a weight."""
 
     def minimum_spanning_tree(self) -> Graph:
         """Use Prim's algorithm to return a minimum weight spanning tree.
@@ -194,4 +197,4 @@ class WeightedGraph(AbstractWeightedGraph, LabeledGraph):
 
 
 class WeightedDirectedGraph(AbstractWeightedGraph, LabeledDirectedGraph):
-    pass
+    """A directed graph with weights (i.e. positive floats) associated to its edges."""
