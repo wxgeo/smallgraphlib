@@ -1,11 +1,11 @@
 import ast
 import math
 import re
-from abc import ABC
+from abc import ABC, abstractmethod
 from itertools import chain
 from math import inf
 from numbers import Real
-from typing import Iterable, Tuple, Dict, List, TypeVar, Generic, Any
+from typing import Iterable, Tuple, Dict, List, TypeVar, Generic, Any, Sequence
 
 from smallgraphlib.basic_graphs import Graph, DirectedGraph
 from smallgraphlib.core import Node, Edge, AbstractGraph, InvalidGraphAttribute
@@ -18,6 +18,7 @@ WeightedEdge = Tuple[Node, Node, float]
 
 class AbstractLabeledGraph(AbstractGraph, ABC, Generic[Label]):
     """Abstract class for all labeled graphs, don't use it directly."""
+
     def __init__(
         self,
         nodes: Iterable[Node],
@@ -34,8 +35,13 @@ class AbstractLabeledGraph(AbstractGraph, ABC, Generic[Label]):
 
     def __eq__(self, other: Any):
         return super().__eq__(other) and all(
-            sorted(self.labels(*edge)) == sorted(other.labels(*edge)) for edge in self.edges
+            sorted(self.labels(*edge)) == sorted(other.labels(*edge))
+            for edge in self.edges
         )
+
+    def __repr__(self):
+        labeled_edges = (repr((*edge, label)) for edge, label in self._labels.items())
+        return f"{self.__class__.__name__}({tuple(self.nodes)!r}, {', '.join(labeled_edges)})"
 
     @classmethod
     def from_dict(cls, edge_label_dict: dict = None, /, **edge_label):
@@ -70,7 +76,9 @@ class AbstractLabeledGraph(AbstractGraph, ABC, Generic[Label]):
         If no label is given, `None` is stored by default.
         """
         # Convert spaces inside labels to null characters, to make splitting easier.
-        string = re.sub("""'[^']*'|"[^"]*""", (lambda m: m.group().replace(" ", "\x00")), string)
+        string = re.sub(
+            """'[^']*'|"[^"]*""", (lambda m: m.group().replace(" ", "\x00")), string
+        )
         nodes: List[str] = []
         edges: List[Tuple[str, str, Any]] = []
         label: Any
@@ -97,8 +105,27 @@ class AbstractLabeledGraph(AbstractGraph, ABC, Generic[Label]):
 
     def labels(self, node1: Node, node2: Node) -> List[str]:
         labels = self._labels.get(self._edge(node1, node2), [])
-        assert len(labels) == self.count_edges(node1, node2, count_undirected_loops_twice=False)
+        assert len(labels) == self.count_edges(
+            node1, node2, count_undirected_loops_twice=False
+        )
         return [str(label if label is not None else "") for label in labels]
+
+    def rename_nodes(self, node_names: Dict[Node, Node]) -> None:
+        super().rename_nodes(node_names)
+        # Rename nodes in self._labels dict.
+        old_labels = self._labels.copy()
+        self._labels.clear()
+        for edge, label in old_labels.items():
+            new_edge = self._edge(*(node_names[node] for node in edge))
+            self._labels[new_edge] = label
+
+        # # Rename nodes in self._labels dict.
+        # edges_and_labels = [(list(edge), label) for edge, label in self._labels.items()]
+        # for edge, label in edges_and_labels:
+        #     for i, node in enumerate(edge):
+        #         edge[i] = node_names[node]
+        # self._labels.clear()
+        # self._labels.update(*((self._edge(*edge), label) for edge, label in edges_and_labels))
 
 
 class LabeledGraph(AbstractLabeledGraph, Graph):
@@ -111,6 +138,7 @@ class LabeledDirectedGraph(AbstractLabeledGraph, DirectedGraph):
 
 class AbstractWeightedGraph(AbstractLabeledGraph, ABC):
     """Abstract class for all weighted graphs, don't use it directly."""
+
     def __init__(
         self,
         nodes: Iterable[Node],
@@ -118,13 +146,34 @@ class AbstractWeightedGraph(AbstractLabeledGraph, ABC):
         sort_nodes: bool = True,
     ):
         super().__init__(nodes, *weighted_edges, sort_nodes=sort_nodes)
-        self.weights: Dict[Edge, List[float]] = self._labels  # type: ignore
-        for weights in self.weights.values():
+        for edge, weights in self.weights.items():
             for weight in weights:
-                if not isinstance(weight, Real):
-                    raise ValueError(f"Edge weight {weight!r} is not a real number.")
+                if not self._is_weight(weight):
+                    raise ValueError(
+                        f"Edge {edge} weight must be a positive real number, not {weight!r}."
+                    )
 
-    def weight(self, node1: Node, node2: Node, *, aggregator=min, default: float = inf) -> float:
+    @staticmethod
+    def _is_weight(value: Any) -> bool:
+        """Test if a value is a positive real number (including positive infinity)."""
+        try:
+            if isinstance(value, Real):
+                return float(value) >= 0
+            else:
+                # We must support sympy.oo, but isinstance(sympy.oo, Real) return False.
+                return (
+                    float(value) == math.inf and value != "inf"
+                )  # do not accept string "inf" !
+        except (TypeError, ValueError):
+            return False
+
+    @property
+    def weights(self) -> Dict[Edge, List[float]]:
+        return self._labels
+
+    def weight(
+        self, node1: Node, node2: Node, *, aggregator=min, default: float = inf
+    ) -> float:
         """
         Return the weight of the edge joining node1 and node2.
 
@@ -137,6 +186,8 @@ class AbstractWeightedGraph(AbstractLabeledGraph, ABC):
         Return:
             float
         """
+        if node1 == node2:
+            return 0
         values = self.weights[self._edge(node1, node2)]
         return aggregator(values) if values else default
 
@@ -145,9 +196,69 @@ class AbstractWeightedGraph(AbstractLabeledGraph, ABC):
         """Return the sum of all edges weights."""
         return sum(sum(values) for values in self.weights.values())
 
+    @staticmethod
+    @abstractmethod
+    def _get_edges_from_weights_matrix(
+        matrix: Sequence[Sequence[float]],
+    ) -> List[Tuple[int, int, float]]:
+        ...
+
+    @classmethod
+    def from_matrix(
+        cls, matrix: Iterable[Iterable[float]], nodes_names: Iterable[Node] = None
+    ) -> "AbstractGraph":
+        """Construct the graph corresponding to the given adjacency matrix.
+
+        Matrix must be a matrix of positive real numbers
+        (`float` or any numeric type inheriting from `numbers.Real`).
+        """
+        # Convert iterable to matrix.
+        M = cls._matrix_as_tuple_of_tuples(matrix)
+        # Test if M is correct
+        n = len(M)
+        for line in M:
+            for val in line:
+                if not cls._is_weight(val):
+                    raise ValueError(
+                        f"All matrix values must be positive real numbers, but {val!r} is not."
+                    )
+
+        edges = cls._get_edges_from_weights_matrix(M)
+
+        g = cls(range(1, n + 1), *edges)  # type: ignore
+        if nodes_names:
+            g.rename_nodes(dict(enumerate(list(nodes_names)[: len(g.nodes)], start=1)))  # type: ignore
+        return g
+
 
 class WeightedGraph(AbstractWeightedGraph, LabeledGraph):
-    """A weighted undirected graph, i.e. an undirected graph where all edges have a weight."""
+    """A weighted undirected graph, i.e. an undirected graph where all edges have a positive weight."""
+
+    @staticmethod
+    def _get_edges_from_weights_matrix(
+        matrix: Sequence[Sequence[float]],
+    ) -> List[Tuple[int, int, float]]:
+        edges = []
+        for i in range(len(matrix)):
+            for j in range(
+                i + 1
+            ):  # we must only deal with i <= j, since it is an undirected graph.
+                weight = matrix[i][j]
+                if i == j:
+                    if weight != 0:
+                        raise ValueError(
+                            "The diagonal coefficients of the weights matrix must be nul, "
+                            f"but matrix[{i}][{i}]={weight}."
+                        )
+
+                else:
+                    if matrix[i][j] != matrix[j][i]:
+                        raise ValueError(
+                            "The adjacency matrix of an undirected graph must be symmetric, "
+                            f"but matrix[{i}][{j}]={matrix[i][j]} != matrix[{j}][{i}]={matrix[j][i]}"
+                        )
+                edges.append((i + 1, j + 1, weight))
+        return edges
 
     def minimum_spanning_tree(self) -> Graph:
         """Use Prim's algorithm to return a minimum weight spanning tree.
@@ -185,16 +296,39 @@ class WeightedGraph(AbstractWeightedGraph, LabeledGraph):
             connected_nodes.append(last_connected_node)
             unreached_nodes.remove(last_connected_node)
             weighted_edges.append(
-                (cheapest_edge[last_connected_node], last_connected_node, cheapest_cost[last_connected_node])
+                (
+                    cheapest_edge[last_connected_node],
+                    last_connected_node,
+                    cheapest_cost[last_connected_node],
+                )
             )
             cheapest_cost.pop(last_connected_node)
             cheapest_edge.pop(last_connected_node)
 
         if unreached_nodes:
-            raise InvalidGraphAttribute("This graph has no spanning tree since it is not connected.")
+            raise InvalidGraphAttribute(
+                "This graph has no spanning tree since it is not connected."
+            )
 
         return WeightedGraph(connected_nodes, *weighted_edges)
 
 
 class WeightedDirectedGraph(AbstractWeightedGraph, LabeledDirectedGraph):
     """A directed graph with weights (i.e. positive floats) associated to its edges."""
+
+    @staticmethod
+    def _get_edges_from_weights_matrix(
+        matrix: Sequence[Sequence[float]],
+    ) -> List[Tuple[int, int, float]]:
+        edges = []
+        for i in range(len(matrix)):
+            for j in range(len(matrix)):
+                weight = matrix[i][j]
+                if i == j:
+                    if weight != 0:
+                        raise ValueError(
+                            "The diagonal coefficients of the weights matrix must be nul, "
+                            f"but matrix[{i}][{i}]={weight}."
+                        )
+                edges.append((i + 1, j + 1, weight))
+        return edges

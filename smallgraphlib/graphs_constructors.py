@@ -1,5 +1,5 @@
 import random
-from typing import List, Tuple
+from typing import List, Tuple, Iterable
 
 from smallgraphlib import (
     Graph,
@@ -16,6 +16,7 @@ from smallgraphlib.core import (
     _TIKZ_EXPORT_MAX_MULTIPLE_LOOPS_SUPPORT,
     AbstractGraph,
     Edge,
+    Node,
 )
 from smallgraphlib.utilities import Multiset
 
@@ -99,6 +100,7 @@ def random_graph(
     max_multiple_edges: int = None,
     max_multiple_loops: int = None,
     shuffle_nodes=False,
+    nodes_names: Iterable[Node] = None,
 ) -> AbstractGraph:
     """Create a random graph satisfying given constraints.
 
@@ -151,7 +153,9 @@ def random_graph(
         if max_multiple_loops is None:
             max_multiple_loops = degree
 
-    max_degree = order * max_multiple_loops + (order * (order - 1) * max_multiple_edges) // 2
+    max_degree = (
+        order * max_multiple_loops + (order * (order - 1) * max_multiple_edges) // 2
+    )
 
     if degree > max_degree:
         raise ValueError(f"Degree must not exceed {max_degree} with given contraints.")
@@ -200,4 +204,6 @@ def random_graph(
     g = graph(nodes, *edges, directed=directed)
     if shuffle_nodes:
         g.shuffle_nodes()
+    if nodes_names:
+        g.rename_nodes(dict(enumerate(list(nodes_names)[: len(g.nodes)], start=1)))
     return g

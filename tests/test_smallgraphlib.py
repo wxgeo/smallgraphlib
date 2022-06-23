@@ -18,6 +18,7 @@ from smallgraphlib import (
     LabeledGraph,
     graph,
     perfect_binary_tree,
+    WeightedDirectedGraph,
 )
 
 
@@ -100,7 +101,16 @@ def test_levels_and_kernel():
 
 def test_kernel():
     g = DirectedGraph(
-        (1, 2, 3, 4, 5, 6, 7), (1, 3), (1, 4), (1, 5), (1, 6), (2, 3), (2, 5), (3, 6), (5, 3), (7, 4)
+        (1, 2, 3, 4, 5, 6, 7),
+        (1, 3),
+        (1, 4),
+        (1, 5),
+        (1, 6),
+        (2, 3),
+        (2, 5),
+        (3, 6),
+        (5, 3),
+        (7, 4),
     )
     assert not g.has_cycle
     assert g.kernel == {4, 5, 6}
@@ -198,6 +208,11 @@ def test_random_graph2():
             assert max(M[i][i] for i, _ in enumerate(M)) <= (
                 max_multiple_loops if directed else 2 * max_multiple_loops
             ), g
+
+
+def test_random_graph_node_names():
+    g = random_graph(4, 6, nodes_names="ABCD")
+    assert g.nodes_set == set("ABCD")
 
 
 def test_remove_edges():
@@ -386,9 +401,13 @@ def test_isomorphic_basic_case():
 def test_non_isomorphic_with_same_degrees():
     k33 = complete_bipartite_graph(3, 3)
     isomorphic_to_k33 = graph("s1:s2,s3,s6 s2:s4,s5 s3:s4,s5 s4:s6 s5:s6 s6")
-    other_graph_with_same_degrees = graph("t1:t2,t5,t4 t2:t6,t3 t3:t6,t4 t4:t5 t5:t6 t6")
+    other_graph_with_same_degrees = graph(
+        "t1:t2,t5,t4 t2:t6,t3 t3:t6,t4 t4:t5 t5:t6 t6"
+    )
     assert k33.order == isomorphic_to_k33.order == other_graph_with_same_degrees.order
-    assert k33.degree == isomorphic_to_k33.degree == other_graph_with_same_degrees.degree
+    assert (
+        k33.degree == isomorphic_to_k33.degree == other_graph_with_same_degrees.degree
+    )
     assert not isomorphic_to_k33.is_isomorphic_to(other_graph_with_same_degrees)
     assert isomorphic_to_k33.is_isomorphic_to(k33)
     assert not other_graph_with_same_degrees.is_isomorphic_to(k33)
@@ -485,8 +504,23 @@ def test_binary_tree_and_dfs():
     assert not g.is_acyclic
 
 
+def test_dfs_bfs():
+    g = Graph("ABCDEFG", "AB", "BC", "BD", "AE", "EF", "EG")
+    assert (
+        "".join(g.depth_first_search(start="A", order=Traversal.PREORDER)) == "ABCDEFG"
+    )
+    assert (
+        "".join(g.depth_first_search(start="A", order=Traversal.POSTORDER)) == "CDBFGEA"
+    )
+    assert (
+        "".join(g.depth_first_search(start="A", order=Traversal.INORDER)) == "CBDAFEG"
+    )
+
+
 def test_weighted_graph():
-    g = WeightedGraph([1, 2, 3, 4, 5], (1, 2, 10.0), (2, 3, 9.0), (2, 4, 7.0), (4, 5, 8.0))
+    g = WeightedGraph(
+        [1, 2, 3, 4, 5], (1, 2, 10.0), (2, 3, 9.0), (2, 4, 7.0), (4, 5, 8.0)
+    )
     assert g.successors(1) == {2}
     assert g.weight(2, 1) == 10.0
     assert g.total_weight == 10.0 + 9.0 + 7.0 + 8.0
@@ -495,7 +529,9 @@ def test_weighted_graph():
 def test_minimum_spanning_tree():
     g = WeightedGraph([1])
     assert g.minimum_spanning_tree() == g
-    g = WeightedGraph([1, 2, 3, 4, 5], (1, 2, 10.0), (2, 3, 9.0), (2, 4, 7.0), (4, 5, 8.0))
+    g = WeightedGraph(
+        [1, 2, 3, 4, 5], (1, 2, 10.0), (2, 3, 9.0), (2, 4, 7.0), (4, 5, 8.0)
+    )
     assert g.minimum_spanning_tree() == g
     g = WeightedGraph.from_dict(
         AB=15,
@@ -543,7 +579,10 @@ def test_intersection():
     D = (0.8760107816711589, -0.12129380053908356)
     expected_intersection = (-1.374693295677149, 0.9901650030897102)
     M = segments_intersection((A, B), (C, D))
-    assert math.hypot(M[0] - expected_intersection[0], M[1] - expected_intersection[1]) < 10**-8
+    assert (
+        math.hypot(M[0] - expected_intersection[0], M[1] - expected_intersection[1])
+        < 10**-8
+    )
     A = (-2.0572283216093616, 1.544030635724147)
     assert segments_intersection((A, B), (C, D)) is None
 
@@ -569,5 +608,59 @@ def test_transitivity():
     M = [[0, 1, 0, 0], [0, 0, 0, 1], [0, 0, 0, 0], [0, 0, 1, 0]]
     g = DirectedGraph.from_matrix(M)
     assert not g.is_transitive
-    assert g.transitive_closure_matrix == ((0, 1, 1, 1), (0, 0, 1, 1), (0, 0, 0, 0), (0, 0, 1, 0))
+    assert g.transitive_closure_matrix == (
+        (0, 1, 1, 1),
+        (0, 0, 1, 1),
+        (0, 0, 0, 0),
+        (0, 0, 1, 0),
+    )
     assert DirectedGraph.from_matrix(g.transitive_closure_matrix).is_transitive
+    M = [[0, 1], [1, 0]]
+    g = DirectedGraph.from_matrix(M)
+    assert not g.is_transitive
+    assert g.transitive_closure_matrix == ((1, 1), (1, 1))
+    assert DirectedGraph(
+        "ABCD", "AB", "BA", "AC", "AD", "AA", "BB", "BC", "BD"
+    ).is_transitive
+
+
+def test_weighted_graph_from_matrix():
+    oo = math.inf
+    M = (
+        (0, 2, oo, oo, 17, oo, 5),
+        (4, 0, 5, 4, oo, oo, 4),
+        (7, 8, 0, 13, oo, 8, 15),
+        (17, oo, oo, 0, 7, 9, oo),
+        (6, 8, 14, oo, 0, 21, 9),
+        (6, 10, 8, 9, 7, 0, oo),
+        (oo, 15, 5, 7, 18, oo, 0),
+    )
+    g = WeightedDirectedGraph.from_matrix(M)
+    assert g.weight(1, 5) == 17
+
+
+def test_weighted_graph_from_sympy_matrix():
+    import sympy
+
+    oo = sympy.oo
+    M = sympy.Matrix(
+        (
+            (0, 2, oo, oo, 17, oo, 5),
+            (4, 0, 5, 4, oo, oo, 4),
+            (7, 8, 0, 13, oo, 8, 15),
+            (17, oo, oo, 0, 7, 9, oo),
+            (6, 8, 14, oo, 0, 21, 9),
+            (6, 10, 8, 9, 7, 0, oo),
+            (oo, 15, 5, 7, 18, oo, 0),
+        )
+    )
+    g = WeightedDirectedGraph.from_matrix(M, nodes_names="ABCDEFG")
+    assert g.weight("A", "E") == 17
+    assert g.nodes == tuple("ABCDEFG")
+    assert g.distance("A", "A") == 0
+    assert g.distance("A", "B") == 2
+    assert g.distance("A", "G") == 5
+    assert g.distance("A", "D") == 6
+    assert g.distance("A", "C") == 7
+    assert g.distance("A", "E") == 13
+    assert g.distance("A", "F") == 15
