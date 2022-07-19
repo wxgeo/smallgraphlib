@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "smallgraphlib"
-version = "0.4.0"
+version = "0.5.0"
 description = "Simple library for handling small graphs, including Tikz code generation."
 authors = ["Nicolas Pourcelot <nicolas.pourcelot@gmail.com>"]
 repository = "https://github.com/wxgeo/smallgraphlib"
@@ -40,6 +40,7 @@ envlist = py38
 whitelist_externals = poetry
 commands =
     poetry install -v
+    poetry run black smallgraphlib tests
     poetry run pytest tests
     poetry run mypy smallgraphlib tests
     poetry run flake8 --max-line-length 110 --ignore=E203,W503,W391
