@@ -33,9 +33,7 @@ class Tree:
             for edge in edges:
                 labeled_edges.append((*edge, edges_labels.pop(edge, None)))
             if edges_labels:  # should be empty now
-                raise ValueError(
-                    "Unknown edges: " + ", ".join(str(edge) for edge in edges_labels)
-                )
+                raise ValueError("Unknown edges: " + ", ".join(str(edge) for edge in edges_labels))
             if all(isinstance(value, Real) for value in edges_labels.values()):
                 self._graph = WeightedGraph(nodes, *labeled_edges)  # type: ignore
             else:
@@ -66,9 +64,7 @@ class Tree:
         assert len(predecessors) == 1, predecessors
         return next(iter(predecessors))
 
-    def depth_first_search(
-        self, *, order: Traversal = Traversal.PREORDER
-    ) -> Iterator[Node]:
+    def depth_first_search(self, *, order: Traversal = Traversal.PREORDER) -> Iterator[Node]:
         """Recursive implementation of DFS (Depth First Search)."""
         return self._graph.depth_first_search(start=self.root, order=order)
 

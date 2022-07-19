@@ -93,9 +93,7 @@ class AbstractGraph(ABC, Generic[Node]):
             node, *remaining = substring.split(":", 1)
             nodes.append(node.strip())
             if remaining:
-                edges.extend(
-                    (node, successor.strip()) for successor in remaining[0].split(",")
-                )
+                edges.extend((node, successor.strip()) for successor in remaining[0].split(","))
         return cls(nodes, *edges)  # type: ignore
 
     @staticmethod
@@ -132,9 +130,7 @@ class AbstractGraph(ABC, Generic[Node]):
         for line in M:
             for val in line:
                 if not (isinstance(val, Integral) and int(val) >= 0):
-                    raise ValueError(
-                        f"All matrix values must be positive integers, but {val!r} is not."
-                    )
+                    raise ValueError(f"All matrix values must be positive integers, but {val!r} is not.")
 
         edges = cls._get_edges_from_adjacency_matrix(M)
 
@@ -184,13 +180,9 @@ class AbstractGraph(ABC, Generic[Node]):
     def rename_node(self, old_name: Node, new_name: Node) -> None:
         """Rename node. New name must not be already present, else a `NameError` will be raised."""
         if new_name in self.nodes:
-            raise NameError(
-                f"Conflicting names: this graph already has a node named {new_name!r}"
-            )
+            raise NameError(f"Conflicting names: this graph already has a node named {new_name!r}")
         for dictionary in (self._successors, self._predecessors):
-            for node, counter in list(
-                dictionary.items()
-            ):  # make a copy, since we modify the dictionary.
+            for node, counter in list(dictionary.items()):  # make a copy, since we modify the dictionary.
                 if node == old_name:
                     dictionary[new_name] = dictionary.pop(old_name)
                 if old_name in counter:
@@ -258,9 +250,7 @@ class AbstractGraph(ABC, Generic[Node]):
         """
         nodes = list(self.nodes)
         random.shuffle(nodes)
-        self.rename_nodes(
-            dict((old_name, new_name) for old_name, new_name in zip(self.nodes, nodes))
-        )
+        self.rename_nodes(dict((old_name, new_name) for old_name, new_name in zip(self.nodes, nodes)))
 
     # ------------
     # Edge methods
@@ -358,12 +348,8 @@ class AbstractGraph(ABC, Generic[Node]):
 
         degrees_to_nodes_for_other_graph: Dict[Tuple[int, int], List[Node]] = {}
         for node in other.nodes:
-            degrees_to_nodes_for_other_graph.setdefault(
-                other.in_out_degree(node), []
-            ).append(node)
-        nodes_to_degrees_for_self = {
-            node: self.in_out_degree(node) for node in self.nodes
-        }
+            degrees_to_nodes_for_other_graph.setdefault(other.in_out_degree(node), []).append(node)
+        nodes_to_degrees_for_self = {node: self.in_out_degree(node) for node in self.nodes}
 
         remaining_self_nodes = set(self.nodes)
         remaining_other_nodes = set(other.nodes)
@@ -382,9 +368,7 @@ class AbstractGraph(ABC, Generic[Node]):
             for self_method, other_method in adjacency_test_methods:
                 for adjacent_node in self_method(node):
                     try:
-                        _possibilities = corresponding_nodes_possibilities[
-                            adjacent_node
-                        ]
+                        _possibilities = corresponding_nodes_possibilities[adjacent_node]
                         assert _possibilities is not None and len(_possibilities) > 0
                         corresponding_node = _possibilities[0]
                         if corresponding_node not in other_method(candidate):
@@ -406,12 +390,8 @@ class AbstractGraph(ABC, Generic[Node]):
             if possibilities is None:  # First time we test this node
                 # Test for any possibilities to go further in this direction.
                 possibilities = []
-                for possibility in degrees_to_nodes_for_other_graph[
-                    nodes_to_degrees_for_self[node]
-                ]:
-                    if possibility in remaining_other_nodes and test_possibility(
-                        possibility
-                    ):
+                for possibility in degrees_to_nodes_for_other_graph[nodes_to_degrees_for_self[node]]:
+                    if possibility in remaining_other_nodes and test_possibility(possibility):
                         possibilities.append(possibility)
                 corresponding_nodes_possibilities[node] = possibilities
 
@@ -423,13 +403,8 @@ class AbstractGraph(ABC, Generic[Node]):
                 if used_nodes:
                     # Remove other graph node from possibilities, as this branch of possibilities failed.
                     previous_node = used_nodes[-1]
-                    previous_possibilities = corresponding_nodes_possibilities[
-                        previous_node
-                    ]
-                    assert (
-                        previous_possibilities is not None
-                        and len(previous_possibilities) > 0
-                    )
+                    previous_possibilities = corresponding_nodes_possibilities[previous_node]
+                    assert previous_possibilities is not None and len(previous_possibilities) > 0
                     registered_corresponding_node = previous_possibilities.pop(0)
                     remaining_other_nodes.add(registered_corresponding_node)
                     del reversed_mapping[registered_corresponding_node]
@@ -517,9 +492,7 @@ class AbstractGraph(ABC, Generic[Node]):
     def is_connected(self) -> bool:
         ...
 
-    def count_edges(
-        self, node1: Node, node2: Node, count_undirected_loops_twice=True
-    ) -> int:
+    def count_edges(self, node1: Node, node2: Node, count_undirected_loops_twice=True) -> int:
         """Count the number of edges from node1 to node2.
 
         Warning: by default, undirected loops are counted twice."""
@@ -538,10 +511,7 @@ class AbstractGraph(ABC, Generic[Node]):
 
     @cached_property
     def weight_matrix(self):
-        return tuple(
-            tuple(self.weight(node1, node2) for node2 in self.nodes)
-            for node1 in self.nodes
-        )
+        return tuple(tuple(self.weight(node1, node2) for node2 in self.nodes) for node1 in self.nodes)
 
     def labels(self, node1: Node, node2: Node) -> List[str]:
         n = self.count_edges(node1, node2, count_undirected_loops_twice=False)
@@ -599,10 +569,7 @@ class AbstractGraph(ABC, Generic[Node]):
         Return:
             A matrix of integers, as a tuple of tuples.
         """
-        return tuple(
-            tuple(self.count_edges(start, end) for end in self.nodes)
-            for start in self.nodes
-        )
+        return tuple(tuple(self.count_edges(start, end) for end in self.nodes) for start in self.nodes)
 
     @abstractmethod
     def are_adjacents(self, node1: Node, node2: Node) -> bool:
@@ -623,17 +590,13 @@ class AbstractGraph(ABC, Generic[Node]):
     def _edge(node1: Node, node2: Node = None) -> Edge:
         ...
 
-    def _dijkstra(
-        self, start: Node, end: Node = None
-    ) -> Tuple[Dict[Node, float], Dict[Node, List[Node]]]:
+    def _dijkstra(self, start: Node, end: Node = None) -> Tuple[Dict[Node, float], Dict[Node, List[Node]]]:
         """Implementation of Dijkstra Algorithm."""
         if start not in self.nodes:
             raise ValueError(f"Unknown node {start!r}.")
         if end is not None and end not in self.nodes:
             raise ValueError(f"Unknown node {end!r}.")
-        lengths: Dict[Node, float] = {
-            node: (0 if node == start else math.inf) for node in self.nodes
-        }
+        lengths: Dict[Node, float] = {node: (0 if node == start else math.inf) for node in self.nodes}
         last_step: Dict[Node, List[Node]] = {node: [] for node in self.nodes}
         never_selected_nodes = set(self.nodes)
         selected_node = start
@@ -649,9 +612,7 @@ class AbstractGraph(ABC, Generic[Node]):
                     last_step[successor] = [selected_node]
                 elif new_length == lengths[successor]:
                     last_step[successor].append(selected_node)
-            selected_node = min(
-                never_selected_nodes, key=(lambda node_: lengths[node_])
-            )
+            selected_node = min(never_selected_nodes, key=(lambda node_: lengths[node_]))
         return lengths, last_step
 
     # TODO: put in cache all distances from `start` node when running Dijkstra algorithm.
@@ -663,16 +624,11 @@ class AbstractGraph(ABC, Generic[Node]):
 
     @cached_property
     def distance_matrix(self):
-        return tuple(
-            tuple(self.distance(node1, node2) for node2 in self.nodes)
-            for node1 in self.nodes
-        )
+        return tuple(tuple(self.distance(node1, node2) for node2 in self.nodes) for node1 in self.nodes)
 
     @cached_property
     def diameter(self) -> float:
-        return max(
-            self.distance(node1, node2) for node1 in self.nodes for node2 in self.nodes
-        )
+        return max(self.distance(node1, node2) for node1 in self.nodes for node2 in self.nodes)
 
     def shortest_paths(self, start: Node, end: Node) -> Tuple[float, List[List[Node]]]:
         """Implementation of Dijkstra Algorithm."""
@@ -748,9 +704,7 @@ class AbstractGraph(ABC, Generic[Node]):
             visited.add(node)
             # Eliminate visited nodes from the list of successors *before* splitting it.
             successors: List[Node] = [
-                successor
-                for successor in self._successors[node]
-                if successor not in visited
+                successor for successor in self._successors[node] if successor not in visited
             ]
             for successor in successors[:1]:
                 yield from inorder_dfs(successor)
@@ -781,9 +735,7 @@ class AbstractGraph(ABC, Generic[Node]):
             return False
         try:
             # All nodes must be visited once.
-            return self.nodes_set == set(
-                self._iterative_depth_first_search(error_if_already_visited=True)
-            )
+            return self.nodes_set == set(self._iterative_depth_first_search(error_if_already_visited=True))
         except NodeAlreadyFoundError:
             return False
 
@@ -796,11 +748,7 @@ class AbstractGraph(ABC, Generic[Node]):
             node = queue.popleft()
             visited.add(node)
             yield node
-            queue.extend(
-                successor
-                for successor in self._successors[node]
-                if successor not in visited
-            )
+            queue.extend(successor for successor in self._successors[node] if successor not in visited)
 
     def as_tikz(self, *, shuffle_nodes=False, options="") -> str:
         r"""Generate tikz code corresponding to this graph.
@@ -860,14 +808,8 @@ class AbstractGraph(ABC, Generic[Node]):
                 if index[node1] < index[node2]:
                     for node3 in nodes:
                         for node4 in self.successors(node3) | self.predecessors(node3):
-                            if (
-                                index[node3] < index[node4]
-                                and len({node1, node2, node3, node4}) == 4
-                            ):
-                                A, B, C, D = (
-                                    nodes_positions[node]
-                                    for node in (node1, node2, node3, node4)
-                                )
+                            if index[node3] < index[node4] and len({node1, node2, node3, node4}) == 4:
+                                A, B, C, D = (nodes_positions[node] for node in (node1, node2, node3, node4))
                                 intersection = segments_intersection((A, B), (C, D))
                                 if intersection is not None:
                                     labels_positions.append(intersection)
@@ -881,9 +823,7 @@ class AbstractGraph(ABC, Generic[Node]):
                     # This is a loop.
                     node = node1
                     style = "directed" if self.is_directed else "undirected"
-                    n: int = self.count_edges(
-                        node, node, count_undirected_loops_twice=False
-                    )
+                    n: int = self.count_edges(node, node, count_undirected_loops_twice=False)
                     if n > _TIKZ_EXPORT_MAX_MULTIPLE_LOOPS_SUPPORT:
                         raise NotImplementedError(n)
                     if n == 1:
@@ -899,12 +839,8 @@ class AbstractGraph(ABC, Generic[Node]):
                     styles: List[str] = []
                     labels: List[str] = []
                     # Detect if node1 and node2 are neighbours on the circle.
-                    node2_is_right_neighbour = (index[node1] - index[node2] - 1) % len(
-                        nodes
-                    ) == 0
-                    node2_is_left_neighbour = (index[node1] - index[node2] + 1) % len(
-                        nodes
-                    ) == 0
+                    node2_is_right_neighbour = (index[node1] - index[node2] - 1) % len(nodes) == 0
+                    node2_is_left_neighbour = (index[node1] - index[node2] + 1) % len(nodes) == 0
 
                     if self.is_directed:
                         data = [("directed", node1, node2), ("reversed", node2, node1)]
@@ -914,9 +850,7 @@ class AbstractGraph(ABC, Generic[Node]):
                         labels.extend(self.labels(nodeA, nodeB))
                         styles += self.count_edges(nodeA, nodeB) * [direction]
                     n = len(styles)
-                    assert (
-                        len(labels) == n
-                    ), f"len(styles)={n} != len(labels)={len(labels)}"
+                    assert len(labels) == n, f"len(styles)={n} != len(labels)={len(labels)}"
                     if n == 0:
                         bendings = []
                     elif n == 1:
@@ -962,18 +896,13 @@ class AbstractGraph(ABC, Generic[Node]):
                                 ):
                                     new_x, new_y = label_position(node1, node2, pos)
                                     min_dists[pos] = min(
-                                        (new_x - x) ** 2 + (new_y - y) ** 2
-                                        for (x, y) in labels_positions
+                                        (new_x - x) ** 2 + (new_y - y) ** 2 for (x, y) in labels_positions
                                     )
                                     coordinates[pos] = new_x, new_y
                                 pos = max(min_dists, key=min_dists.get)  # type: ignore
                                 labels_positions.append(coordinates[pos])
-                            label_tikz_code = (
-                                rf"node[pos={pos}] {{\contour{{white}}{{{label}}}}}"
-                            )
-                        lines.append(
-                            rf"\draw[{style}] ({node1}) to[{bending}] {label_tikz_code} ({node2});"
-                        )
+                            label_tikz_code = rf"node[pos={pos}] {{\contour{{white}}{{{label}}}}}"
+                        lines.append(rf"\draw[{style}] ({node1}) to[{bending}] {label_tikz_code} ({node2});")
 
         lines.append(r"\end{tikzpicture}")
         return "\n".join(lines)

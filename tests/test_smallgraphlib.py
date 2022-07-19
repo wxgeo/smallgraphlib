@@ -401,13 +401,9 @@ def test_isomorphic_basic_case():
 def test_non_isomorphic_with_same_degrees():
     k33 = complete_bipartite_graph(3, 3)
     isomorphic_to_k33 = graph("s1:s2,s3,s6 s2:s4,s5 s3:s4,s5 s4:s6 s5:s6 s6")
-    other_graph_with_same_degrees = graph(
-        "t1:t2,t5,t4 t2:t6,t3 t3:t6,t4 t4:t5 t5:t6 t6"
-    )
+    other_graph_with_same_degrees = graph("t1:t2,t5,t4 t2:t6,t3 t3:t6,t4 t4:t5 t5:t6 t6")
     assert k33.order == isomorphic_to_k33.order == other_graph_with_same_degrees.order
-    assert (
-        k33.degree == isomorphic_to_k33.degree == other_graph_with_same_degrees.degree
-    )
+    assert k33.degree == isomorphic_to_k33.degree == other_graph_with_same_degrees.degree
     assert not isomorphic_to_k33.is_isomorphic_to(other_graph_with_same_degrees)
     assert isomorphic_to_k33.is_isomorphic_to(k33)
     assert not other_graph_with_same_degrees.is_isomorphic_to(k33)
@@ -506,21 +502,13 @@ def test_binary_tree_and_dfs():
 
 def test_dfs_bfs():
     g = Graph("ABCDEFG", "AB", "BC", "BD", "AE", "EF", "EG")
-    assert (
-        "".join(g.depth_first_search(start="A", order=Traversal.PREORDER)) == "ABCDEFG"
-    )
-    assert (
-        "".join(g.depth_first_search(start="A", order=Traversal.POSTORDER)) == "CDBFGEA"
-    )
-    assert (
-        "".join(g.depth_first_search(start="A", order=Traversal.INORDER)) == "CBDAFEG"
-    )
+    assert "".join(g.depth_first_search(start="A", order=Traversal.PREORDER)) == "ABCDEFG"
+    assert "".join(g.depth_first_search(start="A", order=Traversal.POSTORDER)) == "CDBFGEA"
+    assert "".join(g.depth_first_search(start="A", order=Traversal.INORDER)) == "CBDAFEG"
 
 
 def test_weighted_graph():
-    g = WeightedGraph(
-        [1, 2, 3, 4, 5], (1, 2, 10.0), (2, 3, 9.0), (2, 4, 7.0), (4, 5, 8.0)
-    )
+    g = WeightedGraph([1, 2, 3, 4, 5], (1, 2, 10.0), (2, 3, 9.0), (2, 4, 7.0), (4, 5, 8.0))
     assert g.successors(1) == {2}
     assert g.weight(2, 1) == 10.0
     assert g.total_weight == 10.0 + 9.0 + 7.0 + 8.0
@@ -529,9 +517,7 @@ def test_weighted_graph():
 def test_minimum_spanning_tree():
     g = WeightedGraph([1])
     assert g.minimum_spanning_tree() == g
-    g = WeightedGraph(
-        [1, 2, 3, 4, 5], (1, 2, 10.0), (2, 3, 9.0), (2, 4, 7.0), (4, 5, 8.0)
-    )
+    g = WeightedGraph([1, 2, 3, 4, 5], (1, 2, 10.0), (2, 3, 9.0), (2, 4, 7.0), (4, 5, 8.0))
     assert g.minimum_spanning_tree() == g
     g = WeightedGraph.from_dict(
         AB=15,
@@ -579,10 +565,7 @@ def test_intersection():
     D = (0.8760107816711589, -0.12129380053908356)
     expected_intersection = (-1.374693295677149, 0.9901650030897102)
     M = segments_intersection((A, B), (C, D))
-    assert (
-        math.hypot(M[0] - expected_intersection[0], M[1] - expected_intersection[1])
-        < 10**-8
-    )
+    assert math.hypot(M[0] - expected_intersection[0], M[1] - expected_intersection[1]) < 10**-8
     A = (-2.0572283216093616, 1.544030635724147)
     assert segments_intersection((A, B), (C, D)) is None
 
@@ -619,9 +602,7 @@ def test_transitivity():
     g = DirectedGraph.from_matrix(M)
     assert not g.is_transitive
     assert g.transitive_closure_matrix == ((1, 1), (1, 1))
-    assert DirectedGraph(
-        "ABCD", "AB", "BA", "AC", "AD", "AA", "BB", "BC", "BD"
-    ).is_transitive
+    assert DirectedGraph("ABCD", "AB", "BA", "AC", "AD", "AA", "BB", "BC", "BD").is_transitive
 
 
 def test_weighted_graph_from_matrix():

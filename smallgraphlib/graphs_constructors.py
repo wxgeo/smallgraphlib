@@ -153,9 +153,7 @@ def random_graph(
         if max_multiple_loops is None:
             max_multiple_loops = degree
 
-    max_degree = (
-        order * max_multiple_loops + (order * (order - 1) * max_multiple_edges) // 2
-    )
+    max_degree = order * max_multiple_loops + (order * (order - 1) * max_multiple_edges) // 2
 
     if degree > max_degree:
         raise ValueError(f"Degree must not exceed {max_degree} with given contraints.")

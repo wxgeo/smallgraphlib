@@ -30,13 +30,9 @@ def get_version():
             if tool_poetry_section and line.startswith("version ="):
                 return line[9:].strip("\"' \n")
     if tool_poetry_section:
-        raise RuntimeError(
-            f"No line starts with 'version =' in [tool.poetry] section of {path}."
-        )
+        raise RuntimeError(f"No line starts with 'version =' in [tool.poetry] section of {path}.")
     else:
-        raise RuntimeError(
-            f"[tool.poetry] section not found in {path} (maybe an indentation problem ?)"
-        )
+        raise RuntimeError(f"[tool.poetry] section not found in {path} (maybe an indentation problem ?)")
 
 
 # -- Project information -----------------------------------------------------
