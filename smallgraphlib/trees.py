@@ -40,7 +40,7 @@ class Tree:
                 self._graph = LabeledGraph(nodes, *labeled_edges)  # type: ignore
 
     @property
-    def root(self) -> Node:
+    def root(self) -> Node:  # type: ignore
         return self._root
 
     def as_graph(self) -> AbstractGraph:

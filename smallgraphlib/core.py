@@ -686,21 +686,21 @@ class AbstractGraph(ABC, Generic[Node]):
                 f"Order must be Traversal.PREORDER, Traversal.POSTORDER or Traversal.INORDER, not {order!r}."
             )
 
-        def preorder_dfs(node):
+        def preorder_dfs(node: Node) -> Iterator[Node]:
             if node not in visited:
                 yield node
                 visited.add(node)
                 for successor in self._successors[node]:
                     yield from preorder_dfs(successor)
 
-        def postorder_dfs(node):
+        def postorder_dfs(node: Node) -> Iterator[Node]:
             if node not in visited:
                 visited.add(node)
                 for successor in self._successors[node]:
                     yield from postorder_dfs(successor)
                 yield node
 
-        def inorder_dfs(node):
+        def inorder_dfs(node: Node) -> Iterator[Node]:
             visited.add(node)
             # Eliminate visited nodes from the list of successors *before* splitting it.
             successors: List[Node] = [
