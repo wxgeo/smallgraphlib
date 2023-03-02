@@ -19,6 +19,7 @@ from smallgraphlib import (
     graph,
     perfect_binary_tree,
     WeightedDirectedGraph,
+    Automaton,
 )
 
 
@@ -645,3 +646,22 @@ def test_weighted_graph_from_sympy_matrix():
     assert g.distance("A", "C") == 7
     assert g.distance("A", "E") == 13
     assert g.distance("A", "F") == 15
+
+
+def test_Automaton_from_string():
+    g = Automaton.from_string(">(I):a,b:1 ; (1):a:2&b:3 ; (2):a:1,I ; 3")
+    assert g.alphabet == ("a", "b")
+    assert set(g.states) == {"1", "2", "3", "I"}
+    assert g.transitions == (
+        ("I", "1", "a"),
+        ("I", "1", "b"),
+        ("1", "2", "a"),
+        ("1", "3", "b"),
+        ("2", "1", "a"),
+        ("2", "I", "a"),
+    )
+    assert g.is_directed
+    assert g.initial_states == {"I"}
+    assert g.final_states == {"I", "1", "2"}
+    tikz = g.as_tikz()
+    print(tikz)

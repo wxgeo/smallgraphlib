@@ -1,5 +1,6 @@
 from importlib import metadata
 
+from smallgraphlib.automatons import Automaton
 from smallgraphlib.basic_graphs import Graph, DirectedGraph
 from smallgraphlib.labeled_graphs import (
     WeightedGraph,
@@ -33,4 +34,5 @@ __all__ = [
     "perfect_binary_tree",
     "Traversal",
     "InvalidGraphAttribute",
+    "Automaton",
 ]
