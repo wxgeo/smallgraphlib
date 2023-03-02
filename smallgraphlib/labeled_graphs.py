@@ -39,8 +39,14 @@ class AbstractLabeledGraph(AbstractGraph, ABC, Generic[Label]):
         )
 
     def __repr__(self):
-        labeled_edges = (repr((*edge, label)) for edge, label in self._labels.items())
+        labeled_edges = (repr(labeled_edge) for labeled_edge in self.labeled_edges)
         return f"{self.__class__.__name__}({tuple(self.nodes)!r}, {', '.join(labeled_edges)})"
+
+    @property
+    def labeled_edges(self) -> tuple[LabeledEdge, ...]:
+        return tuple(  # type: ignore
+            (*edge, label) for edge, labels in self._labels.items() for label in labels  # type: ignore
+        )
 
     @classmethod
     def from_dict(cls, edge_label_dict: dict = None, /, **edge_label):
@@ -65,10 +71,10 @@ class AbstractLabeledGraph(AbstractGraph, ABC, Generic[Label]):
     @classmethod
     def from_string(cls, string: str):
         """LabeledGraph.from_string("A:B=label,C='other label' B:C=5 C D:C")
-        will generate a graph of 3 nodes, A, B and C, with edges A->B, A->C
-        and B->C and respective labels 'label', 'other label' and 5.
+        will generate a graph of 4 nodes, A, B, C and D, with edges A->B, A->C, B->C and C->D
+        and respective labels 'label', 'other label', 5 and `None`.
 
-        Note that labels containing a space must be surrounded by quotes.
+        Note that labels containing a space must be surrounded by single or double quotes.
         Labels containing only digits will be converted to numbers (integers or floats),
         except if surrounded by quotes.
 

@@ -750,6 +750,17 @@ class AbstractGraph(ABC, Generic[Node]):
             yield node
             queue.extend(successor for successor in self._successors[node] if successor not in visited)
 
+    def _tikz_specific_node_style(self, node: Node) -> str:
+        """Overwrite this method to add a specific tikz style to some nodes."""
+        return ""
+
+    def _tikz_count_edges(self, node1: Node, node2: Node) -> int:
+        return self.count_edges(node1, node2, count_undirected_loops_twice=False)
+
+    def _tikz_labels(self, node1: Node, node2: Node) -> list[str]:
+        """Overwrite this method to modify tikz value for some labels."""
+        return self.labels(node1, node2)
+
     def as_tikz(self, *, shuffle_nodes=False, options="") -> str:
         r"""Generate tikz code corresponding to this graph.
 
@@ -784,7 +795,8 @@ class AbstractGraph(ABC, Generic[Node]):
         # All nodes are placed around a circle, creating a regular polygon.
         for i, node in enumerate(nodes):
             angle = angles[node] = i * theta
-            lines.append(rf"\node[vertex] ({node}) at ({angle}:1cm) {{${node}$}};")
+            specific_style = self._tikz_specific_node_style(node)
+            lines.append(rf"\node[vertex,{specific_style}] ({node}) at ({angle}:1cm) {{${node}$}};")
 
         # Store nodes' cartesian coordinates.
         nodes_positions: Dict[Node, Tuple[float, float]] = {}
@@ -818,16 +830,16 @@ class AbstractGraph(ABC, Generic[Node]):
             # If the graph is undirected, draw only i -> j edge and not j -> i edge,
             # since it is in fact the same edge.
             # An easy way to do that is to keep index[node2] always superior or equal to index[node1].
-            for node2 in nodes if self.is_directed else nodes[index[node1] :]:
+            for node2 in nodes[index[node1] :]:
                 if node1 == node2:
                     # This is a loop.
                     node = node1
                     style = "directed" if self.is_directed else "undirected"
-                    n: int = self.count_edges(node, node, count_undirected_loops_twice=False)
+                    n: int = self._tikz_count_edges(node, node)
                     if n > _TIKZ_EXPORT_MAX_MULTIPLE_LOOPS_SUPPORT:
                         raise NotImplementedError(n)
                     if n == 1:
-                        (label,) = self.labels(node, node)
+                        (label,) = self._tikz_labels(node, node)
                         lines.append(
                             rf"\draw[{style}] ({node}) to "
                             f"[out={angles[node] - 45},in={angles[node] + 45},looseness=5] "
@@ -847,8 +859,8 @@ class AbstractGraph(ABC, Generic[Node]):
                     else:
                         data = [("undirected", node1, node2)]
                     for direction, nodeA, nodeB in data:
-                        labels.extend(self.labels(nodeA, nodeB))
-                        styles += self.count_edges(nodeA, nodeB) * [direction]
+                        labels.extend(self._tikz_labels(nodeA, nodeB))
+                        styles += self._tikz_count_edges(nodeA, nodeB) * [direction]
                     n = len(styles)
                     assert len(labels) == n, f"len(styles)={n} != len(labels)={len(labels)}"
                     if n == 0:
@@ -884,7 +896,7 @@ class AbstractGraph(ABC, Generic[Node]):
                                 # This one will store the coordinates of the label for each position.
                                 coordinates: Dict[float, Tuple[float, float]] = {}
                                 for pos in (
-                                    0.1,
+                                    # 0.1,
                                     0.2,
                                     0.3,
                                     0.4,
@@ -892,14 +904,15 @@ class AbstractGraph(ABC, Generic[Node]):
                                     0.6,
                                     0.7,
                                     0.8,
-                                    0.9,
+                                    # 0.9,
                                 ):
                                     new_x, new_y = label_position(node1, node2, pos)
                                     min_dists[pos] = min(
-                                        (new_x - x) ** 2 + (new_y - y) ** 2 for (x, y) in labels_positions
+                                        [(new_x - x) ** 2 + (new_y - y) ** 2 for (x, y) in labels_positions],
+                                        default=math.inf,
                                     )
                                     coordinates[pos] = new_x, new_y
-                                pos = max(min_dists, key=min_dists.get)  # type: ignore
+                                pos = max(min_dists, key=min_dists.get, default=0.5)  # type: ignore
                                 labels_positions.append(coordinates[pos])
                             label_tikz_code = rf"node[pos={pos}] {{\contour{{white}}{{{label}}}}}"
                         lines.append(rf"\draw[{style}] ({node1}) to[{bending}] {label_tikz_code} ({node2});")
