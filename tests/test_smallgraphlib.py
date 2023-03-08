@@ -665,3 +665,47 @@ def test_Automaton_from_string():
     assert g.final_states == {"I", "1", "2"}
     tikz = g.as_tikz()
     print(tikz)
+
+
+def test_Automaton_deterministic():
+    g = Automaton(
+        (1, 2, 3),
+        (1, 1, "0"),
+        (1, 2, "1"),
+        (2, 2, "0"),
+        (2, 3, "1"),
+        (3, 3, "0"),
+        (3, 1, "1"),
+        alphabet="01",
+        initial_states=(1,),
+        final_states=(2,),
+    )
+    assert g.is_deterministic
+    g = Automaton(
+        (1, 2, 3),
+        (1, 1, "0"),
+        (1, 1, "1"),
+        (1, 2, "1"),
+        (2, 2, "0"),
+        (2, 3, "1"),
+        (3, 3, "0"),
+        (3, 1, "1"),
+        alphabet="01",
+        initial_states=(1,),
+        final_states=(2,),
+    )
+    assert g.transition(1, "1") == {1, 2}
+    assert not g.is_deterministic
+    g = Automaton(
+        (1, 2, 3),
+        (1, 1, "0"),
+        (1, 2, "1"),
+        (2, 2, "0"),
+        (2, 3, "1"),
+        (3, 3, "0"),
+        alphabet="01",
+        initial_states=(1,),
+        final_states=(2,),
+    )
+    assert g.transition(3, "1") == set()
+    assert not g.is_deterministic

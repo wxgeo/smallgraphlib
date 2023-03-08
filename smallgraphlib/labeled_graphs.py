@@ -44,7 +44,9 @@ class AbstractLabeledGraph(AbstractGraph, ABC, Generic[Label]):
 
     @property
     def labeled_edges(self) -> tuple[LabeledEdge, ...]:
-        return tuple((*edge, label) for edge, labels in self._labels.items() for label in labels)  # type: ignore
+        return tuple(  # type: ignore
+            (*edge, label) for edge, labels in self._labels.items() for label in labels  # type: ignore
+        )
 
     @classmethod
     def from_dict(cls, edge_label_dict: dict = None, /, **edge_label):

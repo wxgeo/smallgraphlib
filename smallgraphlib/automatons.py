@@ -1,7 +1,9 @@
 import re
-from typing import Iterable
+from typing import Iterable, TypeAlias
 
-from smallgraphlib.labeled_graphs import LabeledEdge, LabeledDirectedGraph, Label
+from smallgraphlib.utilities import ComparableAndHashable, cached_property
+
+from smallgraphlib.labeled_graphs import LabeledEdge, LabeledDirectedGraph
 from smallgraphlib.core import Node
 
 
@@ -32,11 +34,13 @@ class Automaton(LabeledDirectedGraph):
         for state in final_states:
             if state not in states:
                 raise UnknownState(f"Final state {state} must be one of the automaton states: {states}.")
+        alphabet = tuple(sorted(alphabet))
         for _, _, label in transitions:
-            if label not in alphabet:
-                raise UnknownLetter(f"Letter {label} must be one of the automat alphabet: {alphabet}.")
+            # Label must be either a letter of the alphabet or the empty word.
+            if label and label not in alphabet:
+                raise UnknownLetter(f"Letter {label} must be in the automat alphabet: {alphabet}.")
         super().__init__(states, *transitions, sort_nodes=sort_nodes)
-        self.alphabet = tuple(sorted(alphabet))
+        self.alphabet = alphabet
         self.initial_states = frozenset(initial_states)
         self.final_states = frozenset(final_states)
 
@@ -70,23 +74,6 @@ class Automaton(LabeledDirectedGraph):
         """
         return min(self.count_edges(node1, node2), 1)
 
-    @staticmethod
-    def _parse_transitions(substr: str) -> list[tuple[Node | None, Label]]:
-        state_transitions: list[tuple[Node | None, Label]] = []
-        for transition in substr.split("&"):
-            match transition.split(":"):
-                case [letters, next_states]:
-                    state_transitions.extend(
-                        (next_state.strip(), letter.strip())
-                        for next_state in next_states.split(",")
-                        for letter in letters.split(",")
-                    )
-                case [letters]:
-                    state_transitions.extend((None, letter.strip()) for letter in letters.split(","))
-                case _:
-                    raise ValueError(f"Invalid format for {transition!r}.")
-        return state_transitions
-
     @classmethod
     def from_string(cls, string: str):
         """Constructor used to generate an automaton from a string.
@@ -110,17 +97,38 @@ class Automaton(LabeledDirectedGraph):
         If the letter is left empty, like in `2::1`, an epsilon-transition is assumed
         (transition without reading any letter).
         """
-        all_states = []
-        final_states = []
-        initial_states = []
+        _Node_: TypeAlias = ComparableAndHashable
+        _Label_: TypeAlias = str
+
+        def parse_transitions(substr: str) -> list[tuple[_Node_ | None, _Label_]]:
+            state_transitions: list[tuple[_Node_ | None, _Label_]] = []
+            for transition in substr.split("&"):
+                match transition.split(":"):
+                    case [letters, next_states]:
+                        state_transitions.extend(
+                            (_next_state.strip(), _letter.strip())
+                            for _next_state in next_states.split(",")
+                            for _letter in letters.split(",")
+                        )
+                    case [letters]:
+                        state_transitions.extend((None, _letter.strip()) for _letter in letters.split(","))
+                    case _:
+                        raise ValueError(f"Invalid format for {transition!r}.")
+            return state_transitions
+
+        all_states: list[str] = []
+        final_states: list[str] = []
+        initial_states: list[str] = []
         transitions = []
         alphabet = set()
+        state: str
+        transitions_str: str
         for state_info in string.split(";"):
             match state_info.strip().split(":", maxsplit=1):
                 case ["", *_]:
                     raise ValueError(f"Empty state name in {state_info!r}.")
                 case [state, transitions_str]:
-                    transitions_data: list[tuple[Node | None, str]] = cls._parse_transitions(transitions_str)
+                    transitions_data: list[tuple[_Node_ | None, str]] = parse_transitions(transitions_str)
                 case [state]:
                     transitions_data = []
                 case _:
@@ -146,9 +154,25 @@ class Automaton(LabeledDirectedGraph):
                 transitions.append((state, next_state, letter))
                 alphabet.add(letter)
         return cls(
-            all_states,
+            all_states,  # type: ignore
             *transitions,
             alphabet=alphabet,
-            initial_states=initial_states,
-            final_states=final_states,
+            initial_states=initial_states,  # type: ignore
+            final_states=final_states,  # type: ignore
         )
+
+    def transition(self, state: Node, letter: str) -> set[Node]:
+        return {node for node in self.successors(state) if letter in self._labels[(state, node)]}
+
+    @cached_property
+    def is_deterministic(self):
+        if len(self.initial_states) > 1:
+            return False
+        for node in self.nodes:
+            for letter in self.alphabet:
+                if len(self.transition(node, letter)) != 1:
+                    return False
+        return True
+
+    def recognize(self, word: str) -> bool:
+        raise NotImplementedError
