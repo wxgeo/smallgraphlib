@@ -1,7 +1,7 @@
 import re
 from typing import Iterable, TypeAlias
 
-from smallgraphlib.utilities import ComparableAndHashable
+from smallgraphlib.utilities import ComparableAndHashable, cached_property
 
 from smallgraphlib.labeled_graphs import LabeledEdge, LabeledDirectedGraph
 from smallgraphlib.core import Node
@@ -34,11 +34,13 @@ class Automaton(LabeledDirectedGraph):
         for state in final_states:
             if state not in states:
                 raise UnknownState(f"Final state {state} must be one of the automaton states: {states}.")
+        alphabet = tuple(sorted(alphabet))
         for _, _, label in transitions:
-            if label not in alphabet:
-                raise UnknownLetter(f"Letter {label} must be one of the automat alphabet: {alphabet}.")
+            # Label must be either a letter of the alphabet or the empty word.
+            if label and label not in alphabet:
+                raise UnknownLetter(f"Letter {label} must be in the automat alphabet: {alphabet}.")
         super().__init__(states, *transitions, sort_nodes=sort_nodes)
-        self.alphabet = tuple(sorted(alphabet))
+        self.alphabet = alphabet
         self.initial_states = frozenset(initial_states)
         self.final_states = frozenset(final_states)
 
@@ -158,3 +160,19 @@ class Automaton(LabeledDirectedGraph):
             initial_states=initial_states,  # type: ignore
             final_states=final_states,  # type: ignore
         )
+
+    def transition(self, state: Node, letter: str) -> set[Node]:
+        return {node for node in self.successors(state) if letter in self._labels[(state, node)]}
+
+    @cached_property
+    def is_deterministic(self):
+        if len(self.initial_states) > 1:
+            return False
+        for node in self.nodes:
+            for letter in self.alphabet:
+                if len(self.transition(node, letter)) != 1:
+                    return False
+        return True
+
+    def recognize(self, word: str) -> bool:
+        raise NotImplementedError
