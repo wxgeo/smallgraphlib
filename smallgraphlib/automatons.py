@@ -174,5 +174,9 @@ class Automaton(LabeledDirectedGraph):
                     return False
         return True
 
-    def recognize(self, word: str) -> bool:
-        raise NotImplementedError
+    def recognize(self, word: str, _start: Iterable[Node] = None) -> bool:
+        states = set(_start) if _start is not None else self.initial_states
+        if word == "":
+            # Any of the current states must be final.
+            return len(states & self.final_states) != 0
+        return any(self.recognize(word[1:], self.transition(state, word[0])) for state in states)

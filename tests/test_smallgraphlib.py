@@ -709,3 +709,29 @@ def test_Automaton_deterministic():
     )
     assert g.transition(3, "1") == set()
     assert not g.is_deterministic
+
+
+def test_Automation_recognize():
+    # g recognize all the binary words for which the number of 1 is a multiple of 3
+    g = Automaton(
+        (1, 2, 3),
+        (1, 1, "0"),
+        (1, 2, "1"),
+        (2, 2, "0"),
+        (2, 3, "1"),
+        (3, 3, "0"),
+        (3, 1, "1"),
+        alphabet="01",
+        initial_states=(1,),
+        final_states=(1,),
+    )
+    assert g.recognize("")
+    assert g.recognize(5 * "0")
+    assert g.recognize(9 * "1")
+    assert not g.recognize(7 * "1")
+    word = "100101000101000100"
+    assert word.count("1") % 3 == 0
+    assert g.recognize(word)
+    word = "10010000101000100"
+    assert word.count("1") % 3 != 0
+    assert not g.recognize(word)
