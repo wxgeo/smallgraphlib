@@ -42,10 +42,17 @@ class AbstractLabeledGraph(AbstractGraph, ABC, Generic[Label]):
         labeled_edges = (repr(labeled_edge) for labeled_edge in self.labeled_edges)
         return f"{self.__class__.__name__}({tuple(self.nodes)!r}, {', '.join(labeled_edges)})"
 
-    @property
+    @cached_property
     def labeled_edges(self) -> tuple[LabeledEdge, ...]:
         return tuple(  # type: ignore
-            (*edge, label) for edge, labels in self._labels.items() for label in labels  # type: ignore
+            sorted(
+                (
+                    *edge,  # type: ignore
+                    label,
+                )
+                for edge, labels in self._labels.items()
+                for label in labels
+            )
         )
 
     @classmethod

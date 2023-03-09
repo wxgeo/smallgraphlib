@@ -649,22 +649,28 @@ def test_weighted_graph_from_sympy_matrix():
 
 
 def test_Automaton_from_string():
-    g = Automaton.from_string(">(I):a,b:1 ; (1):a:2&b:3 ; (2):a:1,I ; 3")
-    assert g.alphabet == ("a", "b")
-    assert set(g.states) == {"1", "2", "3", "I"}
-    assert g.transitions == (
-        ("I", "1", "a"),
-        ("I", "1", "b"),
+    g1 = Automaton.from_string(">(I)--a|b--1 / (1)--a--2;b--3 / (2)--a--1|I / 3")
+    assert g1.alphabet == ("a", "b")
+    assert set(g1.states) == {"1", "2", "3", "I"}
+    assert g1.transitions == (
         ("1", "2", "a"),
         ("1", "3", "b"),
         ("2", "1", "a"),
         ("2", "I", "a"),
+        ("I", "1", "a"),
+        ("I", "1", "b"),
     )
-    assert g.is_directed
-    assert g.initial_states == {"I"}
-    assert g.final_states == {"I", "1", "2"}
-    tikz = g.as_tikz()
-    print(tikz)
+    assert g1.is_directed
+    assert g1.initial_states == {"I"}
+    assert g1.final_states == {"I", "1", "2"}
+    tikz1 = g1.as_tikz()
+    print(tikz1)
+    g2 = Automaton.from_string(">(I):a,b:1 ; (1):a:2+b:3 ; (2):a:1,I ; 3", sep=(";", "+", ":", ","))
+    assert g2 == g1
+    g3 = Automaton.from_string("(I):a,b:1 ; >(1):a:2+b:3 ; (2):a:1,I ; 3", sep=(";", "+", ":", ","))
+    assert g3 != g1
+    g4 = Automaton.from_string("(I):a,b:1 ; 1:a:2+b:3 ; (2):a:1,I ; 3", sep=(";", "+", ":", ","))
+    assert g4 != g1
 
 
 def test_Automaton_deterministic():
