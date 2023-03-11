@@ -20,6 +20,7 @@ from typing import (
     Optional,
     Iterator,
     Sequence,
+    Type,
 )
 
 from smallgraphlib.utilities import (
@@ -33,6 +34,7 @@ from smallgraphlib.utilities import (
 _TIKZ_EXPORT_MAX_MULTIPLE_EDGES_SUPPORT = 3
 _TIKZ_EXPORT_MAX_MULTIPLE_LOOPS_SUPPORT = 1
 
+_AbstractGraph = TypeVar("_AbstractGraph", bound="AbstractGraph")
 # Node = TypeVar("Node", bound=typing.Hashable)  # too subtile for Pycharm ? ;-(
 Node = TypeVar("Node", bound=ComparableAndHashable)
 DirectedEdge = Tuple[Node, Node]
@@ -84,7 +86,7 @@ class AbstractGraph(ABC, Generic[Node]):
     # ------------------
 
     @classmethod
-    def from_string(cls, string: str):
+    def from_string(cls: Type[_AbstractGraph], string: str) -> _AbstractGraph:
         """DirectedGraph.from_string("A:B,C B:C C") will generate a graph of 3 nodes, A, B and C, with
         edges A->B, A->C and B->C."""
         nodes: List[str] = []
@@ -94,7 +96,7 @@ class AbstractGraph(ABC, Generic[Node]):
             nodes.append(node.strip())
             if remaining:
                 edges.extend((node, successor.strip()) for successor in remaining[0].split(","))
-        return cls(nodes, *edges)  # type: ignore
+        return cls(nodes, *edges)
 
     @staticmethod
     def _matrix_as_tuple_of_tuples(matrix: Iterable[Iterable]) -> Tuple[Tuple, ...]:
@@ -116,8 +118,8 @@ class AbstractGraph(ABC, Generic[Node]):
 
     @classmethod
     def from_matrix(
-        cls, matrix: Iterable[Iterable[int]], nodes_names: Iterable[Node] = None
-    ) -> "AbstractGraph":
+        cls: Type[_AbstractGraph], matrix: Iterable[Iterable[int]], nodes_names: Iterable[Node] = None
+    ) -> _AbstractGraph:
         """Construct the graph corresponding to the given adjacency matrix.
 
         Matrix must be a matrix of positive integers

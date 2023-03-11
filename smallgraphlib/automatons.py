@@ -1,10 +1,12 @@
 import re
-from typing import Iterable, TypeAlias, Generic
+from typing import Iterable, TypeAlias, Generic, Type, TypeVar
 
 from smallgraphlib.utilities import ComparableAndHashable, cached_property
 
 from smallgraphlib.labeled_graphs import LabeledEdge, LabeledDirectedGraph
 from smallgraphlib.core import Node
+
+_T = TypeVar("_T")
 
 
 class UnknownState(RuntimeError):
@@ -80,7 +82,7 @@ class Automaton(LabeledDirectedGraph, Generic[Node]):
 
     # noinspection PyTypeHints
     @classmethod
-    def from_string(cls, string: str, sep: tuple[str, str, str, str] = ("/", ";", "--", "|")) -> "Automaton":
+    def from_string(cls: Type[_T], string: str, sep: tuple[str, str, str, str] = ("/", ";", "--", "|")) -> _T:
         """Constructor used to generate an automaton from a string.
 
             >>> Automaton.from_string(">(I)--a|b--1  /  (1)--a--2;b--3  /  (2)--a--1|I  /  3")

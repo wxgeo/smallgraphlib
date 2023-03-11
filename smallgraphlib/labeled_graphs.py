@@ -5,12 +5,14 @@ from abc import ABC, abstractmethod
 from itertools import chain
 from math import inf
 from numbers import Real
-from typing import Iterable, Tuple, Dict, List, TypeVar, Generic, Any, Sequence
+from typing import Iterable, Tuple, Dict, List, TypeVar, Generic, Any, Sequence, Type
 
 from smallgraphlib.basic_graphs import Graph, DirectedGraph
 from smallgraphlib.core import Node, Edge, AbstractGraph, InvalidGraphAttribute
 from smallgraphlib.utilities import cached_property
 
+_AbstractLabeledGraph = TypeVar("_AbstractLabeledGraph", bound="AbstractLabeledGraph")
+_AbstractWeightedGraph = TypeVar("_AbstractWeightedGraph", bound="AbstractWeightedGraph")
 Label = TypeVar("Label")
 LabeledEdge = Tuple[Node, Node, Label]
 WeightedEdge = Tuple[Node, Node, float]
@@ -56,7 +58,9 @@ class AbstractLabeledGraph(AbstractGraph, ABC, Generic[Label]):
         )
 
     @classmethod
-    def from_dict(cls, edge_label_dict: dict = None, /, **edge_label):
+    def from_dict(
+        cls: Type[_AbstractLabeledGraph], edge_label_dict: dict = None, /, **edge_label
+    ) -> _AbstractLabeledGraph:
         """Construct a directed graph using a {edge_name: label} dictionnary (or keywords).
 
         All edges' names must be two letters strings (like "AB"), each letter representing a node.
@@ -76,7 +80,7 @@ class AbstractLabeledGraph(AbstractGraph, ABC, Generic[Label]):
         return cls(nodes, *((*edge, label) for edge, label in edge_label_dict.items()))  # type: ignore
 
     @classmethod
-    def from_string(cls, string: str):
+    def from_string(cls: Type[_AbstractLabeledGraph], string: str) -> _AbstractLabeledGraph:
         """LabeledGraph.from_string("A:B=label,C='other label' B:C=5 C D:C")
         will generate a graph of 4 nodes, A, B, C and D, with edges A->B, A->C, B->C and C->D
         and respective labels 'label', 'other label', 5 and `None`.
@@ -207,8 +211,10 @@ class AbstractWeightedGraph(AbstractLabeledGraph, ABC):
 
     @classmethod
     def from_matrix(
-        cls, matrix: Iterable[Iterable[float]], nodes_names: Iterable[Node] = None
-    ) -> "AbstractGraph":
+        cls: Type[_AbstractWeightedGraph],
+        matrix: Iterable[Iterable[float]],
+        nodes_names: Iterable[Node] = None,
+    ) -> _AbstractWeightedGraph:
         """Construct the graph corresponding to the given adjacency matrix.
 
         Matrix must be a matrix of positive real numbers
