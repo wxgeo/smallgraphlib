@@ -25,6 +25,7 @@ class Automaton(LabeledDirectedGraph, Generic[Node]):
         alphabet: Iterable[str] | str,
         initial_states: Iterable[Node],
         final_states: Iterable[Node],
+        alphabet_name: str = None,
         sort_nodes: bool = True,
     ):
         states = tuple(states)
@@ -49,6 +50,7 @@ class Automaton(LabeledDirectedGraph, Generic[Node]):
         self.alphabet = sorted_alphabet
         self.initial_states = frozenset(initial_states)
         self.final_states = frozenset(final_states)
+        self.alphabet_name = alphabet_name
 
     @property
     def states(self) -> tuple[Node, ...]:
@@ -205,4 +207,12 @@ class Automaton(LabeledDirectedGraph, Generic[Node]):
                 for letter in self.alphabet
                 for state in self.states
             )
+        )
+
+    def __repr__(self):
+        return (
+            f"{self.__class__.__name__}({self.states!r}, "
+            f"{', '.join(repr(transition) for transition in self.transitions)}, "
+            f"alphabet={''.join(self.alphabet)!r}, initial_states={self.initial_states!r}, "
+            f"final_states={self.final_states!r}, alphabet_name={self.alphabet_name!r})"
         )

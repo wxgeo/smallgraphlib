@@ -717,7 +717,7 @@ def test_Automaton_deterministic():
     assert not g.is_deterministic
 
 
-def test_Automation_recognize():
+def test_Automaton_recognize():
     # g recognize all the binary words for which the number of 1 is a multiple of 3
     g = Automaton(
         (1, 2, 3),
@@ -741,3 +741,12 @@ def test_Automation_recognize():
     word = "10010000101000100"
     assert word.count("1") % 3 != 0
     assert not g.recognize(word)
+
+def test_Automaton_repr_eq():
+    g = Automaton.from_string(">I--1;0--1 / (1)--1;0--I")
+    assert eval(repr(g)) == g
+
+# def test_Automaton_greek_letters():
+#     g = Automaton.from_string(">I--\Sigma;0--1 / (1)--0;1--I")
+#     g.as_tikz()
+    #print(g.transition(I,r"\Sigma"))

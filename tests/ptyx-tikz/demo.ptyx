@@ -18,13 +18,25 @@ top=2.5cm,bottom=2cm}{geometry}
 \usetikzlibrary{calc}
 \usetikzlibrary{math}
 \usetikzlibrary{arrows.meta}
+
+\usepackage[outline]{contour}
+\contourlength{0.5pt}
 \begin{document}
 
 
 
 #PYTHON
 from smallgraphlib import *
-write(Graph.from_matrix([[6,3,3,3],[3,6,3,3],[3,3,6,3],[3,3,3,6]]).as_tikz())
+
+graph_list = [
+	Graph.from_matrix([[6,3,3,3],[3,6,3,3],[3,3,6,3],[3,3,3,6]]),
+	DirectedGraph.from_matrix([[6,1,2,1],[1,6,1,1],[1,1,6,1],[1,1,1,6]]),
+	Automaton.from_string(">I--0|1;0--1 / (1)--0;1--I"),
+]
+
+for graph in graph_list:
+	write(graph.as_tikz())
+
 #END
 
 
