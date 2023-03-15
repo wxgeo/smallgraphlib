@@ -32,7 +32,6 @@ from smallgraphlib.utilities import (
 )
 
 _TIKZ_EXPORT_MAX_MULTIPLE_EDGES_SUPPORT = 3
-_TIKZ_EXPORT_MAX_MULTIPLE_LOOPS_SUPPORT = 1
 
 _AbstractGraph = TypeVar("_AbstractGraph", bound="AbstractGraph")
 # Node = TypeVar("Node", bound=typing.Hashable)  # too subtile for Pycharm ? ;-(
@@ -838,13 +837,10 @@ class AbstractGraph(ABC, Generic[Node]):
                     node = node1
                     style = "directed" if self.is_directed else "undirected"
                     n: int = self._tikz_count_edges(node, node)
-                    if n > _TIKZ_EXPORT_MAX_MULTIPLE_LOOPS_SUPPORT:
-                        raise NotImplementedError(n)
-                    if n == 1:
-                        (label,) = self._tikz_labels(node, node)
+                    for i, label in enumerate(self._tikz_labels(node, node), start=1):
                         lines.append(
                             rf"\draw[{style}] ({node}) to "
-                            f"[out={angles[node] - 45},in={angles[node] + 45},looseness=5] "
+                            f"[out={angles[node] - 45},in={angles[node] + 45},looseness={1+i*4}] "
                             rf"node[midway] {{\contour{{white}}{{{label}}}}} "
                             f"({node});"
                         )

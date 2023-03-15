@@ -13,7 +13,6 @@ from smallgraphlib.basic_graphs import (
 )
 from smallgraphlib.core import (
     _TIKZ_EXPORT_MAX_MULTIPLE_EDGES_SUPPORT,
-    _TIKZ_EXPORT_MAX_MULTIPLE_LOOPS_SUPPORT,
     AbstractGraph,
     Edge,
     Node,
@@ -139,13 +138,7 @@ def random_graph(
             max_multiple_edges = _TIKZ_EXPORT_MAX_MULTIPLE_EDGES_SUPPORT
 
         if max_multiple_loops is None:
-            max_multiple_loops = _TIKZ_EXPORT_MAX_MULTIPLE_LOOPS_SUPPORT
-        elif max_multiple_loops > _TIKZ_EXPORT_MAX_MULTIPLE_LOOPS_SUPPORT:
-            print(
-                "Warning: if `tikz_export_supported` is True, `max_multiple_loops` can't be set "
-                f"to more than {_TIKZ_EXPORT_MAX_MULTIPLE_LOOPS_SUPPORT}."
-            )
-            max_multiple_loops = _TIKZ_EXPORT_MAX_MULTIPLE_LOOPS_SUPPORT
+            max_multiple_loops = degree
 
     else:
         if max_multiple_edges is None:
