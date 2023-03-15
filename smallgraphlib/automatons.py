@@ -72,7 +72,9 @@ class Automaton(LabeledDirectedGraph, Generic[Node]):
         def latex(letter: str) -> str:
             return f"${letter}$" if letter else r"$\varepsilon$"
 
-        labels = self.labels(node1, node2)
+        labels = sorted(self.labels(node1, node2))
+        if self.alphabet_name is not None and sorted(labels) == list(self.alphabet):
+            return [latex(self.alphabet_name)]
         return [",".join(latex(label) for label in labels)] if labels else []
 
     def _tikz_count_edges(self, node1: Node, node2: Node) -> int:
@@ -84,32 +86,42 @@ class Automaton(LabeledDirectedGraph, Generic[Node]):
 
     # noinspection PyTypeHints
     @classmethod
-    def from_string(cls: Type[_T], string: str, sep: tuple[str, str, str, str] = ("/", ";", "--", "|")) -> _T:
+    def from_string(
+        cls: Type[_T],
+        string: str,
+        sep: tuple[str, str, str, str] = ("/", ";", "--", "|"),
+        alphabet_name: str = None,
+    ) -> _T:
         """Constructor used to generate an automaton from a string.
 
             >>> Automaton.from_string(">(I)--a|b--1  /  (1)--a--2;b--3  /  (2)--a--1|I  /  3")
 
         will generate an automaton of 4 states: `I`, `1`, `2` and `3`,
-        each state information being separated by `;`.
+        each state information being separated by `/`.
 
         Each state can be marked as initial or final:
 
             - The parentheses `()` around states `I`, `1` and `2` mean those states will be final.
             - The `>` before state `I` means it's the initial state.
 
-        After the state name, `:` will introduce the eventual transitions:
+        After the state name, `--` will introduce the eventual transitions:
 
-            - `I:a,b:1` means that reading `a` or `b` while being in state `I` leads to state `1`.
-            - `1:a:2&b:3` means that in state `1`, reading `a` leads to state `2`
+            - `I--a|b--1` means that reading `a` or `b` while being in state `I` leads to state `1`.
+            - `1--a--2|b--3` means that in state `1`, reading `a` leads to state `2`
               and reading `b` leads to state `3`.
-            - `2:a:1,I` means that in state `2`, reading `a` leads either to state `1` or to state `I`.
+            - `2--a--1|I` means that in state `2`, reading `a` leads either to state `1` or to state `I`.
 
-        If the letter is left empty, like in `2::1`, an epsilon-transition is assumed
+        If the letter is left empty, like in `2-- --1`, an epsilon-transition is assumed
         (transition without reading any letter).
 
         Separators may be changed using `sep` keyword:
 
             >>> Automaton.from_string(">(I):a,b:1 ; (1):a:2+b:3 ; (2):a:1,I ; 3", sep=(";", "+", ":", ","))
+
+        If a transition applies for every letter, one may use the alphabet name or `**` instead of listing
+        all the letters.
+
+            >>> Automaton.from_string(">I--a--1;b / (1)--**--I")
         """
         _Node_: TypeAlias = ComparableAndHashable
         _Label_: TypeAlias = str
@@ -167,12 +179,22 @@ class Automaton(LabeledDirectedGraph, Generic[Node]):
                     next_state = state
                 transitions.append((state, next_state, letter))
                 alphabet.add(letter)
+
+        alphabet -= {"**", alphabet_name}
+        updated_transitions = []
+        for state, next_state, letter in transitions:
+            if letter == alphabet_name or letter == "**":
+                updated_transitions.extend((state, next_state, alpha) for alpha in alphabet)
+            else:
+                updated_transitions.append((state, next_state, letter))
+
         return Automaton[str](
             all_states,
-            *transitions,
+            *updated_transitions,
             alphabet=alphabet,
             initial_states=initial_states,  # type: ignore
             final_states=final_states,  # type: ignore
+            alphabet_name=alphabet_name,
         )
 
     def transition(self, state: Node, letter: str) -> set[Node]:

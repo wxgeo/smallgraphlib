@@ -32,6 +32,7 @@ graph_list = [
 	Graph.from_matrix([[6,3,3,3],[3,6,3,3],[3,3,6,3],[3,3,3,6]]),
 	DirectedGraph.from_matrix([[6,1,2,1],[1,6,1,1],[1,1,6,1],[1,1,1,6]]),
 	Automaton.from_string(">I--0|1;0--1 / (1)--0;1--I"),
+	Automaton.from_string(">I--a--1;b / (1)--**--I", alphabet_name=r"\Sigma")
 ]
 
 for graph in graph_list:

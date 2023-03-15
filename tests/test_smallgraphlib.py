@@ -742,11 +742,27 @@ def test_Automaton_recognize():
     assert word.count("1") % 3 != 0
     assert not g.recognize(word)
 
+
 def test_Automaton_repr_eq():
     g = Automaton.from_string(">I--1;0--1 / (1)--1;0--I")
     assert eval(repr(g)) == g
 
+
+def test_Automaton_alphabet_name():
+    g1 = Automaton.from_string(">I--a--1;b / (1)--a|b--I")
+    g2 = Automaton.from_string(">I--a--1;b / (1)--**--I")
+    g3 = Automaton.from_string(">I--a--1;b / (1)--A--I", alphabet_name="A")
+    g4 = Automaton.from_string(r">I--a--1;b / (1)--\Sigma--I", alphabet_name=r"\Sigma")
+    assert g2 == g1
+    assert g3 == g1
+    assert g4 == g1
+    assert g1._tikz_labels("1", "I") == [r"$a$,$b$"]
+    assert g2._tikz_labels("1", "I") == [r"$a$,$b$"]
+    assert g3._tikz_labels("1", "I") == [r"$A$"]
+    assert g4._tikz_labels("1", "I") == [r"$\Sigma$"]
+
+
 # def test_Automaton_greek_letters():
 #     g = Automaton.from_string(">I--\Sigma;0--1 / (1)--0;1--I")
 #     g.as_tikz()
-    #print(g.transition(I,r"\Sigma"))
+# print(g.transition(I,r"\Sigma"))
