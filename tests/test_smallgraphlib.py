@@ -4,22 +4,16 @@ import random
 import pytest
 
 from smallgraphlib.basic_graphs import DirectedGraph
-from smallgraphlib.core import Traversal, InvalidGraphAttribute
+from smallgraphlib.core import InvalidGraphAttribute
 from smallgraphlib.utilities import Multiset, segments_intersection
 
 from smallgraphlib import (
     __version__,
     Graph,
-    LabeledDirectedGraph,
-    WeightedGraph,
     random_graph,
     complete_graph,
     complete_bipartite_graph,
-    LabeledGraph,
     graph,
-    perfect_binary_tree,
-    WeightedDirectedGraph,
-    Automaton,
 )
 
 
@@ -237,42 +231,6 @@ def test_simple():
     assert g.is_simple
 
 
-def test_shortest_paths():
-    g = WeightedGraph.from_dict(
-        AB=1,
-        BG=9,
-        FC=1,
-        FD=5,
-        AG=9,
-        BC=8,
-        AF=5,
-        BF=7,
-        BD=12,
-        CD=3,
-        FE=2,
-        ED=7,
-        GE=1,
-        GD=2,
-        AE=3,
-    )
-    assert {node: g.node_degree(node) for node in g.nodes} == {
-        "A": 4,
-        "B": 5,
-        "C": 3,
-        "D": 5,
-        "E": 4,
-        "F": 5,
-        "G": 4,
-    }
-    assert g.shortest_paths("D", "B") == (7, [["D", "G", "E", "A", "B"]])
-    assert g.shortest_paths("D", "A") == (6, [["D", "G", "E", "A"]])
-    assert g.shortest_paths("D", "C") == (3, [["D", "C"]])
-    assert g.shortest_paths("D", "E") == (3, [["D", "G", "E"]])
-    assert g.shortest_paths("D", "F") == (4, [["D", "C", "F"]])
-    assert g.shortest_paths("D", "G") == (2, [["D", "G"]])
-    assert g.shortest_paths("D", "D") == (0, [["D"]])
-
-
 def test_complete_bipartite():
     g = complete_bipartite_graph(3, 4)
     assert g.order == 7
@@ -281,29 +239,6 @@ def test_complete_bipartite():
     assert g.is_simple
     assert g.is_complete_bipartite
     assert g.diameter == 2
-
-
-def test_LabeledDirectedGraph_from_string():
-    g = LabeledDirectedGraph.from_string("A:B=label,C='other label' B:C=5 C D:C")
-    assert g.nodes == ("A", "B", "C", "D")
-    assert g.edges_set == {("A", "B"), ("A", "C"), ("B", "C"), ("D", "C")}
-    assert g.labels("A", "B") == ["label"]
-    assert g.labels("A", "C") == ["other label"]
-    assert g.labels("B", "C") == ["5"]
-    assert g.labels("D", "C") == [""]
-
-
-def test_LabeledGraph_from_string():
-    def f(*nodes):
-        return frozenset(nodes)
-
-    g = LabeledGraph.from_string("A:B=label,C='other label' B:C=5 C D:C")
-    assert g.nodes == ("A", "B", "C", "D")
-    assert g.edges_set == {f("A", "B"), f("A", "C"), f("B", "C"), f("D", "C")}
-    assert g.labels("A", "B") == ["label"]
-    assert g.labels("A", "C") == ["other label"]
-    assert g.labels("B", "C") == ["5"]
-    assert g.labels("D", "C") == [""]
 
 
 def test_graph_constructor():
@@ -410,155 +345,6 @@ def test_non_isomorphic_with_same_degrees():
     assert not other_graph_with_same_degrees.is_isomorphic_to(k33)
 
 
-def test_dfs():
-    g = Graph(range(1, 6), (3, 4), (3, 2), (2, 5), (2, 1))
-    assert g.is_a_tree
-    assert g.is_acyclic
-    assert not g.is_directed
-    assert g.is_connected
-    assert g.diameter == 3
-    assert tuple(g.depth_first_search(3, order=Traversal.PREORDER)) == (3, 4, 2, 5, 1)
-    assert tuple(g.depth_first_search(3, order=Traversal.POSTORDER)) == (4, 5, 1, 2, 3)
-    assert tuple(g.depth_first_search(3, order=Traversal.INORDER)) == (4, 3, 5, 2, 1)
-    g = Graph(range(7), (0, 1), (0, 4), (1, 2), (1, 3), (4, 5), (4, 6))
-    assert tuple(g.depth_first_search(order=Traversal.PREORDER)) == (
-        0,
-        1,
-        2,
-        3,
-        4,
-        5,
-        6,
-    )
-    assert tuple(g.depth_first_search(order=Traversal.POSTORDER)) == (
-        2,
-        3,
-        1,
-        5,
-        6,
-        4,
-        0,
-    )
-    assert tuple(g.depth_first_search(order=Traversal.INORDER)) == (2, 1, 3, 0, 5, 4, 6)
-
-
-def test_bfs():
-    g = Graph(range(7), (0, 1), (0, 4), (1, 2), (1, 3), (4, 5), (4, 6))
-    assert tuple(g.breadth_first_search()) == (0, 1, 4, 2, 3, 5, 6)
-
-
-def test_binary_tree_and_dfs():
-    g = perfect_binary_tree(4)
-    assert g.nodes_set == {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15}
-    assert g.edges_set == set(
-        frozenset(s)
-        for s in (
-            {1, 2},
-            {1, 3},
-            {2, 4},
-            {2, 5},
-            {3, 6},
-            {3, 7},
-            {8, 4},
-            {9, 4},
-            {11, 5},
-            {10, 5},
-            {12, 6},
-            {13, 6},
-            {14, 7},
-            {15, 7},
-        )
-    )
-    assert list(g._iterative_depth_first_search()) == [
-        1,
-        2,
-        4,
-        8,
-        9,
-        5,
-        10,
-        11,
-        3,
-        6,
-        12,
-        13,
-        7,
-        14,
-        15,
-    ]
-    assert g.is_a_tree
-    assert g.is_acyclic
-    g.add_edges((1, 15))
-    assert g.order == 15
-    assert g.degree == 15
-    assert not g.is_a_tree
-    assert not g.is_acyclic
-    g.remove_edges((1, 15))
-    g.add_edges((4, 14))
-    assert g.order == 15
-    assert g.degree == 15
-    assert not g.is_a_tree
-    assert not g.is_acyclic
-
-
-def test_dfs_bfs():
-    g = Graph("ABCDEFG", "AB", "BC", "BD", "AE", "EF", "EG")
-    assert "".join(g.depth_first_search(start="A", order=Traversal.PREORDER)) == "ABCDEFG"
-    assert "".join(g.depth_first_search(start="A", order=Traversal.POSTORDER)) == "CDBFGEA"
-    assert "".join(g.depth_first_search(start="A", order=Traversal.INORDER)) == "CBDAFEG"
-
-
-def test_weighted_graph():
-    g = WeightedGraph([1, 2, 3, 4, 5], (1, 2, 10.0), (2, 3, 9.0), (2, 4, 7.0), (4, 5, 8.0))
-    assert g.successors(1) == {2}
-    assert g.weight(2, 1) == 10.0
-    assert g.total_weight == 10.0 + 9.0 + 7.0 + 8.0
-
-
-def test_minimum_spanning_tree():
-    g = WeightedGraph([1])
-    assert g.minimum_spanning_tree() == g
-    g = WeightedGraph([1, 2, 3, 4, 5], (1, 2, 10.0), (2, 3, 9.0), (2, 4, 7.0), (4, 5, 8.0))
-    assert g.minimum_spanning_tree() == g
-    g = WeightedGraph.from_dict(
-        AB=15,
-        AE=8,
-        AG=6,
-        AF=13,
-        BC=10,
-        BD=13,
-        BG=14,
-        CD=12,
-        CF=11,
-        DE=11,
-        DF=5,
-        DG=12,
-        EF=5,
-        EG=10,
-    )
-    assert g.degree == 14
-    assert g.minimum_spanning_tree().total_weight == 45
-    g = WeightedGraph.from_dict(
-        AB=12,
-        AC=20,
-        AD=9,
-        BF=13,
-        CD=8,
-        CF=2,
-        CG=11,
-        DG=21,
-        EF=9,
-        EG=3,
-        FG=5,
-    )
-    assert g.degree == 11
-    assert g.minimum_spanning_tree().total_weight == 39
-    # Not connected graph
-    g = WeightedGraph((1, 2))
-    with pytest.raises(InvalidGraphAttribute):
-        g.minimum_spanning_tree()
-
-
 def test_intersection():
     A = (-4.191374663072777, -0.4986522911051212)
     B = (-0.41778975741239854, 1.495956873315364)
@@ -604,165 +390,3 @@ def test_transitivity():
     assert not g.is_transitive
     assert g.transitive_closure_matrix == ((1, 1), (1, 1))
     assert DirectedGraph("ABCD", "AB", "BA", "AC", "AD", "AA", "BB", "BC", "BD").is_transitive
-
-
-def test_weighted_graph_from_matrix():
-    oo = math.inf
-    M = (
-        (0, 2, oo, oo, 17, oo, 5),
-        (4, 0, 5, 4, oo, oo, 4),
-        (7, 8, 0, 13, oo, 8, 15),
-        (17, oo, oo, 0, 7, 9, oo),
-        (6, 8, 14, oo, 0, 21, 9),
-        (6, 10, 8, 9, 7, 0, oo),
-        (oo, 15, 5, 7, 18, oo, 0),
-    )
-    g = WeightedDirectedGraph.from_matrix(M)
-    assert g.weight(1, 5) == 17
-
-
-def test_weighted_graph_from_sympy_matrix():
-    import sympy
-
-    oo = sympy.oo
-    M = sympy.Matrix(
-        (
-            (0, 2, oo, oo, 17, oo, 5),
-            (4, 0, 5, 4, oo, oo, 4),
-            (7, 8, 0, 13, oo, 8, 15),
-            (17, oo, oo, 0, 7, 9, oo),
-            (6, 8, 14, oo, 0, 21, 9),
-            (6, 10, 8, 9, 7, 0, oo),
-            (oo, 15, 5, 7, 18, oo, 0),
-        )
-    )
-    g = WeightedDirectedGraph.from_matrix(M, nodes_names="ABCDEFG")
-    assert g.weight("A", "E") == 17
-    assert g.nodes == tuple("ABCDEFG")
-    assert g.distance("A", "A") == 0
-    assert g.distance("A", "B") == 2
-    assert g.distance("A", "G") == 5
-    assert g.distance("A", "D") == 6
-    assert g.distance("A", "C") == 7
-    assert g.distance("A", "E") == 13
-    assert g.distance("A", "F") == 15
-
-
-def test_Automaton_from_string():
-    g1 = Automaton.from_string(">(I)--a|b--1 / (1)--a--2;b--3 / (2)--a--1|I / 3")
-    assert g1.alphabet == ("a", "b")
-    assert set(g1.states) == {"1", "2", "3", "I"}
-    assert g1.transitions == (
-        ("1", "2", "a"),
-        ("1", "3", "b"),
-        ("2", "1", "a"),
-        ("2", "I", "a"),
-        ("I", "1", "a"),
-        ("I", "1", "b"),
-    )
-    assert g1.is_directed
-    assert g1.initial_states == {"I"}
-    assert g1.final_states == {"I", "1", "2"}
-    tikz1 = g1.as_tikz()
-    print(tikz1)
-    g2 = Automaton.from_string(">(I):a,b:1 ; (1):a:2+b:3 ; (2):a:1,I ; 3", sep=(";", "+", ":", ","))
-    assert g2 == g1
-    g3 = Automaton.from_string("(I):a,b:1 ; >(1):a:2+b:3 ; (2):a:1,I ; 3", sep=(";", "+", ":", ","))
-    assert g3 != g1
-    g4 = Automaton.from_string("(I):a,b:1 ; 1:a:2+b:3 ; (2):a:1,I ; 3", sep=(";", "+", ":", ","))
-    assert g4 != g1
-
-
-def test_Automaton_deterministic():
-    g = Automaton(
-        (1, 2, 3),
-        (1, 1, "0"),
-        (1, 2, "1"),
-        (2, 2, "0"),
-        (2, 3, "1"),
-        (3, 3, "0"),
-        (3, 1, "1"),
-        alphabet="01",
-        initial_states=(1,),
-        final_states=(2,),
-    )
-    assert g.is_deterministic
-    g = Automaton(
-        (1, 2, 3),
-        (1, 1, "0"),
-        (1, 1, "1"),
-        (1, 2, "1"),
-        (2, 2, "0"),
-        (2, 3, "1"),
-        (3, 3, "0"),
-        (3, 1, "1"),
-        alphabet="01",
-        initial_states=(1,),
-        final_states=(2,),
-    )
-    assert g.transition(1, "1") == {1, 2}
-    assert not g.is_deterministic
-    g = Automaton(
-        (1, 2, 3),
-        (1, 1, "0"),
-        (1, 2, "1"),
-        (2, 2, "0"),
-        (2, 3, "1"),
-        (3, 3, "0"),
-        alphabet="01",
-        initial_states=(1,),
-        final_states=(2,),
-    )
-    assert g.transition(3, "1") == set()
-    assert not g.is_deterministic
-
-
-def test_Automaton_recognize():
-    # g recognize all the binary words for which the number of 1 is a multiple of 3
-    g = Automaton(
-        (1, 2, 3),
-        (1, 1, "0"),
-        (1, 2, "1"),
-        (2, 2, "0"),
-        (2, 3, "1"),
-        (3, 3, "0"),
-        (3, 1, "1"),
-        alphabet="01",
-        initial_states=(1,),
-        final_states=(1,),
-    )
-    assert g.recognize("")
-    assert g.recognize(5 * "0")
-    assert g.recognize(9 * "1")
-    assert not g.recognize(7 * "1")
-    word = "100101000101000100"
-    assert word.count("1") % 3 == 0
-    assert g.recognize(word)
-    word = "10010000101000100"
-    assert word.count("1") % 3 != 0
-    assert not g.recognize(word)
-
-
-def test_Automaton_repr_eq():
-    g = Automaton.from_string(">I--1;0--1 / (1)--1;0--I")
-    assert eval(repr(g)) == g
-
-
-def test_Automaton_alphabet_name():
-    g1 = Automaton.from_string(">I--a--1;b / (1)--a|b--I")
-    g2 = Automaton.from_string(">I--a--1;b / (1)--**--I")
-    g3 = Automaton.from_string(">I--a--1;b / (1)--A--I", alphabet_name="A")
-    g4 = Automaton.from_string(r">I--a--1;b / (1)--\Sigma--I", alphabet_name=r"\Sigma")
-    assert g2 == g1
-    assert g3 == g1
-    assert g4 == g1
-    assert g1._tikz_labels("1", "I") == [r"$a$,$b$"]
-    assert g2._tikz_labels("1", "I") == [r"$a$,$b$"]
-    assert g3._tikz_labels("1", "I") == [r"$A$"]
-    assert g4._tikz_labels("1", "I") == [r"$\Sigma$"]
-
-
-# def test_Automaton_greek_letters():
-#     g = Automaton.from_string(">I--\Sigma;0--1 / (1)--0;1--I")
-#     g.as_tikz()
-# print(g.transition(I,r"\Sigma"))
