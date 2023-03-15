@@ -264,7 +264,7 @@ class WeightedGraph(AbstractWeightedGraph, LabeledGraph):
                 edges.append((i + 1, j + 1, weight))
         return edges
 
-    def minimum_spanning_tree(self) -> Graph:
+    def minimum_spanning_tree(self) -> "WeightedGraph":
         """Use Prim's algorithm to return a minimum weight spanning tree.
 
         A spanning tree of a graph G is a subgraph of G who is a tree and contains all the nodes of G.

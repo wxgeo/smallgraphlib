@@ -1,10 +1,9 @@
 import re
-from typing import Iterable, TypeAlias, Generic, Type, TypeVar
+from typing import Iterable, Generic, Type, TypeVar
 
-from smallgraphlib.utilities import ComparableAndHashable, cached_property
-
-from smallgraphlib.labeled_graphs import LabeledEdge, LabeledDirectedGraph
 from smallgraphlib.core import Node
+from smallgraphlib.labeled_graphs import LabeledEdge, LabeledDirectedGraph
+from smallgraphlib.utilities import cached_property
 
 _T = TypeVar("_T")
 
@@ -123,11 +122,9 @@ class Automaton(LabeledDirectedGraph, Generic[Node]):
 
             >>> Automaton.from_string(">I--a--1;b / (1)--**--I")
         """
-        _Node_: TypeAlias = ComparableAndHashable
-        _Label_: TypeAlias = str
 
-        def parse_transitions(substr: str) -> list[tuple[_Node_ | None, _Label_]]:
-            state_transitions: list[tuple[_Node_ | None, _Label_]] = []
+        def parse_transitions(substr: str) -> list[tuple[str | None, str]]:
+            state_transitions: list[tuple[str | None, str]] = []
             for transition in substr.split(sep[1]):
                 match transition.split(sep[2]):
                     case [letters, next_states]:
@@ -145,16 +142,17 @@ class Automaton(LabeledDirectedGraph, Generic[Node]):
         all_states: list[str] = []
         final_states: list[str] = []
         initial_states: list[str] = []
-        transitions = []
+        transitions: list[tuple[str, str, str]] = []
         alphabet = set()
         state: str
+        next_state: str
         transitions_str: str
         for state_info in string.split(sep[0]):
             match state_info.strip().split(sep[2], maxsplit=1):
                 case ["", *_]:
                     raise ValueError(f"Empty state name in {state_info!r}.")
                 case [state, transitions_str]:
-                    transitions_data: list[tuple[_Node_ | None, str]] = parse_transitions(transitions_str)
+                    transitions_data: list[tuple[str | None, str]] = parse_transitions(transitions_str)
                 case [state]:
                     transitions_data = []
                 case _:
@@ -174,14 +172,13 @@ class Automaton(LabeledDirectedGraph, Generic[Node]):
                 final_states.append(state)
             if initial:
                 initial_states.append(state)
-            for next_state, letter in transitions_data:
-                if next_state is None:
-                    next_state = state
+            for _next_state, letter in transitions_data:
+                next_state = state if _next_state is None else _next_state
                 transitions.append((state, next_state, letter))
                 alphabet.add(letter)
 
         alphabet -= {"**", alphabet_name}
-        updated_transitions = []
+        updated_transitions: list[tuple[str, str, str]] = []
         for state, next_state, letter in transitions:
             if letter == alphabet_name or letter == "**":
                 updated_transitions.extend((state, next_state, alpha) for alpha in alphabet)
