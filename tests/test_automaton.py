@@ -1,8 +1,8 @@
-from smallgraphlib import Automaton
+from smallgraphlib import Acceptor
 
 
-def test_Automaton_from_string():
-    g1 = Automaton.from_string(">(I)--a|b--1 / (1)--a--2;b--3 / (2)--a--1|I / 3")
+def test_Acceptor_from_string():
+    g1 = Acceptor.from_string(">(I)--a|b--1 / (1)--a--2;b--3 / (2)--a--1|I / 3")
     assert g1.alphabet == ("a", "b")
     assert set(g1.states) == {"1", "2", "3", "I"}
     assert g1.transitions == (
@@ -18,16 +18,16 @@ def test_Automaton_from_string():
     assert g1.final_states == {"I", "1", "2"}
     tikz1 = g1.as_tikz()
     print(tikz1)
-    g2 = Automaton.from_string(">(I):a,b:1 ; (1):a:2+b:3 ; (2):a:1,I ; 3", sep=(";", "+", ":", ","))
+    g2 = Acceptor.from_string(">(I):a,b:1 ; (1):a:2+b:3 ; (2):a:1,I ; 3", sep=(";", "+", ":", ","))
     assert g2 == g1
-    g3 = Automaton.from_string("(I):a,b:1 ; >(1):a:2+b:3 ; (2):a:1,I ; 3", sep=(";", "+", ":", ","))
+    g3 = Acceptor.from_string("(I):a,b:1 ; >(1):a:2+b:3 ; (2):a:1,I ; 3", sep=(";", "+", ":", ","))
     assert g3 != g1
-    g4 = Automaton.from_string("(I):a,b:1 ; 1:a:2+b:3 ; (2):a:1,I ; 3", sep=(";", "+", ":", ","))
+    g4 = Acceptor.from_string("(I):a,b:1 ; 1:a:2+b:3 ; (2):a:1,I ; 3", sep=(";", "+", ":", ","))
     assert g4 != g1
 
 
-def test_Automaton_deterministic():
-    g = Automaton(
+def test_Acceptor_deterministic():
+    g = Acceptor(
         (1, 2, 3),
         (1, 1, "0"),
         (1, 2, "1"),
@@ -40,7 +40,7 @@ def test_Automaton_deterministic():
         final_states=(2,),
     )
     assert g.is_deterministic
-    g = Automaton(
+    g = Acceptor(
         (1, 2, 3),
         (1, 1, "0"),
         (1, 1, "1"),
@@ -53,9 +53,9 @@ def test_Automaton_deterministic():
         initial_states=(1,),
         final_states=(2,),
     )
-    assert g.transition(1, "1") == {1, 2}
+    assert g.transition_func(1, "1") == {1, 2}
     assert not g.is_deterministic
-    g = Automaton(
+    g = Acceptor(
         (1, 2, 3),
         (1, 1, "0"),
         (1, 2, "1"),
@@ -66,13 +66,13 @@ def test_Automaton_deterministic():
         initial_states=(1,),
         final_states=(2,),
     )
-    assert g.transition(3, "1") == set()
+    assert g.transition_func(3, "1") == set()
     assert not g.is_deterministic
 
 
-def test_Automaton_recognize():
+def test_Acceptor_recognize():
     # g recognize all the binary words for which the number of 1 is a multiple of 3
-    g = Automaton(
+    g = Acceptor(
         (1, 2, 3),
         (1, 1, "0"),
         (1, 2, "1"),
@@ -97,15 +97,15 @@ def test_Automaton_recognize():
 
 
 def test_Automaton_repr_eq():
-    g = Automaton.from_string(">I--1;0--1 / (1)--1;0--I")
+    g = Acceptor.from_string(">I--1;0--1 / (1)--1;0--I")
     assert eval(repr(g)) == g
 
 
-def test_Automaton_alphabet_name():
-    g1 = Automaton.from_string(">I--a--1;b / (1)--a|b--I")
-    g2 = Automaton.from_string(">I--a--1;b / (1)--**--I")
-    g3 = Automaton.from_string(">I--a--1;b / (1)--A--I", alphabet_name="A")
-    g4 = Automaton.from_string(r">I--a--1;b / (1)--\Sigma--I", alphabet_name=r"\Sigma")
+def test_Acceptor_alphabet_name():
+    g1 = Acceptor.from_string(">I--a--1;b / (1)--a|b--I")
+    g2 = Acceptor.from_string(">I--a--1;b / (1)--**--I")
+    g3 = Acceptor.from_string(">I--a--1;b / (1)--A--I", alphabet_name="A")
+    g4 = Acceptor.from_string(r">I--a--1;b / (1)--\Sigma--I", alphabet_name=r"\Sigma")
     assert g2 == g1
     assert g3 == g1
     assert g4 == g1
