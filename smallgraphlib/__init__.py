@@ -1,6 +1,6 @@
 from importlib import metadata
 
-from smallgraphlib.automatons import Acceptor, DeterministicTransducer
+from smallgraphlib.automatons import Acceptor, Transducer
 from smallgraphlib.basic_graphs import Graph, DirectedGraph
 from smallgraphlib.labeled_graphs import (
     WeightedGraph,
@@ -35,5 +35,5 @@ __all__ = [
     "Traversal",
     "InvalidGraphAttribute",
     "Acceptor",
-    "DeterministicTransducer",
+    "Transducer",
 ]

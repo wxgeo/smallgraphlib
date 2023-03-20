@@ -1,13 +1,40 @@
-import re
 from abc import ABC
-from typing import Iterable, Generic, Type, TypeVar, NewType, cast
+from typing import Iterable, Generic, TypeVar, NewType, cast
+
+from smallgraphlib.string2automaton import StringToAutomatonParser
 
 from smallgraphlib.core import Node
-from smallgraphlib.labeled_graphs import LabeledEdge, LabeledDirectedGraph, Label
+from smallgraphlib.labeled_graphs import LabeledEdge, LabeledDirectedGraph
 from smallgraphlib.utilities import cached_property
 
-_T = TypeVar("_T")
-Letter = NewType("Letter", str)
+_T = TypeVar("_T", bound="Automaton")
+Char = NewType("Char", str)
+
+GREEK_LETTERS = (
+    "alpha",
+    "beta",
+    "gamma",
+    "delta",
+    "epsilon",
+    "zeta",
+    "eta",
+    "theta",
+    "iota",
+    "kappa",
+    "lambda",
+    "mu",
+    "nu",
+    "xi",
+    "pi",
+    "rho",
+    "sigma",
+    "tau",
+    "upsilon",
+    "phi",
+    "chi",
+    "psi",
+    "omega",
+)
 
 
 class UnknownState(RuntimeError):
@@ -39,14 +66,14 @@ class Automaton(LabeledDirectedGraph, ABC, Generic[Node]):
 
         # Verify transitions' letters.
         self.alphabet_name = alphabet_name
-        alphabet = cast(Iterable[Letter], alphabet)
-        self.alphabet: tuple[Letter, ...] = tuple(sorted(alphabet))
+        alphabet = cast(Iterable[Char], alphabet)
+        self.alphabet: tuple[Char, ...] = tuple(sorted(alphabet))
         for letter in self.alphabet:
             if len(letter) != 1:
                 raise ValueError(
                     f"Invalid value for letter: {letter!r}. Letters must be strings of length 1."
                 )
-        self._transitions_dict: dict[tuple[Node, Letter], set[Node]] = {}
+        self._transitions_dict: dict[tuple[Node, Char], set[Node]] = {}
         for state1, state2, label in transitions:
             # Label must be either a letter of the alphabet or the empty word.
             if label:
@@ -68,15 +95,113 @@ class Automaton(LabeledDirectedGraph, ABC, Generic[Node]):
         return True
 
     def transition_func(self, state: Node, letter: str) -> frozenset[Node]:
-        return frozenset(self._transitions_dict.get((state, Letter(letter)), ()))
+        return frozenset(self._transitions_dict.get((state, Char(letter)), ()))
+
+    def _verify_letter(self, letter):
+        if letter not in self.alphabet:
+            raise UnknownLetter(
+                f"Invalid letter: {letter}. The alphabet of this automaton is {''.join(self.alphabet)!r}."
+            )
+
+    def _verify_state(self, state, state_type=""):
+        if state_type:
+            state_type += " "
+        if state not in self.states:
+            raise UnknownState(
+                f"Invalid {state_type}state: {state}. The states of this automaton are {self.states}."
+            )
+
+    def _tikz_specific_node_style(self, node: Node) -> str:
+        styles = []
+        if node in self.initial_states:
+            styles.append("rectangle")
+        return ",".join(styles)
+
+    def _tikz_labels(self, node1, node2) -> list[str]:
+        labels = sorted(self.labels(node1, node2))
+        if self.alphabet_name is not None and sorted(labels) == list(self.alphabet):
+            return [self._latex(self.alphabet_name)]
+        return [",".join(self._latex(label) for label in labels)] if labels else []
+
+    @staticmethod
+    def _latex(label: str) -> str:
+        label = label.replace("#", r"\#")
+        if label in GREEK_LETTERS:
+            label = "\\" + label
+        return f"${label}$" if label else r"$\varepsilon$"
+
+
+class Acceptor(Automaton, Generic[Node]):
+    def __init__(
+        self,
+        states: Iterable[Node],
+        *transitions: LabeledEdge,
+        alphabet: Iterable[str] | str,
+        initial_states: Iterable[Node],
+        final_states: Iterable[Node],
+        alphabet_name: str = None,
+        sort_nodes: bool = True,
+    ):
+        alphabet = cast(Iterable[Char], alphabet)
+        super().__init__(
+            states,
+            *transitions,
+            alphabet=alphabet,
+            initial_states=initial_states,
+            alphabet_name=alphabet_name,
+            sort_nodes=sort_nodes,
+        )
+        final_states = tuple(final_states)
+        for state in final_states:
+            self._verify_state(state, state_type="final")
+        self.final_states = frozenset(final_states)
+
+    @cached_property
+    def transitions(self) -> tuple[LabeledEdge, ...]:
+        return self.labeled_edges
+
+    def _tikz_specific_node_style(self, node: Node) -> str:
+        styles = [super()._tikz_specific_node_style(node)]
+        if node in self.final_states:
+            styles.append("double,fill=lightgray")
+        return ",".join(styles)
+
+    def recognize(self, word: str, _start: Iterable[Node] = None) -> bool:
+        states = set(_start) if _start is not None else self.initial_states
+        if word == "":
+            # Any of the current states must be final.
+            return len(states & self.final_states) != 0
+        return any(self.recognize(word[1:], self.transition_func(state, Char(word[0]))) for state in states)
+
+    def __eq__(self, other):
+        return (
+            isinstance(other, Acceptor)
+            and other.alphabet == self.alphabet
+            and other.states == self.states
+            and other.initial_states == self.initial_states
+            and other.final_states == self.final_states
+            and all(
+                other.transition_func(state, letter) == self.transition_func(state, letter)
+                for letter in self.alphabet
+                for state in self.states
+            )
+        )
+
+    def __repr__(self):
+        return (
+            f"{self.__class__.__name__}({self.states!r}, "
+            f"{', '.join(repr(transition) for transition in self.transitions)}, "
+            f"alphabet={''.join(self.alphabet)!r}, initial_states={set(self.initial_states)!r}, "
+            f"final_states={set(self.final_states)!r}, alphabet_name={self.alphabet_name!r})"
+        )
 
     @classmethod
     def from_string(
-        cls: Type[_T],
+        cls,
         string: str,
         sep: tuple[str, str, str, str, str] = ("/", ":", ";", "--", "|"),
         alphabet_name: str = None,
-    ) -> _T:
+    ) -> "Acceptor":
         """Constructor used to generate an automaton from a string.
 
             >>> Acceptor.from_string(">(I)--a|b--1  /  (1)--a--2;b--3  /  (2)--a--1|I  /  3")
@@ -109,196 +234,38 @@ class Automaton(LabeledDirectedGraph, ABC, Generic[Node]):
         all the letters.
 
             >>> Acceptor.from_string(">I--a--1;b / (1)--**--I")
-
-        This constructor can also be used to generate transducers.
-
-            >>> DeterministicTransducer.from_string(">I:a--1;b / 1:b;a[#]--I")
         """
-        # Alternative syntaxes:
-        #  >I--a--1;b / 1--b;a[#]--I
-        #  >I:--a--1;@b / 1:@b;--a[#]--I
-        #  >I--a--1;@b / 1@b;a[#]--I
-        #  >I:a--1;b / 1:b;a[#]--I
-        # It seems to me that the last one is the easier to read.
-
-        s_between_states, s_after_start, s_between_transitions, s_before_end, s_alternatives = sep
-        del sep  # don't use sep (it would make code unreadable!)
-
-        def parse_transitions(substr: str) -> list[tuple[str | None, Letter]]:
-            """Parse the transitions related to a state."""
-            state_transitions: list[tuple[str | None, Letter]] = []
-            for transition in substr.split(s_between_transitions):
-                match transition.split(s_before_end):
-                    case [letters, next_states]:
-                        state_transitions.extend(
-                            (next_one.strip(), Letter(_letter.strip()))
-                            for next_one in next_states.split(s_alternatives)
-                            for _letter in letters.split(s_alternatives)
-                        )
-                    case [letters]:
-                        state_transitions.extend(
-                            (None, Letter(_letter.strip())) for _letter in letters.split(s_alternatives)
-                        )
-                    case _:
-                        raise ValueError(f"Invalid format for {transition!r}.")
-            return state_transitions
-
-        all_states: list[str] = []
-        final_states: list[str] = []
-        initial_states: list[str] = []
-        transitions: list[tuple[str, str, Letter]] = []
-        alphabet: set[Letter] = set()
-        state: str
-        next_state: str
-        transitions_str: str
-
-        for state_info in string.split(s_between_states):
-            match state_info.strip().split(s_after_start, maxsplit=1):
-                case ["", *_]:
-                    raise ValueError(f"Empty state name in {state_info!r}.")
-                case [state, transitions_str]:
-                    transitions_data: list[tuple[str | None, Letter]] = parse_transitions(transitions_str)
-                case [state]:
-                    transitions_data = []
-                case _:
-                    raise ValueError(f"Invalid format for {state_info!r}.")
-            # Parse state format
-            state = state.strip()
-            initial = final = False
-            if state[0] == ">":
-                initial = True
-                state = state[1:]
-            if m := re.match(r"\((.+)\)", state):
-                final = True
-                state = m.group(1)
-            # Collect all data
-            all_states.append(state)
-            if final:
-                final_states.append(state)
-            if initial:
-                initial_states.append(state)
-            for _next_state, letter in transitions_data:
-                next_state = state if _next_state is None else _next_state
-                transitions.append((state, next_state, letter))
-                alphabet.add(letter)
-
+        data = StringToAutomatonParser(sep).parse(string)
         # `**` notation stands for all alphabet's letters.
-        alphabet -= {"**", alphabet_name}
-        updated_transitions: list[tuple[str, str, str]] = []
-        for state, next_state, letter in transitions:
+        alphabet = {letter for state, next_state, letter in data.transitions} - {"**", alphabet_name}
+        transitions: list[tuple[str, str, str]] = []
+        for state, next_state, letter in data.transitions:
             if letter == alphabet_name or letter == "**":
-                updated_transitions.extend((state, next_state, alpha) for alpha in alphabet)
+                transitions.extend((state, next_state, alpha) for alpha in alphabet)
             else:
-                updated_transitions.append((state, next_state, letter))
+                transitions.append((state, next_state, letter))
 
-        return Acceptor[str, str](
-            all_states,
-            *updated_transitions,
-            alphabet=alphabet,
-            initial_states=initial_states,  # type: ignore
-            final_states=final_states,  # type: ignore
-            alphabet_name=alphabet_name,
-        )
-
-    def _verify_letter(self, letter):
-        if letter not in self.alphabet:
-            raise UnknownLetter(
-                f"Invalid letter: {letter}. The alphabet of this automaton is {''.join(self.alphabet)!r}."
-            )
-
-    def _verify_state(self, state, state_type=""):
-        if state_type:
-            state_type += " "
-        if state not in self.states:
-            raise UnknownState(
-                f"Invalid {state_type}state: {state}. The states of this automaton are {self.states}."
-            )
-
-
-class Acceptor(Automaton, Generic[Node, Label]):
-    def __init__(
-        self,
-        states: Iterable[Node],
-        *transitions: LabeledEdge,
-        alphabet: Iterable[str] | str,
-        initial_states: Iterable[Node],
-        final_states: Iterable[Node],
-        alphabet_name: str = None,
-        sort_nodes: bool = True,
-    ):
-        alphabet = cast(Iterable[Letter], alphabet)
-        super().__init__(
-            states,
+        return Acceptor(
+            data.states,
             *transitions,
             alphabet=alphabet,
-            initial_states=initial_states,
+            initial_states=data.initial_states,
+            final_states=data.final_states,
             alphabet_name=alphabet_name,
-            sort_nodes=sort_nodes,
-        )
-        final_states = tuple(final_states)
-        for state in final_states:
-            self._verify_state(state, state_type="final")
-        self.final_states = frozenset(final_states)
-
-    @cached_property
-    def transitions(self) -> tuple[LabeledEdge, ...]:
-        return self.labeled_edges
-
-    def _tikz_specific_node_style(self, node: Node) -> str:
-        styles = []
-        if node in self.final_states:
-            styles.append("double,fill=lightgray")
-        if node in self.initial_states:
-            styles.append("rectangle")
-        return ",".join(styles)
-
-    def _tikz_labels(self, node1, node2) -> list[str]:
-        def latex(letter: str) -> str:
-            return f"${letter}$" if letter else r"$\varepsilon$"
-
-        labels = sorted(self.labels(node1, node2))
-        if self.alphabet_name is not None and sorted(labels) == list(self.alphabet):
-            return [latex(self.alphabet_name)]
-        return [",".join(latex(label) for label in labels)] if labels else []
-
-    def _tikz_count_edges(self, node1: Node, node2: Node) -> int:
-        """For automatons, any parallel oriented edges are displayed as a unique oriented edge,
-        with merged labels (for example, two edges labeled `a` and `b` are replaced by a unique edge
-        labeled `a,b`).
-        """
-        return min(self.count_edges(node1, node2), 1)
-
-    def recognize(self, word: str, _start: Iterable[Node] = None) -> bool:
-        states = set(_start) if _start is not None else self.initial_states
-        if word == "":
-            # Any of the current states must be final.
-            return len(states & self.final_states) != 0
-        return any(self.recognize(word[1:], self.transition_func(state, Letter(word[0]))) for state in states)
-
-    def __eq__(self, other):
-        return (
-            isinstance(other, Acceptor)
-            and other.alphabet == self.alphabet
-            and other.states == self.states
-            and other.initial_states == self.initial_states
-            and other.final_states == self.final_states
-            and all(
-                other.transition_func(state, letter) == self.transition_func(state, letter)
-                for letter in self.alphabet
-                for state in self.states
-            )
-        )
-
-    def __repr__(self):
-        return (
-            f"{self.__class__.__name__}({self.states!r}, "
-            f"{', '.join(repr(transition) for transition in self.transitions)}, "
-            f"alphabet={''.join(self.alphabet)!r}, initial_states={set(self.initial_states)!r}, "
-            f"final_states={set(self.final_states)!r}, alphabet_name={self.alphabet_name!r})"
         )
 
 
-class DeterministicTransducer(Automaton, Generic[Node]):
+class Transducer(Automaton, Generic[Node]):
+    """A deterministic transducer.
+
+    A transducer is a finite states automaton which translates an input word into another word.
+
+        >>> from smallgraphlib import Transducer
+        >>> transducer = Transducer.from_string(">I:a--1;b / 1:b;a[#]--I")
+        >>> transducer.translate("aababba")  # Count the number of "ba" substrings
+        "##"
+    """
+
     def __init__(
         self,
         states: Iterable[Node],
@@ -309,18 +276,19 @@ class DeterministicTransducer(Automaton, Generic[Node]):
         alphabet_name: str = None,
         sort_nodes: bool = True,
     ):
-        input_alphabet = cast(Iterable[Letter], input_alphabet)
-        self._outputs_dict: dict[tuple[Node, Letter], str] = {}
+        input_alphabet = cast(Iterable[Char], input_alphabet)
+        self._outputs_dict: dict[tuple[Node, Char], str] = {}
         output_free_transitions = []
         for transition in transitions:
             match transition:
-                case state1, state2, input_letter, output_message:
-                    pass
                 case state1, state2, input_letter:
-                    output_message = ""
+                    pass
+                case state1, state2, input_letter, "":
+                    pass
+                case state1, state2, input_letter, output_message:
+                    self._outputs_dict[(state1, input_letter)] = output_message  # type: ignore
                 case _:
                     raise ValueError(f"Invalid format for transition {transition!r}.")
-            self._outputs_dict[(state1, input_letter)] = output_message  # type: ignore
             output_free_transitions.append((state1, state2, input_letter))
         super().__init__(
             states,
@@ -346,24 +314,93 @@ class DeterministicTransducer(Automaton, Generic[Node]):
                     print(f"Warning: no possible next states for state {state} and letter {letter}:\n.")
                     deterministic = False
         if not deterministic:
-            raise ValueError("DeterministicTransducer instance must be deterministic.")
+            raise ValueError("Transducer instance must be deterministic.")
 
     def next_state(self, state: Node, letter: str) -> Node:
+        """Return the new reached state when being in state `state` and reading letter `letter`."""
         self._verify_state(state)
         self._verify_letter(letter)
         # A Transducer is a deterministic automaton,
         # so there is only one next possible state for a given letter.
-        return next(iter(self._transitions_dict[(state, Letter(letter))]))
+        return next(iter(self._transitions_dict[(state, Char(letter))]))
 
     def next_word(self, state: Node, letter: str) -> str:
+        """Return the output generated when being in state `state` and reading letter `letter`."""
         self._verify_state(state)
         self._verify_letter(letter)
-        return self._outputs_dict[(state, Letter(letter))]
+        return self._outputs_dict.get((state, Char(letter)), "")
 
     def translate(self, word: str) -> str:
+        """Return the output generated by the automaton when the string `word` is read."""
         state = next(iter(self.initial_states))
         output = []
         for letter in word:
             output.append(self.next_word(state, letter))
             state = self.next_state(state, letter)
         return "".join(output)
+
+    def _tikz_labels(self, node1: Node, node2: Node) -> list[str]:
+        # Associate to each output word all the input letters than can produce it.
+        words: dict[str, set[Char]] = {}
+        for letter in self.alphabet:
+            if self.next_state(node1, letter) == node2:
+                words.setdefault(self.next_word(node1, letter), set()).add(letter)
+
+        labels: list[str] = []
+        for word, letters in words.items():
+            sorted_letters = sorted(letters)
+            if sorted_letters == list(self.alphabet) and self.alphabet_name is not None:
+                letters_str = self.alphabet_name
+            else:
+                letters_str = ",".join(sorted_letters)
+            letters_str = self._latex(letters_str)
+            if word:
+                letters_str += rf"\fbox{{{self._latex(word)}}}"
+            labels.append(letters_str)
+        return labels
+
+    @classmethod
+    def from_string(
+        cls,
+        string: str,
+        sep: tuple[str, str, str, str, str] = ("/", ":", ";", "--", "|"),
+        alphabet_name: str = None,
+    ) -> "Transducer":
+        """This constructor is used to generate transducers.
+
+        For example, the following automaton prints a "#" character for each "ba" substring read.
+
+            >>> Transducer.from_string(">I:a--1;b / 1:b;a[#]--I")
+
+        Extensive syntax description can be found in `Acceptor.from_string()` documentation.
+        """
+
+        data = StringToAutomatonParser(sep).parse(string)
+        # Extract output information from transitions labels
+        transitions: list[tuple[str, str, str, str]] = []
+        for state, next_state, label in data.transitions:
+            output: str = ""
+            i = label.find("[")
+            if i != -1 and label.endswith("]"):
+                label, output = label[:i], label[i + 1 : -1]
+            transitions.append((state, next_state, label, output))
+
+        alphabet = {letter for _, _, letter, _ in transitions} - {"**", alphabet_name}
+        output_alphabet = {output for _, _, _, output in transitions} - {""}
+
+        # `**` notation stands for all alphabet's letters.
+        updated_transitions: list[tuple[str, str, str, str]] = []
+        for state, next_state, letter, output in transitions:
+            if letter == alphabet_name or letter == "**":
+                updated_transitions.extend((state, next_state, alpha, output) for alpha in alphabet)
+            else:
+                updated_transitions.append((state, next_state, letter, output))
+
+        return Transducer(
+            data.states,
+            *updated_transitions,
+            input_alphabet=alphabet,
+            initial_state=next(iter(data.initial_states)),
+            alphabet_name=alphabet_name,
+            output_alphabet=output_alphabet,
+        )

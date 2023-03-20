@@ -755,9 +755,6 @@ class AbstractGraph(ABC, Generic[Node]):
         """Overwrite this method to add a specific tikz style to some nodes."""
         return ""
 
-    def _tikz_count_edges(self, node1: Node, node2: Node) -> int:
-        return self.count_edges(node1, node2, count_undirected_loops_twice=False)
-
     def _tikz_labels(self, node1: Node, node2: Node) -> list[str]:
         """Overwrite this method to modify tikz value for some labels."""
         return self.labels(node1, node2)
@@ -836,7 +833,7 @@ class AbstractGraph(ABC, Generic[Node]):
                     # This is a loop.
                     node = node1
                     style = "directed" if self.is_directed else "undirected"
-                    n: int = self._tikz_count_edges(node, node)
+                    # n: int = self._tikz_count_edges(node, node)
                     for i, label in enumerate(self._tikz_labels(node, node), start=1):
                         lines.append(
                             rf"\draw[{style}] ({node}) to "
@@ -857,10 +854,10 @@ class AbstractGraph(ABC, Generic[Node]):
                     else:
                         data = [("undirected", node1, node2)]
                     for direction, nodeA, nodeB in data:
-                        labels.extend(self._tikz_labels(nodeA, nodeB))
-                        styles += self._tikz_count_edges(nodeA, nodeB) * [direction]
+                        _labels = self._tikz_labels(nodeA, nodeB)
+                        labels.extend(_labels)
+                        styles += len(_labels) * [direction]
                     n = len(styles)
-                    assert len(labels) == n, f"len(styles)={n} != len(labels)={len(labels)}"
                     if n == 0:
                         bendings = []
                     elif n == 1:

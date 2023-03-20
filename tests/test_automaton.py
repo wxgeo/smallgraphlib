@@ -1,4 +1,21 @@
-from smallgraphlib import Acceptor, DeterministicTransducer
+from smallgraphlib.string2automaton import StringToAutomatonParser
+
+from smallgraphlib import Acceptor, Transducer
+
+
+def test_StringToAutomatonParser():
+    result = StringToAutomatonParser().parse(">(I):a|b--1 / (1):a--2;b--3 / 2:a--1|I / 3")
+    assert set(result.states) == {"I", "1", "2", "3"}
+    assert set(result.initial_states) == {"I"}
+    assert set(result.final_states) == {"I", "1"}
+    assert set(result.transitions) == {
+        ("I", "1", "a"),
+        ("I", "1", "b"),
+        ("1", "2", "a"),
+        ("1", "3", "b"),
+        ("2", "1", "a"),
+        ("2", "I", "a"),
+    }
 
 
 def test_Acceptor_from_string():
@@ -115,9 +132,9 @@ def test_Acceptor_alphabet_name():
     assert g4._tikz_labels("1", "I") == [r"$\Sigma$"]
 
 
-def test_DeterministicTransducer():
+def test_Transducer():
     # This automaton count the number of "ba" substrings.
-    g = DeterministicTransducer(
+    g = Transducer(
         ("I", "B"),
         ("I", "I", "a"),
         ("I", "B", "b"),
@@ -131,3 +148,13 @@ def test_DeterministicTransducer():
     assert all(s == "ba" or "ba" not in s for s in substrings)
     # The output must have one star for each "ba" substring.
     assert g.translate("".join(substrings)) == substrings.count("ba") * "*"
+
+
+def test_Transducer_from_string():
+    g = Transducer.from_string(">I:a--1;b / 1:b;a[#]--I")
+    assert g.translate("aababba") == "##"
+
+
+def test_Transducer_to_tikz():
+    g = Transducer.from_string(">I:a--1;b / 1:b;a[#]--I")
+    assert r"\fbox{$\#$}" in g.as_tikz()
