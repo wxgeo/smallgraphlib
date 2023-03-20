@@ -115,6 +115,15 @@ class StringToAutomatonParser:
             if initial:
                 initial_states.append(state)
 
+        for state1, state2, _ in transitions:
+            for state in (state1, state2):
+                if state not in all_states:
+                    raise ValueError(
+                        f"Invalid state: {state!r} not found in {all_states!r}.\n"
+                        "HINT: This may be caused by a syntax error in the string "
+                        f"defining the automaton:\n{string!r}"
+                    )
+
         return StringConstructorData(
             states=all_states,
             transitions=transitions,

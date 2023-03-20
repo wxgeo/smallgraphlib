@@ -1,3 +1,5 @@
+import pytest
+
 from smallgraphlib.string2automaton import StringToAutomatonParser
 
 from smallgraphlib import Acceptor, Transducer
@@ -16,7 +18,9 @@ def test_StringToAutomatonParser():
         ("2", "1", "a"),
         ("2", "I", "a"),
     }
-
+    with pytest.raises(ValueError) as excinfo:
+        StringToAutomatonParser().parse(">(I):a--1 / 1:b--2 / (2:b--I")
+    assert "Invalid state" in str(excinfo.value) and "(2" in str(excinfo.value)
 
 def test_Acceptor_from_string():
     g1 = Acceptor.from_string(">(I):a|b--1 / (1):a--2;b--3 / (2):a--1|I / 3")
@@ -130,6 +134,11 @@ def test_Acceptor_alphabet_name():
     assert g2._tikz_labels("1", "I") == [r"$a$,$b$"]
     assert g3._tikz_labels("1", "I") == [r"$A$"]
     assert g4._tikz_labels("1", "I") == [r"$\Sigma$"]
+
+def test_Acceptor_tikz():
+    Acceptor.from_string(">I:a--I|1  /  (1)--b--I|1").as_tikz()
+    Acceptor.from_string(">I:a--I;b--1 / (1)--a--1;b--I").as_tikz()
+    Acceptor.from_string(">(I):a--1 / 1:b--2 / (2):b--I").as_tikz()
 
 
 def test_Transducer():
