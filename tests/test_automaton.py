@@ -54,6 +54,12 @@ def test_Acceptor_from_string():
     assert g4 != g1
 
 
+def acceptor_from_string_2():
+    g = Acceptor.from_string(r">I:\Sigma;0--1 / (1)", alphabet_name=r"\Sigma", alphabet="01")
+    assert g.labels("I", "1") == ["0"]
+    assert g._tikz_labels("I", "1") == ["$0$"]
+
+
 def test_Acceptor_deterministic():
     g = Acceptor(
         (1, 2, 3),

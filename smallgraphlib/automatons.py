@@ -71,7 +71,8 @@ class Automaton(LabeledDirectedGraph, ABC, Generic[Node]):
         for letter in self.alphabet:
             if len(letter) != 1:
                 raise ValueError(
-                    f"Invalid value for letter: {letter!r}. Letters must be strings of length 1."
+                    f"Alphabet {self.alphabet!r}: letter {letter!r} is invalid. "
+                    "Letters must be strings of length 1."
                 )
         self._transitions_dict: dict[tuple[Node, Char], set[Node]] = {}
         for state1, state2, label in transitions:
@@ -119,7 +120,11 @@ class Automaton(LabeledDirectedGraph, ABC, Generic[Node]):
 
     def _tikz_labels(self, node1, node2) -> list[str]:
         labels = sorted(self.labels(node1, node2))
-        if self.alphabet_name is not None and sorted(labels) == list(self.alphabet):
+        if (
+            self.alphabet_name is not None
+            and sorted(labels) == list(self.alphabet)
+            and len(self.alphabet) > 1
+        ):
             return [self._latex(self.alphabet_name)]
         return [",".join(self._latex(label) for label in labels)] if labels else []
 
@@ -200,6 +205,7 @@ class Acceptor(Automaton, Generic[Node]):
         cls,
         string: str,
         sep: tuple[str, str, str, str, str] = ("/", ":", ";", "--", "|"),
+        alphabet: Iterable[str] = None,
         alphabet_name: str = None,
     ) -> "Acceptor":
         """Constructor used to generate an automaton from a string.
@@ -236,8 +242,9 @@ class Acceptor(Automaton, Generic[Node]):
             >>> Acceptor.from_string(">I--a--1;b / (1)--**--I")
         """
         data = StringToAutomatonParser(sep).parse(string)
-        # `**` notation stands for all alphabet's letters.
-        alphabet = {letter for state, next_state, letter in data.transitions} - {"**", alphabet_name, ""}
+        if alphabet is None:
+            # `**` notation stands for all alphabet's letters.
+            alphabet = {letter for state, next_state, letter in data.transitions} - {"**", alphabet_name, ""}
         transitions: list[tuple[str, str, str]] = []
         for state, next_state, letter in data.transitions:
             if letter == alphabet_name or letter == "**":

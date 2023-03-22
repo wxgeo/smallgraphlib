@@ -34,6 +34,7 @@ graph_list = [
 	Acceptor.from_string(">I:0|1;0--1 / (1):0;1--I"),
 	Acceptor.from_string(">I:a--1;b / (1):**--I", alphabet_name=r"\Sigma"),
 	Transducer.from_string(">I:a--1;b / 1:b;a[#]--I"),
+	Acceptor.from_string(r">I:\Sigma;0--1 / (1)", alphabet_name=r"\Sigma", alphabet="01"),
 ]
 
 for graph in graph_list:
