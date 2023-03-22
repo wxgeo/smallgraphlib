@@ -21,6 +21,13 @@ def test_StringToAutomatonParser():
     with pytest.raises(ValueError) as excinfo:
         StringToAutomatonParser().parse(">(I):a--1 / 1:b--2 / (2:b--I")
     assert "Invalid state" in str(excinfo.value) and "(2" in str(excinfo.value)
+    StringToAutomatonParser().parse(">I:a--I|1 / (1):b--I|1")
+    StringToAutomatonParser().parse(">I:a--I;b--1 / (1):a--1;b--I")
+    StringToAutomatonParser().parse(">(I):a--I")
+    StringToAutomatonParser().parse(">(I):a|b--I")
+    StringToAutomatonParser().parse(">(I):a|b--I;--1 / 1:a|b--1")
+    StringToAutomatonParser().parse(">(I):a--1 / 1:b--2 / (2):b--I")
+
 
 def test_Acceptor_from_string():
     g1 = Acceptor.from_string(">(I):a|b--1 / (1):a--2;b--3 / (2):a--1|I / 3")
@@ -135,10 +142,16 @@ def test_Acceptor_alphabet_name():
     assert g3._tikz_labels("1", "I") == [r"$A$"]
     assert g4._tikz_labels("1", "I") == [r"$\Sigma$"]
 
+
 def test_Acceptor_tikz():
     Acceptor.from_string(">I:a--I|1  /  (1)--b--I|1").as_tikz()
     Acceptor.from_string(">I:a--I;b--1 / (1)--a--1;b--I").as_tikz()
     Acceptor.from_string(">(I):a--1 / 1:b--2 / (2):b--I").as_tikz()
+
+
+def test_epsilon_transition():
+    g = Acceptor.from_string(">(I):a|b--I;--1 / 1:a|b--1")
+    assert g.recognize("abbaabbb")
 
 
 def test_Transducer():

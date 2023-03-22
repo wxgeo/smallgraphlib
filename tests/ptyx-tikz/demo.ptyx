@@ -33,7 +33,7 @@ graph_list = [
 	DirectedGraph.from_matrix([[6,1,2,1],[1,6,1,1],[1,1,6,1],[1,1,1,6]]),
 	Acceptor.from_string(">I:0|1;0--1 / (1):0;1--I"),
 	Acceptor.from_string(">I:a--1;b / (1):**--I", alphabet_name=r"\Sigma"),
-	Transducer.from_string(">I:a--1;b / 1:b;a[*]--I"),
+	Transducer.from_string(">I:a--1;b / 1:b;a[#]--I"),
 ]
 
 for graph in graph_list:

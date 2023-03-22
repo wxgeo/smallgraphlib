@@ -123,6 +123,12 @@ class StringToAutomatonParser:
                         "HINT: This may be caused by a syntax error in the string "
                         f"defining the automaton:\n{string!r}"
                     )
+                if (
+                    self.s_alternatives in state
+                    or self.s_between_transitions in state
+                    or self.s_before_end in state
+                ):
+                    print(f"Warning: strange state format: {state!r}. Verify syntax in {string!r}.")
 
         return StringConstructorData(
             states=all_states,

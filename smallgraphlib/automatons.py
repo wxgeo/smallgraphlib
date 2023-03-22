@@ -237,7 +237,7 @@ class Acceptor(Automaton, Generic[Node]):
         """
         data = StringToAutomatonParser(sep).parse(string)
         # `**` notation stands for all alphabet's letters.
-        alphabet = {letter for state, next_state, letter in data.transitions} - {"**", alphabet_name}
+        alphabet = {letter for state, next_state, letter in data.transitions} - {"**", alphabet_name, ""}
         transitions: list[tuple[str, str, str]] = []
         for state, next_state, letter in data.transitions:
             if letter == alphabet_name or letter == "**":
