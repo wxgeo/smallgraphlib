@@ -3,7 +3,7 @@ from typing import Iterable, Generic, TypeVar, NewType, cast
 
 from smallgraphlib.string2automaton import StringToAutomatonParser
 
-from smallgraphlib.core import Node
+from smallgraphlib.custom_types import Node
 from smallgraphlib.labeled_graphs import LabeledEdge, LabeledDirectedGraph
 from smallgraphlib.utilities import cached_property
 

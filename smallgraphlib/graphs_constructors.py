@@ -1,23 +1,18 @@
 import random
 from typing import List, Tuple, Iterable
 
-from smallgraphlib import (
-    Graph,
-    WeightedDirectedGraph,
+
+from smallgraphlib.custom_types import Node, Edge
+from smallgraphlib.core import AbstractGraph
+from smallgraphlib.basic_graphs import Graph, DirectedGraph
+from smallgraphlib.labeled_graphs import (
     LabeledDirectedGraph,
     LabeledGraph,
+    WeightedDirectedGraph,
     WeightedGraph,
 )
-from smallgraphlib.basic_graphs import (
-    DirectedGraph,
-)
-from smallgraphlib.core import (
-    _TIKZ_EXPORT_MAX_MULTIPLE_EDGES_SUPPORT,
-    AbstractGraph,
-    Edge,
-    Node,
-)
 from smallgraphlib.utilities import Multiset
+from smallgraphlib.tikz_export import _TIKZ_EXPORT_MAX_MULTIPLE_EDGES_SUPPORT
 
 
 def graph(nodes=None, *edges, directed=False, **labeled_edges):

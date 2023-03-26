@@ -5,7 +5,8 @@ import pytest
 
 from smallgraphlib.basic_graphs import DirectedGraph
 from smallgraphlib.core import InvalidGraphAttribute
-from smallgraphlib.utilities import Multiset, segments_intersection
+from smallgraphlib.utilities import Multiset
+from smallgraphlib.tikz_export import segments_intersection
 
 from smallgraphlib import (
     __version__,

@@ -8,7 +8,8 @@ from numbers import Real
 from typing import Iterable, Tuple, Dict, List, TypeVar, Generic, Any, Sequence, Type
 
 from smallgraphlib.basic_graphs import Graph, DirectedGraph
-from smallgraphlib.core import Node, Edge, AbstractGraph, InvalidGraphAttribute
+from smallgraphlib.core import AbstractGraph, InvalidGraphAttribute
+from smallgraphlib.custom_types import Node, Edge
 from smallgraphlib.utilities import cached_property
 
 _AbstractLabeledGraph = TypeVar("_AbstractLabeledGraph", bound="AbstractLabeledGraph")
@@ -201,7 +202,7 @@ class AbstractWeightedGraph(AbstractLabeledGraph, ABC):
         """Overwrite this method to modify tikz value for some labels."""
         labels = self._labels.get(self._edge(node1, node2), [])
 
-        def format(label):
+        def format_(label):
             # Note: math.isinf() supports `sympy.oo` too.
             if label is None:
                 return ""
@@ -212,7 +213,7 @@ class AbstractWeightedGraph(AbstractLabeledGraph, ABC):
             else:
                 return str(label)
 
-        return [format(label) for label in labels]
+        return [format_(label) for label in labels]
 
     @cached_property
     def total_weight(self) -> float:

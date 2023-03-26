@@ -14,12 +14,10 @@ from typing import (
 )
 
 from smallgraphlib.core import (
-    Node,
-    DirectedEdge,
-    UndirectedEdge,
     AbstractGraph,
     InvalidGraphAttribute,
 )
+from smallgraphlib.custom_types import Node, DirectedEdge, UndirectedEdge
 from smallgraphlib.utilities import (
     cached_property,
 )

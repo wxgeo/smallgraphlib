@@ -1,7 +1,7 @@
 from abc import abstractmethod
 from collections import Counter
 from functools import wraps
-from typing import Protocol, Tuple
+from typing import Protocol
 
 
 def cached(f):
@@ -115,31 +115,3 @@ class ComparableAndHashable(Protocol):
     @abstractmethod
     def __hash__(self) -> int:
         ...
-
-
-Point = Tuple[float, float]
-Segment = Tuple[Point, Point]
-
-
-def segments_intersection(segment1: Segment, segment2: Segment, eps: float = 10**-8):
-    (xA, yA), (xB, yB) = segment1
-    (xC, yC), (xD, yD) = segment2
-    # solve: s*A + (1 - s)*B = t*C + (1 - t)*D  <==>  s*(A - B) + t*(D - C) = D - B
-    #                                           <==>  s*xBA + t*xCD = xBD  and  s*yBA + t*yCD = yBD
-    xCD, yCD = xD - xC, yD - yC
-    xBA, yBA = xA - xB, yA - yB
-    xBD, yBD = xD - xB, yD - yB
-    t = s = None
-    intersection = None
-    if abs(yCD * xBA - xCD * yBA) > eps:
-        if abs(xBA) > abs(xCD):
-            t = (yBD * xBA - xBD * yBA) / (yCD * xBA - xCD * yBA)
-            s = (xBD - t * xCD) / xBA
-        else:
-            s = (yBD * xCD - xBD * yCD) / (yBA * xCD - xBA * yCD)
-            t = (xBD - s * xBA) / xCD
-    if t is not None and s is not None and (0 <= t <= 1 and 0 <= s <= 1):
-        # assert abs(s * xA + (1 - s) * xB - (t * xC + (1 - t) * xD)) < eps
-        # assert abs(s * yA + (1 - s) * yB - (t * yC + (1 - t) * yD)) < eps
-        intersection = s * xA + (1 - s) * xB, s * yA + (1 - s) * yB
-    return intersection

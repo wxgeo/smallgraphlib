@@ -3,12 +3,11 @@ from typing import Iterable, Any, Dict, Set, Tuple, Iterator
 
 from smallgraphlib import Graph, WeightedGraph, LabeledGraph
 from smallgraphlib.core import (
-    Node,
-    Edge,
     AbstractGraph,
     InvalidGraphAttribute,
     Traversal,
 )
+from smallgraphlib.custom_types import Node, Edge
 
 
 class Tree:

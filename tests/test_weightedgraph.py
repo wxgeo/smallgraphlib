@@ -27,8 +27,10 @@ def test_weighted_graph_from_matrix():
     assert g.weight(1, 5) == 17
     assert g.weight(1, 7) == 5
     assert g.weight(7, 1) == oo
+
     def convert(val):
         return 0 if (math.isinf(val) or val == 0) else 1
+
     assert g.adjacency_matrix == tuple(tuple(convert(value) for value in line) for line in M)
 
 
@@ -137,3 +139,17 @@ def test_shortest_paths():
     assert g.shortest_paths("D", "F") == (4, [["D", "C", "F"]])
     assert g.shortest_paths("D", "G") == (2, [["D", "G"]])
     assert g.shortest_paths("D", "D") == (0, [["D"]])
+
+
+def test_tikz():
+    oo = math.inf
+    M = [
+        [0, 16, oo, oo, 3, 15, 10],
+        [oo, 0, 1, 4, oo, oo, oo],
+        [oo, 1, 0, oo, oo, oo, oo],
+        [oo, 4, 2, 0, oo, oo, oo],
+        [oo, 13, 17, 7, 0, oo, oo],
+        [15, 2, oo, oo, oo, 0, 3],
+        [oo, oo, oo, oo, oo, 3, 0],
+    ]
+    WeightedDirectedGraph.from_matrix(M).as_tikz()
