@@ -194,8 +194,25 @@ class AbstractWeightedGraph(AbstractLabeledGraph, ABC):
         """
         if node1 == node2:
             return 0
-        values = self.weights[self._edge(node1, node2)]
-        return aggregator(values) if values else default
+        values = self.weights.get(self._edge(node1, node2), [default])
+        return aggregator(values)
+
+    def _tikz_labels(self, node1: Node, node2: Node) -> list[str]:
+        """Overwrite this method to modify tikz value for some labels."""
+        labels = self._labels.get(self._edge(node1, node2), [])
+
+        def format(label):
+            # Note: math.isinf() supports `sympy.oo` too.
+            if label is None:
+                return ""
+            elif math.isinf(label) and label > 0:
+                return r"$\infty$"
+            elif math.isinf(label) and label < 0:
+                return r"$-\infty$"
+            else:
+                return str(label)
+
+        return [format(label) for label in labels]
 
     @cached_property
     def total_weight(self) -> float:
@@ -254,14 +271,16 @@ class WeightedGraph(AbstractWeightedGraph, LabeledGraph):
                             "The diagonal coefficients of the weights matrix must be nul, "
                             f"but matrix[{i}][{i}]={weight}."
                         )
-
+                    # Don't append loops.
                 else:
                     if matrix[i][j] != matrix[j][i]:
                         raise ValueError(
                             "The adjacency matrix of an undirected graph must be symmetric, "
                             f"but matrix[{i}][{j}]={matrix[i][j]} != matrix[{j}][{i}]={matrix[j][i]}"
                         )
-                edges.append((i + 1, j + 1, weight))
+                    # If weight is infinite, nodes are not adjacent.
+                    if not math.isinf(weight):
+                        edges.append((i + 1, j + 1, weight))
         return edges
 
     def minimum_spanning_tree(self) -> "WeightedGraph":
@@ -332,5 +351,8 @@ class WeightedDirectedGraph(AbstractWeightedGraph, LabeledDirectedGraph):
                             "The diagonal coefficients of the weights matrix must be nul, "
                             f"but matrix[{i}][{i}]={weight}."
                         )
-                edges.append((i + 1, j + 1, weight))
+
+                elif not math.isinf(weight):
+                    # If weight is infinite, nodes are not adjacent.
+                    edges.append((i + 1, j + 1, weight))
         return edges

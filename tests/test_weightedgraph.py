@@ -25,6 +25,11 @@ def test_weighted_graph_from_matrix():
     )
     g = WeightedDirectedGraph.from_matrix(M)
     assert g.weight(1, 5) == 17
+    assert g.weight(1, 7) == 5
+    assert g.weight(7, 1) == oo
+    def convert(val):
+        return 0 if (math.isinf(val) or val == 0) else 1
+    assert g.adjacency_matrix == tuple(tuple(convert(value) for value in line) for line in M)
 
 
 def test_weighted_graph_from_sympy_matrix():
