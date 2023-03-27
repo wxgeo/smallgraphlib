@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Index &mdash; SmallGraphLib 0.4.0 documentation</title>
+  <title>Index &mdash; SmallGraphLib 0.6.0 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -15,6 +15,7 @@
         <script src="_static/underscore.js"></script>
         <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="#" />
     <link rel="search" title="Search" href="search.html" /> 
@@ -25,14 +26,18 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="index.html" class="icon icon-home"> SmallGraphLib
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            SmallGraphLib
           </a>
               <div class="version">
-                0.4.0
+                0.6.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -57,8 +62,8 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
-      <li>Index</li>
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Index</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -110,12 +115,14 @@
 </li>
       <li><a href="smallgraphlib.html#smallgraphlib.core.AbstractGraph.all_degrees">all_degrees (smallgraphlib.core.AbstractGraph property)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="smallgraphlib.html#smallgraphlib.core.AbstractGraph.all_in_degrees">all_in_degrees (smallgraphlib.core.AbstractGraph property)</a>
 </li>
       <li><a href="smallgraphlib.html#smallgraphlib.core.AbstractGraph.all_out_degrees">all_out_degrees (smallgraphlib.core.AbstractGraph property)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="smallgraphlib.html#smallgraphlib.tikz_export.TikzPrinter.angles">angles (smallgraphlib.tikz_export.TikzPrinter attribute)</a>
+</li>
       <li><a href="smallgraphlib.html#smallgraphlib.basic_graphs.DirectedGraph.are_adjacents">are_adjacents() (smallgraphlib.basic_graphs.DirectedGraph method)</a>
 
       <ul>
@@ -123,41 +130,23 @@
 </li>
         <li><a href="smallgraphlib.html#smallgraphlib.core.AbstractGraph.are_adjacents">(smallgraphlib.core.AbstractGraph method)</a>
 </li>
-        <li><a href="smallgraphlib.html#smallgraphlib.DirectedGraph.are_adjacents">(smallgraphlib.DirectedGraph method)</a>
-</li>
-        <li><a href="smallgraphlib.html#smallgraphlib.Graph.are_adjacents">(smallgraphlib.Graph method)</a>
-</li>
       </ul></li>
-      <li><a href="smallgraphlib.html#smallgraphlib.trees.Tree.as_graph">as_graph() (smallgraphlib.trees.Tree method)</a>
-</li>
       <li><a href="smallgraphlib.html#smallgraphlib.core.AbstractGraph.as_tikz">as_tikz() (smallgraphlib.core.AbstractGraph method)</a>
-
-      <ul>
-        <li><a href="smallgraphlib.html#smallgraphlib.trees.Tree.as_tikz">(smallgraphlib.trees.Tree method)</a>
 </li>
-      </ul></li>
       <li><a href="smallgraphlib.html#smallgraphlib.basic_graphs.Graph.as_weighted_graph">as_weighted_graph (smallgraphlib.basic_graphs.Graph property)</a>
-
-      <ul>
-        <li><a href="smallgraphlib.html#smallgraphlib.Graph.as_weighted_graph">(smallgraphlib.Graph property)</a>
 </li>
-      </ul></li>
   </ul></td>
 </tr></table>
 
 <h2 id="B">B</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="smallgraphlib.html#smallgraphlib.trees.BinaryTree">BinaryTree (class in smallgraphlib.trees)</a>
+      <li><a href="smallgraphlib.html#smallgraphlib.tikz_export.barycenter">barycenter() (in module smallgraphlib.tikz_export)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="smallgraphlib.html#smallgraphlib.core.AbstractGraph.breadth_first_search">breadth_first_search() (smallgraphlib.core.AbstractGraph method)</a>
-
-      <ul>
-        <li><a href="smallgraphlib.html#smallgraphlib.trees.Tree.breadth_first_search">(smallgraphlib.trees.Tree method)</a>
 </li>
-      </ul></li>
   </ul></td>
 </tr></table>
 
@@ -168,26 +157,16 @@
 </li>
       <li><a href="smallgraphlib.html#smallgraphlib.utilities.cached_property">cached_property() (in module smallgraphlib.utilities)</a>
 </li>
-      <li><a href="smallgraphlib.html#smallgraphlib.trees.Tree.children">children() (smallgraphlib.trees.Tree method)</a>
-</li>
       <li><a href="smallgraphlib.html#smallgraphlib.utilities.clear_cache">clear_cache() (in module smallgraphlib.utilities)</a>
 </li>
       <li><a href="smallgraphlib.html#smallgraphlib.utilities.ComparableAndHashable">ComparableAndHashable (class in smallgraphlib.utilities)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="smallgraphlib.html#smallgraphlib.complete_bipartite_graph">complete_bipartite_graph() (in module smallgraphlib)</a>
-
-      <ul>
-        <li><a href="smallgraphlib.html#smallgraphlib.graphs_constructors.complete_bipartite_graph">(in module smallgraphlib.graphs_constructors)</a>
+      <li><a href="smallgraphlib.html#smallgraphlib.graphs_constructors.complete_bipartite_graph">complete_bipartite_graph() (in module smallgraphlib.graphs_constructors)</a>
 </li>
-      </ul></li>
-      <li><a href="smallgraphlib.html#smallgraphlib.complete_graph">complete_graph() (in module smallgraphlib)</a>
-
-      <ul>
-        <li><a href="smallgraphlib.html#smallgraphlib.graphs_constructors.complete_graph">(in module smallgraphlib.graphs_constructors)</a>
+      <li><a href="smallgraphlib.html#smallgraphlib.graphs_constructors.complete_graph">complete_graph() (in module smallgraphlib.graphs_constructors)</a>
 </li>
-      </ul></li>
       <li><a href="smallgraphlib.html#smallgraphlib.core.AbstractGraph.copy">copy() (smallgraphlib.core.AbstractGraph method)</a>
 </li>
       <li><a href="smallgraphlib.html#smallgraphlib.core.AbstractGraph.count_edges">count_edges() (smallgraphlib.core.AbstractGraph method)</a>
@@ -201,22 +180,16 @@
       <li><a href="smallgraphlib.html#smallgraphlib.core.AbstractGraph.degree">degree (smallgraphlib.core.AbstractGraph property)</a>
 </li>
       <li><a href="smallgraphlib.html#smallgraphlib.core.AbstractGraph.depth_first_search">depth_first_search() (smallgraphlib.core.AbstractGraph method)</a>
-
-      <ul>
-        <li><a href="smallgraphlib.html#smallgraphlib.trees.Tree.depth_first_search">(smallgraphlib.trees.Tree method)</a>
 </li>
-      </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="smallgraphlib.html#smallgraphlib.core.AbstractGraph.diameter">diameter (smallgraphlib.core.AbstractGraph property)</a>
 </li>
-      <li><a href="smallgraphlib.html#smallgraphlib.DirectedGraph">DirectedGraph (class in smallgraphlib)</a>
-
-      <ul>
-        <li><a href="smallgraphlib.html#smallgraphlib.basic_graphs.DirectedGraph">(class in smallgraphlib.basic_graphs)</a>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="smallgraphlib.html#smallgraphlib.basic_graphs.DirectedGraph">DirectedGraph (class in smallgraphlib.basic_graphs)</a>
 </li>
-      </ul></li>
       <li><a href="smallgraphlib.html#smallgraphlib.core.AbstractGraph.distance">distance() (smallgraphlib.core.AbstractGraph method)</a>
+</li>
+      <li><a href="smallgraphlib.html#smallgraphlib.core.AbstractGraph.distance_matrix">distance_matrix (smallgraphlib.core.AbstractGraph property)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -225,11 +198,7 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="smallgraphlib.html#smallgraphlib.core.AbstractGraph.edges">edges (smallgraphlib.core.AbstractGraph property)</a>
-
-      <ul>
-        <li><a href="smallgraphlib.html#smallgraphlib.trees.Tree.edges">(smallgraphlib.trees.Tree property)</a>
 </li>
-      </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="smallgraphlib.html#smallgraphlib.core.AbstractGraph.edges_set">edges_set (smallgraphlib.core.AbstractGraph property)</a>
@@ -240,12 +209,22 @@
 <h2 id="F">F</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="smallgraphlib.html#smallgraphlib.labeled_graphs.AbstractLabeledGraph.from_dict">from_dict() (smallgraphlib.labeled_graphs.AbstractLabeledGraph class method)</a>
+      <li><a href="smallgraphlib.html#smallgraphlib.string2automaton.StringConstructorData.final_states">final_states (smallgraphlib.string2automaton.StringConstructorData attribute)</a>
 </li>
-      <li><a href="smallgraphlib.html#smallgraphlib.core.AbstractGraph.from_matrix">from_matrix() (smallgraphlib.core.AbstractGraph class method)</a>
+      <li><a href="smallgraphlib.html#smallgraphlib.tikz_export.find_free_position">find_free_position() (in module smallgraphlib.tikz_export)</a>
+</li>
+      <li><a href="smallgraphlib.html#smallgraphlib.utilities.frange">frange() (in module smallgraphlib.utilities)</a>
+</li>
+      <li><a href="smallgraphlib.html#smallgraphlib.labeled_graphs.AbstractLabeledGraph.from_dict">from_dict() (smallgraphlib.labeled_graphs.AbstractLabeledGraph class method)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="smallgraphlib.html#smallgraphlib.core.AbstractGraph.from_matrix">from_matrix() (smallgraphlib.core.AbstractGraph class method)</a>
+
+      <ul>
+        <li><a href="smallgraphlib.html#smallgraphlib.labeled_graphs.AbstractWeightedGraph.from_matrix">(smallgraphlib.labeled_graphs.AbstractWeightedGraph class method)</a>
+</li>
+      </ul></li>
       <li><a href="smallgraphlib.html#smallgraphlib.core.AbstractGraph.from_string">from_string() (smallgraphlib.core.AbstractGraph class method)</a>
 
       <ul>
@@ -258,26 +237,16 @@
 <h2 id="G">G</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="smallgraphlib.html#smallgraphlib.Graph">Graph (class in smallgraphlib)</a>
-
-      <ul>
-        <li><a href="smallgraphlib.html#smallgraphlib.basic_graphs.Graph">(class in smallgraphlib.basic_graphs)</a>
+      <li><a href="smallgraphlib.html#smallgraphlib.basic_graphs.Graph">Graph (class in smallgraphlib.basic_graphs)</a>
 </li>
-      </ul></li>
-      <li><a href="smallgraphlib.html#smallgraphlib.graph">graph() (in module smallgraphlib)</a>
-
-      <ul>
-        <li><a href="smallgraphlib.html#smallgraphlib.graphs_constructors.graph">(in module smallgraphlib.graphs_constructors)</a>
+      <li><a href="smallgraphlib.html#smallgraphlib.tikz_export.TikzPrinter.graph">graph (smallgraphlib.tikz_export.TikzPrinter attribute)</a>
 </li>
-      </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="smallgraphlib.html#smallgraphlib.basic_graphs.Graph.greedy_coloring">greedy_coloring (smallgraphlib.basic_graphs.Graph property)</a>
-
-      <ul>
-        <li><a href="smallgraphlib.html#smallgraphlib.Graph.greedy_coloring">(smallgraphlib.Graph property)</a>
+      <li><a href="smallgraphlib.html#smallgraphlib.graphs_constructors.graph">graph() (in module smallgraphlib.graphs_constructors)</a>
 </li>
-      </ul></li>
+      <li><a href="smallgraphlib.html#smallgraphlib.basic_graphs.Graph.greedy_coloring">greedy_coloring (smallgraphlib.basic_graphs.Graph property)</a>
+</li>
   </ul></td>
 </tr></table>
 
@@ -285,11 +254,7 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="smallgraphlib.html#smallgraphlib.basic_graphs.DirectedGraph.has_cycle">has_cycle (smallgraphlib.basic_graphs.DirectedGraph property)</a>
-
-      <ul>
-        <li><a href="smallgraphlib.html#smallgraphlib.DirectedGraph.has_cycle">(smallgraphlib.DirectedGraph property)</a>
 </li>
-      </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="smallgraphlib.html#smallgraphlib.core.AbstractGraph.has_loop">has_loop (smallgraphlib.core.AbstractGraph property)</a>
@@ -306,13 +271,13 @@
 </li>
       <li><a href="smallgraphlib.html#smallgraphlib.core.AbstractGraph.in_out_degree">in_out_degree() (smallgraphlib.core.AbstractGraph method)</a>
 </li>
-      <li><a href="smallgraphlib.html#smallgraphlib.core.Traversal.INORDER">INORDER (smallgraphlib.core.Traversal attribute)</a>
-
-      <ul>
-        <li><a href="smallgraphlib.html#smallgraphlib.Traversal.INORDER">(smallgraphlib.Traversal attribute)</a>
+      <li><a href="smallgraphlib.html#smallgraphlib.tikz_export.TikzPrinter.index">index (smallgraphlib.tikz_export.TikzPrinter attribute)</a>
 </li>
-      </ul></li>
-      <li><a href="smallgraphlib.html#smallgraphlib.InvalidGraphAttribute">InvalidGraphAttribute</a>, <a href="smallgraphlib.html#smallgraphlib.core.InvalidGraphAttribute">[1]</a>
+      <li><a href="smallgraphlib.html#smallgraphlib.string2automaton.StringConstructorData.initial_states">initial_states (smallgraphlib.string2automaton.StringConstructorData attribute)</a>
+</li>
+      <li><a href="smallgraphlib.html#smallgraphlib.core.Traversal.INORDER">INORDER (smallgraphlib.core.Traversal attribute)</a>
+</li>
+      <li><a href="smallgraphlib.html#smallgraphlib.core.InvalidGraphAttribute">InvalidGraphAttribute</a>
 </li>
       <li><a href="smallgraphlib.html#smallgraphlib.core.AbstractGraph.is_a_tree">is_a_tree (smallgraphlib.core.AbstractGraph property)</a>
 </li>
@@ -321,21 +286,13 @@
       <li><a href="smallgraphlib.html#smallgraphlib.core.AbstractGraph.is_complete">is_complete (smallgraphlib.core.AbstractGraph property)</a>
 </li>
       <li><a href="smallgraphlib.html#smallgraphlib.basic_graphs.Graph.is_complete_bipartite">is_complete_bipartite (smallgraphlib.basic_graphs.Graph property)</a>
-
-      <ul>
-        <li><a href="smallgraphlib.html#smallgraphlib.Graph.is_complete_bipartite">(smallgraphlib.Graph property)</a>
 </li>
-      </ul></li>
       <li><a href="smallgraphlib.html#smallgraphlib.basic_graphs.DirectedGraph.is_connected">is_connected (smallgraphlib.basic_graphs.DirectedGraph property)</a>
 
       <ul>
         <li><a href="smallgraphlib.html#smallgraphlib.basic_graphs.Graph.is_connected">(smallgraphlib.basic_graphs.Graph property)</a>
 </li>
         <li><a href="smallgraphlib.html#smallgraphlib.core.AbstractGraph.is_connected">(smallgraphlib.core.AbstractGraph property)</a>
-</li>
-        <li><a href="smallgraphlib.html#smallgraphlib.DirectedGraph.is_connected">(smallgraphlib.DirectedGraph property)</a>
-</li>
-        <li><a href="smallgraphlib.html#smallgraphlib.Graph.is_connected">(smallgraphlib.Graph property)</a>
 </li>
       </ul></li>
       <li><a href="smallgraphlib.html#smallgraphlib.basic_graphs.DirectedGraph.is_directed">is_directed (smallgraphlib.basic_graphs.DirectedGraph property)</a>
@@ -345,11 +302,9 @@
 </li>
         <li><a href="smallgraphlib.html#smallgraphlib.core.AbstractGraph.is_directed">(smallgraphlib.core.AbstractGraph property)</a>
 </li>
-        <li><a href="smallgraphlib.html#smallgraphlib.DirectedGraph.is_directed">(smallgraphlib.DirectedGraph property)</a>
-</li>
-        <li><a href="smallgraphlib.html#smallgraphlib.Graph.is_directed">(smallgraphlib.Graph property)</a>
-</li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="smallgraphlib.html#smallgraphlib.basic_graphs.DirectedGraph.is_eulerian">is_eulerian (smallgraphlib.basic_graphs.DirectedGraph property)</a>
 
       <ul>
@@ -357,23 +312,13 @@
 </li>
         <li><a href="smallgraphlib.html#smallgraphlib.core.AbstractGraph.is_eulerian">(smallgraphlib.core.AbstractGraph property)</a>
 </li>
-        <li><a href="smallgraphlib.html#smallgraphlib.DirectedGraph.is_eulerian">(smallgraphlib.DirectedGraph property)</a>
-</li>
-        <li><a href="smallgraphlib.html#smallgraphlib.Graph.is_eulerian">(smallgraphlib.Graph property)</a>
-</li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="smallgraphlib.html#smallgraphlib.basic_graphs.DirectedGraph.is_isomorphic_to">is_isomorphic_to() (smallgraphlib.basic_graphs.DirectedGraph method)</a>
 
       <ul>
         <li><a href="smallgraphlib.html#smallgraphlib.basic_graphs.Graph.is_isomorphic_to">(smallgraphlib.basic_graphs.Graph method)</a>
 </li>
         <li><a href="smallgraphlib.html#smallgraphlib.core.AbstractGraph.is_isomorphic_to">(smallgraphlib.core.AbstractGraph method)</a>
-</li>
-        <li><a href="smallgraphlib.html#smallgraphlib.DirectedGraph.is_isomorphic_to">(smallgraphlib.DirectedGraph method)</a>
-</li>
-        <li><a href="smallgraphlib.html#smallgraphlib.Graph.is_isomorphic_to">(smallgraphlib.Graph method)</a>
 </li>
       </ul></li>
       <li><a href="smallgraphlib.html#smallgraphlib.basic_graphs.DirectedGraph.is_semi_eulerian">is_semi_eulerian (smallgraphlib.basic_graphs.DirectedGraph property)</a>
@@ -383,31 +328,15 @@
 </li>
         <li><a href="smallgraphlib.html#smallgraphlib.core.AbstractGraph.is_semi_eulerian">(smallgraphlib.core.AbstractGraph property)</a>
 </li>
-        <li><a href="smallgraphlib.html#smallgraphlib.DirectedGraph.is_semi_eulerian">(smallgraphlib.DirectedGraph property)</a>
-</li>
-        <li><a href="smallgraphlib.html#smallgraphlib.Graph.is_semi_eulerian">(smallgraphlib.Graph property)</a>
-</li>
       </ul></li>
       <li><a href="smallgraphlib.html#smallgraphlib.core.AbstractGraph.is_simple">is_simple (smallgraphlib.core.AbstractGraph property)</a>
 </li>
       <li><a href="smallgraphlib.html#smallgraphlib.basic_graphs.DirectedGraph.is_strongly_connected">is_strongly_connected (smallgraphlib.basic_graphs.DirectedGraph property)</a>
-
-      <ul>
-        <li><a href="smallgraphlib.html#smallgraphlib.DirectedGraph.is_strongly_connected">(smallgraphlib.DirectedGraph property)</a>
 </li>
-      </ul></li>
       <li><a href="smallgraphlib.html#smallgraphlib.basic_graphs.Graph.is_subgraph_stable">is_subgraph_stable() (smallgraphlib.basic_graphs.Graph method)</a>
-
-      <ul>
-        <li><a href="smallgraphlib.html#smallgraphlib.Graph.is_subgraph_stable">(smallgraphlib.Graph method)</a>
 </li>
-      </ul></li>
       <li><a href="smallgraphlib.html#smallgraphlib.basic_graphs.DirectedGraph.is_transitive">is_transitive (smallgraphlib.basic_graphs.DirectedGraph property)</a>
-
-      <ul>
-        <li><a href="smallgraphlib.html#smallgraphlib.DirectedGraph.is_transitive">(smallgraphlib.DirectedGraph property)</a>
 </li>
-      </ul></li>
   </ul></td>
 </tr></table>
 
@@ -415,29 +344,21 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="smallgraphlib.html#smallgraphlib.basic_graphs.DirectedGraph.kernel">kernel (smallgraphlib.basic_graphs.DirectedGraph property)</a>
-
-      <ul>
-        <li><a href="smallgraphlib.html#smallgraphlib.DirectedGraph.kernel">(smallgraphlib.DirectedGraph property)</a>
 </li>
-      </ul></li>
   </ul></td>
 </tr></table>
 
 <h2 id="L">L</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="smallgraphlib.html#smallgraphlib.LabeledDirectedGraph">LabeledDirectedGraph (class in smallgraphlib)</a>
-
-      <ul>
-        <li><a href="smallgraphlib.html#smallgraphlib.labeled_graphs.LabeledDirectedGraph">(class in smallgraphlib.labeled_graphs)</a>
+      <li><a href="smallgraphlib.html#smallgraphlib.tikz_export.label_coordinates">label_coordinates() (in module smallgraphlib.tikz_export)</a>
 </li>
-      </ul></li>
-      <li><a href="smallgraphlib.html#smallgraphlib.LabeledGraph">LabeledGraph (class in smallgraphlib)</a>
-
-      <ul>
-        <li><a href="smallgraphlib.html#smallgraphlib.labeled_graphs.LabeledGraph">(class in smallgraphlib.labeled_graphs)</a>
+      <li><a href="smallgraphlib.html#smallgraphlib.labeled_graphs.AbstractLabeledGraph.labeled_edges">labeled_edges (smallgraphlib.labeled_graphs.AbstractLabeledGraph property)</a>
 </li>
-      </ul></li>
+      <li><a href="smallgraphlib.html#smallgraphlib.labeled_graphs.LabeledDirectedGraph">LabeledDirectedGraph (class in smallgraphlib.labeled_graphs)</a>
+</li>
+      <li><a href="smallgraphlib.html#smallgraphlib.labeled_graphs.LabeledGraph">LabeledGraph (class in smallgraphlib.labeled_graphs)</a>
+</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="smallgraphlib.html#smallgraphlib.core.AbstractGraph.labels">labels() (smallgraphlib.core.AbstractGraph method)</a>
@@ -446,12 +367,12 @@
         <li><a href="smallgraphlib.html#smallgraphlib.labeled_graphs.AbstractLabeledGraph.labels">(smallgraphlib.labeled_graphs.AbstractLabeledGraph method)</a>
 </li>
       </ul></li>
-      <li><a href="smallgraphlib.html#smallgraphlib.basic_graphs.DirectedGraph.levels">levels (smallgraphlib.basic_graphs.DirectedGraph property)</a>
-
-      <ul>
-        <li><a href="smallgraphlib.html#smallgraphlib.DirectedGraph.levels">(smallgraphlib.DirectedGraph property)</a>
+      <li><a href="smallgraphlib.html#smallgraphlib.tikz_export.TikzPrinter.labels_positions">labels_positions (smallgraphlib.tikz_export.TikzPrinter attribute)</a>
 </li>
-      </ul></li>
+      <li><a href="smallgraphlib.html#smallgraphlib.basic_graphs.DirectedGraph.levels">levels (smallgraphlib.basic_graphs.DirectedGraph property)</a>
+</li>
+      <li><a href="smallgraphlib.html#smallgraphlib.tikz_export.TikzPrinter.lines">lines (smallgraphlib.tikz_export.TikzPrinter attribute)</a>
+</li>
   </ul></td>
 </tr></table>
 
@@ -459,26 +380,24 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="smallgraphlib.html#smallgraphlib.labeled_graphs.WeightedGraph.minimum_spanning_tree">minimum_spanning_tree() (smallgraphlib.labeled_graphs.WeightedGraph method)</a>
-
-      <ul>
-        <li><a href="smallgraphlib.html#smallgraphlib.WeightedGraph.minimum_spanning_tree">(smallgraphlib.WeightedGraph method)</a>
 </li>
-      </ul></li>
       <li>
     module
 
       <ul>
-        <li><a href="smallgraphlib.html#module-smallgraphlib">smallgraphlib</a>
-</li>
         <li><a href="smallgraphlib.html#module-smallgraphlib.basic_graphs">smallgraphlib.basic_graphs</a>
 </li>
         <li><a href="smallgraphlib.html#module-smallgraphlib.core">smallgraphlib.core</a>
+</li>
+        <li><a href="smallgraphlib.html#module-smallgraphlib.custom_types">smallgraphlib.custom_types</a>
 </li>
         <li><a href="smallgraphlib.html#module-smallgraphlib.graphs_constructors">smallgraphlib.graphs_constructors</a>
 </li>
         <li><a href="smallgraphlib.html#module-smallgraphlib.labeled_graphs">smallgraphlib.labeled_graphs</a>
 </li>
-        <li><a href="smallgraphlib.html#module-smallgraphlib.trees">smallgraphlib.trees</a>
+        <li><a href="smallgraphlib.html#module-smallgraphlib.string2automaton">smallgraphlib.string2automaton</a>
+</li>
+        <li><a href="smallgraphlib.html#module-smallgraphlib.tikz_export">smallgraphlib.tikz_export</a>
 </li>
         <li><a href="smallgraphlib.html#module-smallgraphlib.utilities">smallgraphlib.utilities</a>
 </li>
@@ -497,14 +416,16 @@
 </li>
       <li><a href="smallgraphlib.html#smallgraphlib.core.NodeAlreadyFoundError">NodeAlreadyFoundError</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="smallgraphlib.html#smallgraphlib.core.AbstractGraph.nodes">nodes (smallgraphlib.core.AbstractGraph property)</a>
 
       <ul>
-        <li><a href="smallgraphlib.html#smallgraphlib.trees.Tree.nodes">(smallgraphlib.trees.Tree property)</a>
+        <li><a href="smallgraphlib.html#smallgraphlib.tikz_export.TikzPrinter.nodes">(smallgraphlib.tikz_export.TikzPrinter attribute)</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="smallgraphlib.html#smallgraphlib.tikz_export.TikzPrinter.nodes_positions">nodes_positions (smallgraphlib.tikz_export.TikzPrinter attribute)</a>
+</li>
       <li><a href="smallgraphlib.html#smallgraphlib.core.AbstractGraph.nodes_set">nodes_set (smallgraphlib.core.AbstractGraph property)</a>
 </li>
   </ul></td>
@@ -525,42 +446,26 @@
 <h2 id="P">P</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="smallgraphlib.html#smallgraphlib.trees.Tree.parent">parent() (smallgraphlib.trees.Tree method)</a>
+      <li><a href="smallgraphlib.html#smallgraphlib.string2automaton.StringToAutomatonParser.parse">parse() (smallgraphlib.string2automaton.StringToAutomatonParser method)</a>
 </li>
-      <li><a href="smallgraphlib.html#smallgraphlib.perfect_binary_tree">perfect_binary_tree() (in module smallgraphlib)</a>
-
-      <ul>
-        <li><a href="smallgraphlib.html#smallgraphlib.graphs_constructors.perfect_binary_tree">(in module smallgraphlib.graphs_constructors)</a>
+      <li><a href="smallgraphlib.html#smallgraphlib.graphs_constructors.perfect_binary_tree">perfect_binary_tree() (in module smallgraphlib.graphs_constructors)</a>
 </li>
-      </ul></li>
-      <li><a href="smallgraphlib.html#smallgraphlib.core.Traversal.POSTORDER">POSTORDER (smallgraphlib.core.Traversal attribute)</a>
-
-      <ul>
-        <li><a href="smallgraphlib.html#smallgraphlib.Traversal.POSTORDER">(smallgraphlib.Traversal attribute)</a>
-</li>
-      </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="smallgraphlib.html#smallgraphlib.core.Traversal.POSTORDER">POSTORDER (smallgraphlib.core.Traversal attribute)</a>
+</li>
       <li><a href="smallgraphlib.html#smallgraphlib.core.AbstractGraph.predecessors">predecessors() (smallgraphlib.core.AbstractGraph method)</a>
 </li>
       <li><a href="smallgraphlib.html#smallgraphlib.core.Traversal.PREORDER">PREORDER (smallgraphlib.core.Traversal attribute)</a>
-
-      <ul>
-        <li><a href="smallgraphlib.html#smallgraphlib.Traversal.PREORDER">(smallgraphlib.Traversal attribute)</a>
 </li>
-      </ul></li>
   </ul></td>
 </tr></table>
 
 <h2 id="R">R</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="smallgraphlib.html#smallgraphlib.random_graph">random_graph() (in module smallgraphlib)</a>
-
-      <ul>
-        <li><a href="smallgraphlib.html#smallgraphlib.graphs_constructors.random_graph">(in module smallgraphlib.graphs_constructors)</a>
+      <li><a href="smallgraphlib.html#smallgraphlib.graphs_constructors.random_graph">random_graph() (in module smallgraphlib.graphs_constructors)</a>
 </li>
-      </ul></li>
       <li><a href="smallgraphlib.html#smallgraphlib.core.AbstractGraph.remove_edges">remove_edges() (smallgraphlib.core.AbstractGraph method)</a>
 </li>
       <li><a href="smallgraphlib.html#smallgraphlib.core.AbstractGraph.remove_nodes">remove_nodes() (smallgraphlib.core.AbstractGraph method)</a>
@@ -570,14 +475,12 @@
       <li><a href="smallgraphlib.html#smallgraphlib.core.AbstractGraph.rename_node">rename_node() (smallgraphlib.core.AbstractGraph method)</a>
 </li>
       <li><a href="smallgraphlib.html#smallgraphlib.core.AbstractGraph.rename_nodes">rename_nodes() (smallgraphlib.core.AbstractGraph method)</a>
-</li>
-      <li><a href="smallgraphlib.html#smallgraphlib.basic_graphs.DirectedGraph.reversed_graph">reversed_graph (smallgraphlib.basic_graphs.DirectedGraph property)</a>
 
       <ul>
-        <li><a href="smallgraphlib.html#smallgraphlib.DirectedGraph.reversed_graph">(smallgraphlib.DirectedGraph property)</a>
+        <li><a href="smallgraphlib.html#smallgraphlib.labeled_graphs.AbstractLabeledGraph.rename_nodes">(smallgraphlib.labeled_graphs.AbstractLabeledGraph method)</a>
 </li>
       </ul></li>
-      <li><a href="smallgraphlib.html#smallgraphlib.trees.Tree.root">root (smallgraphlib.trees.Tree property)</a>
+      <li><a href="smallgraphlib.html#smallgraphlib.basic_graphs.DirectedGraph.reversed_graph">reversed_graph (smallgraphlib.basic_graphs.DirectedGraph property)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -585,19 +488,12 @@
 <h2 id="S">S</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="smallgraphlib.html#smallgraphlib.utilities.segments_intersection">segments_intersection() (in module smallgraphlib.utilities)</a>
+      <li><a href="smallgraphlib.html#smallgraphlib.tikz_export.segments_intersection">segments_intersection() (in module smallgraphlib.tikz_export)</a>
 </li>
       <li><a href="smallgraphlib.html#smallgraphlib.core.AbstractGraph.shortest_paths">shortest_paths() (smallgraphlib.core.AbstractGraph method)</a>
 </li>
       <li><a href="smallgraphlib.html#smallgraphlib.core.AbstractGraph.shuffle_nodes">shuffle_nodes() (smallgraphlib.core.AbstractGraph method)</a>
 </li>
-      <li>
-    smallgraphlib
-
-      <ul>
-        <li><a href="smallgraphlib.html#module-smallgraphlib">module</a>
-</li>
-      </ul></li>
       <li>
     smallgraphlib.basic_graphs
 
@@ -612,8 +508,13 @@
         <li><a href="smallgraphlib.html#module-smallgraphlib.core">module</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
+      <li>
+    smallgraphlib.custom_types
+
+      <ul>
+        <li><a href="smallgraphlib.html#module-smallgraphlib.custom_types">module</a>
+</li>
+      </ul></li>
       <li>
     smallgraphlib.graphs_constructors
 
@@ -621,6 +522,8 @@
         <li><a href="smallgraphlib.html#module-smallgraphlib.graphs_constructors">module</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     smallgraphlib.labeled_graphs
 
@@ -629,10 +532,17 @@
 </li>
       </ul></li>
       <li>
-    smallgraphlib.trees
+    smallgraphlib.string2automaton
 
       <ul>
-        <li><a href="smallgraphlib.html#module-smallgraphlib.trees">module</a>
+        <li><a href="smallgraphlib.html#module-smallgraphlib.string2automaton">module</a>
+</li>
+      </ul></li>
+      <li>
+    smallgraphlib.tikz_export
+
+      <ul>
+        <li><a href="smallgraphlib.html#module-smallgraphlib.tikz_export">module</a>
 </li>
       </ul></li>
       <li>
@@ -642,6 +552,12 @@
         <li><a href="smallgraphlib.html#module-smallgraphlib.utilities">module</a>
 </li>
       </ul></li>
+      <li><a href="smallgraphlib.html#smallgraphlib.string2automaton.StringConstructorData.states">states (smallgraphlib.string2automaton.StringConstructorData attribute)</a>
+</li>
+      <li><a href="smallgraphlib.html#smallgraphlib.string2automaton.StringConstructorData">StringConstructorData (class in smallgraphlib.string2automaton)</a>
+</li>
+      <li><a href="smallgraphlib.html#smallgraphlib.string2automaton.StringToAutomatonParser">StringToAutomatonParser (class in smallgraphlib.string2automaton)</a>
+</li>
       <li><a href="smallgraphlib.html#smallgraphlib.core.AbstractGraph.successors">successors() (smallgraphlib.core.AbstractGraph method)</a>
 </li>
   </ul></td>
@@ -650,25 +566,21 @@
 <h2 id="T">T</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="smallgraphlib.html#smallgraphlib.tikz_export.TikzPrinter.tikz_code">tikz_code() (smallgraphlib.tikz_export.TikzPrinter method)</a>
+</li>
+      <li><a href="smallgraphlib.html#smallgraphlib.tikz_export.TikzPrinter">TikzPrinter (class in smallgraphlib.tikz_export)</a>
+</li>
       <li><a href="smallgraphlib.html#smallgraphlib.utilities.Multiset.total">total() (smallgraphlib.utilities.Multiset method)</a>
 </li>
-      <li><a href="smallgraphlib.html#smallgraphlib.labeled_graphs.AbstractWeightedGraph.total_weight">total_weight (smallgraphlib.labeled_graphs.AbstractWeightedGraph property)</a>
-</li>
-      <li><a href="smallgraphlib.html#smallgraphlib.basic_graphs.DirectedGraph.transitive_closure_matrix">transitive_closure_matrix (smallgraphlib.basic_graphs.DirectedGraph property)</a>
-
-      <ul>
-        <li><a href="smallgraphlib.html#smallgraphlib.DirectedGraph.transitive_closure_matrix">(smallgraphlib.DirectedGraph property)</a>
-</li>
-      </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="smallgraphlib.html#smallgraphlib.Traversal">Traversal (class in smallgraphlib)</a>
-
-      <ul>
-        <li><a href="smallgraphlib.html#smallgraphlib.core.Traversal">(class in smallgraphlib.core)</a>
+      <li><a href="smallgraphlib.html#smallgraphlib.labeled_graphs.AbstractWeightedGraph.total_weight">total_weight (smallgraphlib.labeled_graphs.AbstractWeightedGraph property)</a>
 </li>
-      </ul></li>
-      <li><a href="smallgraphlib.html#smallgraphlib.trees.Tree">Tree (class in smallgraphlib.trees)</a>
+      <li><a href="smallgraphlib.html#smallgraphlib.string2automaton.StringConstructorData.transitions">transitions (smallgraphlib.string2automaton.StringConstructorData attribute)</a>
+</li>
+      <li><a href="smallgraphlib.html#smallgraphlib.basic_graphs.DirectedGraph.transitive_closure_matrix">transitive_closure_matrix (smallgraphlib.basic_graphs.DirectedGraph property)</a>
+</li>
+      <li><a href="smallgraphlib.html#smallgraphlib.core.Traversal">Traversal (class in smallgraphlib.core)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -677,11 +589,7 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="smallgraphlib.html#smallgraphlib.basic_graphs.DirectedGraph.undirected_graph">undirected_graph (smallgraphlib.basic_graphs.DirectedGraph property)</a>
-
-      <ul>
-        <li><a href="smallgraphlib.html#smallgraphlib.DirectedGraph.undirected_graph">(smallgraphlib.DirectedGraph property)</a>
 </li>
-      </ul></li>
   </ul></td>
 </tr></table>
 
@@ -694,26 +602,18 @@
         <li><a href="smallgraphlib.html#smallgraphlib.labeled_graphs.AbstractWeightedGraph.weight">(smallgraphlib.labeled_graphs.AbstractWeightedGraph method)</a>
 </li>
       </ul></li>
-      <li><a href="smallgraphlib.html#smallgraphlib.basic_graphs.DirectedGraph.weighted_graph">weighted_graph (smallgraphlib.basic_graphs.DirectedGraph property)</a>
-
-      <ul>
-        <li><a href="smallgraphlib.html#smallgraphlib.DirectedGraph.weighted_graph">(smallgraphlib.DirectedGraph property)</a>
+      <li><a href="smallgraphlib.html#smallgraphlib.core.AbstractGraph.weight_matrix">weight_matrix (smallgraphlib.core.AbstractGraph property)</a>
 </li>
-      </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="smallgraphlib.html#smallgraphlib.WeightedDirectedGraph">WeightedDirectedGraph (class in smallgraphlib)</a>
-
-      <ul>
-        <li><a href="smallgraphlib.html#smallgraphlib.labeled_graphs.WeightedDirectedGraph">(class in smallgraphlib.labeled_graphs)</a>
+      <li><a href="smallgraphlib.html#smallgraphlib.basic_graphs.DirectedGraph.weighted_graph">weighted_graph (smallgraphlib.basic_graphs.DirectedGraph property)</a>
 </li>
-      </ul></li>
-      <li><a href="smallgraphlib.html#smallgraphlib.WeightedGraph">WeightedGraph (class in smallgraphlib)</a>
-
-      <ul>
-        <li><a href="smallgraphlib.html#smallgraphlib.labeled_graphs.WeightedGraph">(class in smallgraphlib.labeled_graphs)</a>
+      <li><a href="smallgraphlib.html#smallgraphlib.labeled_graphs.WeightedDirectedGraph">WeightedDirectedGraph (class in smallgraphlib.labeled_graphs)</a>
 </li>
-      </ul></li>
+      <li><a href="smallgraphlib.html#smallgraphlib.labeled_graphs.WeightedGraph">WeightedGraph (class in smallgraphlib.labeled_graphs)</a>
+</li>
+      <li><a href="smallgraphlib.html#smallgraphlib.labeled_graphs.AbstractWeightedGraph.weights">weights (smallgraphlib.labeled_graphs.AbstractWeightedGraph property)</a>
+</li>
   </ul></td>
 </tr></table>
 

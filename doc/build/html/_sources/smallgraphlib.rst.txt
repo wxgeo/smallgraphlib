@@ -4,6 +4,14 @@ smallgraphlib package
 Submodules
 ----------
 
+smallgraphlib.automatons module
+-------------------------------
+
+.. automodule:: smallgraphlib.automatons
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 smallgraphlib.basic\_graphs module
 ----------------------------------
 
@@ -20,6 +28,14 @@ smallgraphlib.core module
    :undoc-members:
    :show-inheritance:
 
+smallgraphlib.custom\_types module
+----------------------------------
+
+.. automodule:: smallgraphlib.custom_types
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 smallgraphlib.graphs\_constructors module
 -----------------------------------------
 
@@ -32,6 +48,22 @@ smallgraphlib.labeled\_graphs module
 ------------------------------------
 
 .. automodule:: smallgraphlib.labeled_graphs
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+smallgraphlib.string2automaton module
+-------------------------------------
+
+.. automodule:: smallgraphlib.string2automaton
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+smallgraphlib.tikz\_export module
+---------------------------------
+
+.. automodule:: smallgraphlib.tikz_export
    :members:
    :undoc-members:
    :show-inheritance:

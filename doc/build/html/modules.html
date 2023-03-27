@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>smallgraphlib &mdash; SmallGraphLib 0.4.0 documentation</title>
+  <title>smallgraphlib &mdash; SmallGraphLib 0.6.0 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -16,6 +16,7 @@
         <script src="_static/underscore.js"></script>
         <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -28,14 +29,18 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="index.html" class="icon icon-home"> SmallGraphLib
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            SmallGraphLib
           </a>
               <div class="version">
-                0.4.0
+                0.6.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -63,8 +68,8 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
-      <li>smallgraphlib</li>
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">smallgraphlib</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/modules.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -80,13 +85,184 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="smallgraphlib.html">smallgraphlib package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="smallgraphlib.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="smallgraphlib.html#module-smallgraphlib.basic_graphs">smallgraphlib.basic_graphs module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="smallgraphlib.html#module-smallgraphlib.core">smallgraphlib.core module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="smallgraphlib.html#module-smallgraphlib.graphs_constructors">smallgraphlib.graphs_constructors module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="smallgraphlib.html#module-smallgraphlib.labeled_graphs">smallgraphlib.labeled_graphs module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="smallgraphlib.html#module-smallgraphlib.trees">smallgraphlib.trees module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="smallgraphlib.html#module-smallgraphlib.utilities">smallgraphlib.utilities module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="smallgraphlib.html#module-smallgraphlib">Module contents</a></li>
+<li class="toctree-l2"><a class="reference internal" href="smallgraphlib.html#smallgraphlib-automatons-module">smallgraphlib.automatons module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="smallgraphlib.html#module-smallgraphlib.basic_graphs">smallgraphlib.basic_graphs module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="smallgraphlib.html#smallgraphlib.basic_graphs.DirectedGraph"><code class="docutils literal notranslate"><span class="pre">DirectedGraph</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="smallgraphlib.html#smallgraphlib.basic_graphs.DirectedGraph.are_adjacents"><code class="docutils literal notranslate"><span class="pre">DirectedGraph.are_adjacents()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="smallgraphlib.html#smallgraphlib.basic_graphs.DirectedGraph.has_cycle"><code class="docutils literal notranslate"><span class="pre">DirectedGraph.has_cycle</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="smallgraphlib.html#smallgraphlib.basic_graphs.DirectedGraph.is_connected"><code class="docutils literal notranslate"><span class="pre">DirectedGraph.is_connected</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="smallgraphlib.html#smallgraphlib.basic_graphs.DirectedGraph.is_directed"><code class="docutils literal notranslate"><span class="pre">DirectedGraph.is_directed</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="smallgraphlib.html#smallgraphlib.basic_graphs.DirectedGraph.is_eulerian"><code class="docutils literal notranslate"><span class="pre">DirectedGraph.is_eulerian</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="smallgraphlib.html#smallgraphlib.basic_graphs.DirectedGraph.is_isomorphic_to"><code class="docutils literal notranslate"><span class="pre">DirectedGraph.is_isomorphic_to()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="smallgraphlib.html#smallgraphlib.basic_graphs.DirectedGraph.is_semi_eulerian"><code class="docutils literal notranslate"><span class="pre">DirectedGraph.is_semi_eulerian</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="smallgraphlib.html#smallgraphlib.basic_graphs.DirectedGraph.is_strongly_connected"><code class="docutils literal notranslate"><span class="pre">DirectedGraph.is_strongly_connected</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="smallgraphlib.html#smallgraphlib.basic_graphs.DirectedGraph.is_transitive"><code class="docutils literal notranslate"><span class="pre">DirectedGraph.is_transitive</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="smallgraphlib.html#smallgraphlib.basic_graphs.DirectedGraph.kernel"><code class="docutils literal notranslate"><span class="pre">DirectedGraph.kernel</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="smallgraphlib.html#smallgraphlib.basic_graphs.DirectedGraph.levels"><code class="docutils literal notranslate"><span class="pre">DirectedGraph.levels</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="smallgraphlib.html#smallgraphlib.basic_graphs.DirectedGraph.reversed_graph"><code class="docutils literal notranslate"><span class="pre">DirectedGraph.reversed_graph</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="smallgraphlib.html#smallgraphlib.basic_graphs.DirectedGraph.transitive_closure_matrix"><code class="docutils literal notranslate"><span class="pre">DirectedGraph.transitive_closure_matrix</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="smallgraphlib.html#smallgraphlib.basic_graphs.DirectedGraph.undirected_graph"><code class="docutils literal notranslate"><span class="pre">DirectedGraph.undirected_graph</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="smallgraphlib.html#smallgraphlib.basic_graphs.DirectedGraph.weighted_graph"><code class="docutils literal notranslate"><span class="pre">DirectedGraph.weighted_graph</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="smallgraphlib.html#smallgraphlib.basic_graphs.Graph"><code class="docutils literal notranslate"><span class="pre">Graph</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="smallgraphlib.html#smallgraphlib.basic_graphs.Graph.are_adjacents"><code class="docutils literal notranslate"><span class="pre">Graph.are_adjacents()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="smallgraphlib.html#smallgraphlib.basic_graphs.Graph.as_weighted_graph"><code class="docutils literal notranslate"><span class="pre">Graph.as_weighted_graph</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="smallgraphlib.html#smallgraphlib.basic_graphs.Graph.greedy_coloring"><code class="docutils literal notranslate"><span class="pre">Graph.greedy_coloring</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="smallgraphlib.html#smallgraphlib.basic_graphs.Graph.is_complete_bipartite"><code class="docutils literal notranslate"><span class="pre">Graph.is_complete_bipartite</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="smallgraphlib.html#smallgraphlib.basic_graphs.Graph.is_connected"><code class="docutils literal notranslate"><span class="pre">Graph.is_connected</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="smallgraphlib.html#smallgraphlib.basic_graphs.Graph.is_directed"><code class="docutils literal notranslate"><span class="pre">Graph.is_directed</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="smallgraphlib.html#smallgraphlib.basic_graphs.Graph.is_eulerian"><code class="docutils literal notranslate"><span class="pre">Graph.is_eulerian</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="smallgraphlib.html#smallgraphlib.basic_graphs.Graph.is_isomorphic_to"><code class="docutils literal notranslate"><span class="pre">Graph.is_isomorphic_to()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="smallgraphlib.html#smallgraphlib.basic_graphs.Graph.is_semi_eulerian"><code class="docutils literal notranslate"><span class="pre">Graph.is_semi_eulerian</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="smallgraphlib.html#smallgraphlib.basic_graphs.Graph.is_subgraph_stable"><code class="docutils literal notranslate"><span class="pre">Graph.is_subgraph_stable()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="smallgraphlib.html#module-smallgraphlib.core">smallgraphlib.core module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="smallgraphlib.html#smallgraphlib.core.AbstractGraph"><code class="docutils literal notranslate"><span class="pre">AbstractGraph</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="smallgraphlib.html#smallgraphlib.core.AbstractGraph.add_edges"><code class="docutils literal notranslate"><span class="pre">AbstractGraph.add_edges()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="smallgraphlib.html#smallgraphlib.core.AbstractGraph.add_nodes"><code class="docutils literal notranslate"><span class="pre">AbstractGraph.add_nodes()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="smallgraphlib.html#smallgraphlib.core.AbstractGraph.adjacency_matrix"><code class="docutils literal notranslate"><span class="pre">AbstractGraph.adjacency_matrix</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="smallgraphlib.html#smallgraphlib.core.AbstractGraph.all_degrees"><code class="docutils literal notranslate"><span class="pre">AbstractGraph.all_degrees</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="smallgraphlib.html#smallgraphlib.core.AbstractGraph.all_in_degrees"><code class="docutils literal notranslate"><span class="pre">AbstractGraph.all_in_degrees</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="smallgraphlib.html#smallgraphlib.core.AbstractGraph.all_out_degrees"><code class="docutils literal notranslate"><span class="pre">AbstractGraph.all_out_degrees</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="smallgraphlib.html#smallgraphlib.core.AbstractGraph.are_adjacents"><code class="docutils literal notranslate"><span class="pre">AbstractGraph.are_adjacents()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="smallgraphlib.html#smallgraphlib.core.AbstractGraph.as_tikz"><code class="docutils literal notranslate"><span class="pre">AbstractGraph.as_tikz()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="smallgraphlib.html#smallgraphlib.core.AbstractGraph.breadth_first_search"><code class="docutils literal notranslate"><span class="pre">AbstractGraph.breadth_first_search()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="smallgraphlib.html#smallgraphlib.core.AbstractGraph.copy"><code class="docutils literal notranslate"><span class="pre">AbstractGraph.copy()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="smallgraphlib.html#smallgraphlib.core.AbstractGraph.count_edges"><code class="docutils literal notranslate"><span class="pre">AbstractGraph.count_edges()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="smallgraphlib.html#smallgraphlib.core.AbstractGraph.degree"><code class="docutils literal notranslate"><span class="pre">AbstractGraph.degree</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="smallgraphlib.html#smallgraphlib.core.AbstractGraph.depth_first_search"><code class="docutils literal notranslate"><span class="pre">AbstractGraph.depth_first_search()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="smallgraphlib.html#smallgraphlib.core.AbstractGraph.diameter"><code class="docutils literal notranslate"><span class="pre">AbstractGraph.diameter</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="smallgraphlib.html#smallgraphlib.core.AbstractGraph.distance"><code class="docutils literal notranslate"><span class="pre">AbstractGraph.distance()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="smallgraphlib.html#smallgraphlib.core.AbstractGraph.distance_matrix"><code class="docutils literal notranslate"><span class="pre">AbstractGraph.distance_matrix</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="smallgraphlib.html#smallgraphlib.core.AbstractGraph.edges"><code class="docutils literal notranslate"><span class="pre">AbstractGraph.edges</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="smallgraphlib.html#smallgraphlib.core.AbstractGraph.edges_set"><code class="docutils literal notranslate"><span class="pre">AbstractGraph.edges_set</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="smallgraphlib.html#smallgraphlib.core.AbstractGraph.from_matrix"><code class="docutils literal notranslate"><span class="pre">AbstractGraph.from_matrix()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="smallgraphlib.html#smallgraphlib.core.AbstractGraph.from_string"><code class="docutils literal notranslate"><span class="pre">AbstractGraph.from_string()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="smallgraphlib.html#smallgraphlib.core.AbstractGraph.has_loop"><code class="docutils literal notranslate"><span class="pre">AbstractGraph.has_loop</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="smallgraphlib.html#smallgraphlib.core.AbstractGraph.has_multiple_edges"><code class="docutils literal notranslate"><span class="pre">AbstractGraph.has_multiple_edges</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="smallgraphlib.html#smallgraphlib.core.AbstractGraph.in_degree"><code class="docutils literal notranslate"><span class="pre">AbstractGraph.in_degree()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="smallgraphlib.html#smallgraphlib.core.AbstractGraph.in_out_degree"><code class="docutils literal notranslate"><span class="pre">AbstractGraph.in_out_degree()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="smallgraphlib.html#smallgraphlib.core.AbstractGraph.is_a_tree"><code class="docutils literal notranslate"><span class="pre">AbstractGraph.is_a_tree</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="smallgraphlib.html#smallgraphlib.core.AbstractGraph.is_acyclic"><code class="docutils literal notranslate"><span class="pre">AbstractGraph.is_acyclic</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="smallgraphlib.html#smallgraphlib.core.AbstractGraph.is_complete"><code class="docutils literal notranslate"><span class="pre">AbstractGraph.is_complete</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="smallgraphlib.html#smallgraphlib.core.AbstractGraph.is_connected"><code class="docutils literal notranslate"><span class="pre">AbstractGraph.is_connected</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="smallgraphlib.html#smallgraphlib.core.AbstractGraph.is_directed"><code class="docutils literal notranslate"><span class="pre">AbstractGraph.is_directed</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="smallgraphlib.html#smallgraphlib.core.AbstractGraph.is_eulerian"><code class="docutils literal notranslate"><span class="pre">AbstractGraph.is_eulerian</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="smallgraphlib.html#smallgraphlib.core.AbstractGraph.is_isomorphic_to"><code class="docutils literal notranslate"><span class="pre">AbstractGraph.is_isomorphic_to()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="smallgraphlib.html#smallgraphlib.core.AbstractGraph.is_semi_eulerian"><code class="docutils literal notranslate"><span class="pre">AbstractGraph.is_semi_eulerian</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="smallgraphlib.html#smallgraphlib.core.AbstractGraph.is_simple"><code class="docutils literal notranslate"><span class="pre">AbstractGraph.is_simple</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="smallgraphlib.html#smallgraphlib.core.AbstractGraph.labels"><code class="docutils literal notranslate"><span class="pre">AbstractGraph.labels()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="smallgraphlib.html#smallgraphlib.core.AbstractGraph.node_degree"><code class="docutils literal notranslate"><span class="pre">AbstractGraph.node_degree()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="smallgraphlib.html#smallgraphlib.core.AbstractGraph.nodes"><code class="docutils literal notranslate"><span class="pre">AbstractGraph.nodes</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="smallgraphlib.html#smallgraphlib.core.AbstractGraph.nodes_set"><code class="docutils literal notranslate"><span class="pre">AbstractGraph.nodes_set</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="smallgraphlib.html#smallgraphlib.core.AbstractGraph.order"><code class="docutils literal notranslate"><span class="pre">AbstractGraph.order</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="smallgraphlib.html#smallgraphlib.core.AbstractGraph.out_degree"><code class="docutils literal notranslate"><span class="pre">AbstractGraph.out_degree()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="smallgraphlib.html#smallgraphlib.core.AbstractGraph.predecessors"><code class="docutils literal notranslate"><span class="pre">AbstractGraph.predecessors()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="smallgraphlib.html#smallgraphlib.core.AbstractGraph.remove_edges"><code class="docutils literal notranslate"><span class="pre">AbstractGraph.remove_edges()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="smallgraphlib.html#smallgraphlib.core.AbstractGraph.remove_nodes"><code class="docutils literal notranslate"><span class="pre">AbstractGraph.remove_nodes()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="smallgraphlib.html#smallgraphlib.core.AbstractGraph.rename_node"><code class="docutils literal notranslate"><span class="pre">AbstractGraph.rename_node()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="smallgraphlib.html#smallgraphlib.core.AbstractGraph.rename_nodes"><code class="docutils literal notranslate"><span class="pre">AbstractGraph.rename_nodes()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="smallgraphlib.html#smallgraphlib.core.AbstractGraph.shortest_paths"><code class="docutils literal notranslate"><span class="pre">AbstractGraph.shortest_paths()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="smallgraphlib.html#smallgraphlib.core.AbstractGraph.shuffle_nodes"><code class="docutils literal notranslate"><span class="pre">AbstractGraph.shuffle_nodes()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="smallgraphlib.html#smallgraphlib.core.AbstractGraph.successors"><code class="docutils literal notranslate"><span class="pre">AbstractGraph.successors()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="smallgraphlib.html#smallgraphlib.core.AbstractGraph.weight"><code class="docutils literal notranslate"><span class="pre">AbstractGraph.weight()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="smallgraphlib.html#smallgraphlib.core.AbstractGraph.weight_matrix"><code class="docutils literal notranslate"><span class="pre">AbstractGraph.weight_matrix</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="smallgraphlib.html#smallgraphlib.core.InvalidGraphAttribute"><code class="docutils literal notranslate"><span class="pre">InvalidGraphAttribute</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="smallgraphlib.html#smallgraphlib.core.NodeAlreadyFoundError"><code class="docutils literal notranslate"><span class="pre">NodeAlreadyFoundError</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="smallgraphlib.html#smallgraphlib.core.Traversal"><code class="docutils literal notranslate"><span class="pre">Traversal</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="smallgraphlib.html#smallgraphlib.core.Traversal.INORDER"><code class="docutils literal notranslate"><span class="pre">Traversal.INORDER</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="smallgraphlib.html#smallgraphlib.core.Traversal.POSTORDER"><code class="docutils literal notranslate"><span class="pre">Traversal.POSTORDER</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="smallgraphlib.html#smallgraphlib.core.Traversal.PREORDER"><code class="docutils literal notranslate"><span class="pre">Traversal.PREORDER</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="smallgraphlib.html#module-smallgraphlib.custom_types">smallgraphlib.custom_types module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="smallgraphlib.html#module-smallgraphlib.graphs_constructors">smallgraphlib.graphs_constructors module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="smallgraphlib.html#smallgraphlib.graphs_constructors.complete_bipartite_graph"><code class="docutils literal notranslate"><span class="pre">complete_bipartite_graph()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="smallgraphlib.html#smallgraphlib.graphs_constructors.complete_graph"><code class="docutils literal notranslate"><span class="pre">complete_graph()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="smallgraphlib.html#smallgraphlib.graphs_constructors.graph"><code class="docutils literal notranslate"><span class="pre">graph()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="smallgraphlib.html#smallgraphlib.graphs_constructors.perfect_binary_tree"><code class="docutils literal notranslate"><span class="pre">perfect_binary_tree()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="smallgraphlib.html#smallgraphlib.graphs_constructors.random_graph"><code class="docutils literal notranslate"><span class="pre">random_graph()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="smallgraphlib.html#module-smallgraphlib.labeled_graphs">smallgraphlib.labeled_graphs module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="smallgraphlib.html#smallgraphlib.labeled_graphs.AbstractLabeledGraph"><code class="docutils literal notranslate"><span class="pre">AbstractLabeledGraph</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="smallgraphlib.html#smallgraphlib.labeled_graphs.AbstractLabeledGraph.from_dict"><code class="docutils literal notranslate"><span class="pre">AbstractLabeledGraph.from_dict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="smallgraphlib.html#smallgraphlib.labeled_graphs.AbstractLabeledGraph.from_string"><code class="docutils literal notranslate"><span class="pre">AbstractLabeledGraph.from_string()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="smallgraphlib.html#smallgraphlib.labeled_graphs.AbstractLabeledGraph.labeled_edges"><code class="docutils literal notranslate"><span class="pre">AbstractLabeledGraph.labeled_edges</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="smallgraphlib.html#smallgraphlib.labeled_graphs.AbstractLabeledGraph.labels"><code class="docutils literal notranslate"><span class="pre">AbstractLabeledGraph.labels()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="smallgraphlib.html#smallgraphlib.labeled_graphs.AbstractLabeledGraph.rename_nodes"><code class="docutils literal notranslate"><span class="pre">AbstractLabeledGraph.rename_nodes()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="smallgraphlib.html#smallgraphlib.labeled_graphs.AbstractWeightedGraph"><code class="docutils literal notranslate"><span class="pre">AbstractWeightedGraph</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="smallgraphlib.html#smallgraphlib.labeled_graphs.AbstractWeightedGraph.from_matrix"><code class="docutils literal notranslate"><span class="pre">AbstractWeightedGraph.from_matrix()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="smallgraphlib.html#smallgraphlib.labeled_graphs.AbstractWeightedGraph.total_weight"><code class="docutils literal notranslate"><span class="pre">AbstractWeightedGraph.total_weight</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="smallgraphlib.html#smallgraphlib.labeled_graphs.AbstractWeightedGraph.weight"><code class="docutils literal notranslate"><span class="pre">AbstractWeightedGraph.weight()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="smallgraphlib.html#smallgraphlib.labeled_graphs.AbstractWeightedGraph.weights"><code class="docutils literal notranslate"><span class="pre">AbstractWeightedGraph.weights</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="smallgraphlib.html#smallgraphlib.labeled_graphs.LabeledDirectedGraph"><code class="docutils literal notranslate"><span class="pre">LabeledDirectedGraph</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="smallgraphlib.html#smallgraphlib.labeled_graphs.LabeledGraph"><code class="docutils literal notranslate"><span class="pre">LabeledGraph</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="smallgraphlib.html#smallgraphlib.labeled_graphs.WeightedDirectedGraph"><code class="docutils literal notranslate"><span class="pre">WeightedDirectedGraph</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="smallgraphlib.html#smallgraphlib.labeled_graphs.WeightedGraph"><code class="docutils literal notranslate"><span class="pre">WeightedGraph</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="smallgraphlib.html#smallgraphlib.labeled_graphs.WeightedGraph.minimum_spanning_tree"><code class="docutils literal notranslate"><span class="pre">WeightedGraph.minimum_spanning_tree()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="smallgraphlib.html#module-smallgraphlib.string2automaton">smallgraphlib.string2automaton module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="smallgraphlib.html#smallgraphlib.string2automaton.StringConstructorData"><code class="docutils literal notranslate"><span class="pre">StringConstructorData</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="smallgraphlib.html#smallgraphlib.string2automaton.StringConstructorData.final_states"><code class="docutils literal notranslate"><span class="pre">StringConstructorData.final_states</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="smallgraphlib.html#smallgraphlib.string2automaton.StringConstructorData.initial_states"><code class="docutils literal notranslate"><span class="pre">StringConstructorData.initial_states</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="smallgraphlib.html#smallgraphlib.string2automaton.StringConstructorData.states"><code class="docutils literal notranslate"><span class="pre">StringConstructorData.states</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="smallgraphlib.html#smallgraphlib.string2automaton.StringConstructorData.transitions"><code class="docutils literal notranslate"><span class="pre">StringConstructorData.transitions</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="smallgraphlib.html#smallgraphlib.string2automaton.StringToAutomatonParser"><code class="docutils literal notranslate"><span class="pre">StringToAutomatonParser</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="smallgraphlib.html#smallgraphlib.string2automaton.StringToAutomatonParser.parse"><code class="docutils literal notranslate"><span class="pre">StringToAutomatonParser.parse()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="smallgraphlib.html#module-smallgraphlib.tikz_export">smallgraphlib.tikz_export module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="smallgraphlib.html#smallgraphlib.tikz_export.TikzPrinter"><code class="docutils literal notranslate"><span class="pre">TikzPrinter</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="smallgraphlib.html#smallgraphlib.tikz_export.TikzPrinter.angles"><code class="docutils literal notranslate"><span class="pre">TikzPrinter.angles</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="smallgraphlib.html#smallgraphlib.tikz_export.TikzPrinter.graph"><code class="docutils literal notranslate"><span class="pre">TikzPrinter.graph</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="smallgraphlib.html#smallgraphlib.tikz_export.TikzPrinter.index"><code class="docutils literal notranslate"><span class="pre">TikzPrinter.index</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="smallgraphlib.html#smallgraphlib.tikz_export.TikzPrinter.labels_positions"><code class="docutils literal notranslate"><span class="pre">TikzPrinter.labels_positions</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="smallgraphlib.html#smallgraphlib.tikz_export.TikzPrinter.lines"><code class="docutils literal notranslate"><span class="pre">TikzPrinter.lines</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="smallgraphlib.html#smallgraphlib.tikz_export.TikzPrinter.nodes"><code class="docutils literal notranslate"><span class="pre">TikzPrinter.nodes</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="smallgraphlib.html#smallgraphlib.tikz_export.TikzPrinter.nodes_positions"><code class="docutils literal notranslate"><span class="pre">TikzPrinter.nodes_positions</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="smallgraphlib.html#smallgraphlib.tikz_export.TikzPrinter.tikz_code"><code class="docutils literal notranslate"><span class="pre">TikzPrinter.tikz_code()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="smallgraphlib.html#smallgraphlib.tikz_export.barycenter"><code class="docutils literal notranslate"><span class="pre">barycenter()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="smallgraphlib.html#smallgraphlib.tikz_export.find_free_position"><code class="docutils literal notranslate"><span class="pre">find_free_position()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="smallgraphlib.html#smallgraphlib.tikz_export.label_coordinates"><code class="docutils literal notranslate"><span class="pre">label_coordinates()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="smallgraphlib.html#smallgraphlib.tikz_export.segments_intersection"><code class="docutils literal notranslate"><span class="pre">segments_intersection()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="smallgraphlib.html#smallgraphlib-trees-module">smallgraphlib.trees module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="smallgraphlib.html#module-smallgraphlib.utilities">smallgraphlib.utilities module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="smallgraphlib.html#smallgraphlib.utilities.ComparableAndHashable"><code class="docutils literal notranslate"><span class="pre">ComparableAndHashable</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="smallgraphlib.html#smallgraphlib.utilities.Multiset"><code class="docutils literal notranslate"><span class="pre">Multiset</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="smallgraphlib.html#smallgraphlib.utilities.Multiset.total"><code class="docutils literal notranslate"><span class="pre">Multiset.total()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="smallgraphlib.html#smallgraphlib.utilities.cached"><code class="docutils literal notranslate"><span class="pre">cached()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="smallgraphlib.html#smallgraphlib.utilities.cached_property"><code class="docutils literal notranslate"><span class="pre">cached_property()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="smallgraphlib.html#smallgraphlib.utilities.clear_cache"><code class="docutils literal notranslate"><span class="pre">clear_cache()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="smallgraphlib.html#smallgraphlib.utilities.frange"><code class="docutils literal notranslate"><span class="pre">frange()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="smallgraphlib.html#module-contents">Module contents</a></li>
 </ul>
 </li>
 </ul>
