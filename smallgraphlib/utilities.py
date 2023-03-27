@@ -1,7 +1,7 @@
 from abc import abstractmethod
 from collections import Counter
 from functools import wraps
-from typing import Protocol
+from typing import Protocol, Generator
 
 
 def cached(f):
@@ -115,3 +115,11 @@ class ComparableAndHashable(Protocol):
     @abstractmethod
     def __hash__(self) -> int:
         ...
+
+
+def frange(start: float, end: float, step: float = 1) -> Generator[float, None, None]:
+    """Generate float values from `start` (included) to `end` (excluded) with an increment of `step`."""
+    count = start
+    while count < end:
+        yield count
+        count += step

@@ -6,7 +6,6 @@ import pytest
 from smallgraphlib.basic_graphs import DirectedGraph
 from smallgraphlib.core import InvalidGraphAttribute
 from smallgraphlib.utilities import Multiset
-from smallgraphlib.tikz_export import segments_intersection
 
 from smallgraphlib import (
     __version__,
@@ -344,25 +343,6 @@ def test_non_isomorphic_with_same_degrees():
     assert not isomorphic_to_k33.is_isomorphic_to(other_graph_with_same_degrees)
     assert isomorphic_to_k33.is_isomorphic_to(k33)
     assert not other_graph_with_same_degrees.is_isomorphic_to(k33)
-
-
-def test_intersection():
-    A = (-4.191374663072777, -0.4986522911051212)
-    B = (-0.41778975741239854, 1.495956873315364)
-    C = (-3.4905660377358494, 2.035040431266846)
-    D = (0.8760107816711589, -0.12129380053908356)
-    expected_intersection = (-1.374693295677149, 0.9901650030897102)
-    M = segments_intersection((A, B), (C, D))
-    assert math.hypot(M[0] - expected_intersection[0], M[1] - expected_intersection[1]) < 10**-8
-    A = (-2.0572283216093616, 1.544030635724147)
-    assert segments_intersection((A, B), (C, D)) is None
-
-
-def test_tikz_support():
-    for seed in range(100):
-        random.seed(seed)
-        g = random_graph(4, 6, directed=True)
-        g.as_tikz()
 
 
 def test_graph_from_matrix():

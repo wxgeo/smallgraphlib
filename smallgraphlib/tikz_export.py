@@ -2,6 +2,8 @@ import math
 import random
 from typing import Generic, TYPE_CHECKING
 
+from smallgraphlib.utilities import frange
+
 from smallgraphlib.custom_types import Node, Segment, Point
 
 if TYPE_CHECKING:
@@ -11,7 +13,7 @@ if TYPE_CHECKING:
 _TIKZ_EXPORT_MAX_MULTIPLE_EDGES_SUPPORT = 3
 
 
-def segments_intersection(segment1: Segment, segment2: Segment, eps: float = 10**-8):
+def segments_intersection(segment1: Segment, segment2: Segment, eps: float = 10**-8) -> Point | None:
     (xA, yA), (xB, yB) = segment1
     (xC, yC), (xD, yD) = segment2
     # solve: s*A + (1 - s)*B = t*C + (1 - t)*D  <==>  s*(A - B) + t*(D - C) = D - B
@@ -20,7 +22,7 @@ def segments_intersection(segment1: Segment, segment2: Segment, eps: float = 10*
     xBA, yBA = xA - xB, yA - yB
     xBD, yBD = xD - xB, yD - yB
     t = s = None
-    intersection = None
+    intersection: Point | None = None
     if abs(yCD * xBA - xCD * yBA) > eps:
         if abs(xBA) > abs(xCD):
             t = (yBD * xBA - xBD * yBA) / (yCD * xBA - xCD * yBA)
@@ -35,23 +37,171 @@ def segments_intersection(segment1: Segment, segment2: Segment, eps: float = 10*
     return intersection
 
 
+def barycenter(point1: Point, point2: Point, k: float) -> Point:
+    """Return the label cartesian coordinates for position `k`.
+
+    Position `k` is a barycentric coefficient between 0 and 1."""
+    x1, y1 = point1
+    x2, y2 = point2
+    return k * x2 + (1 - k) * x1, k * y2 + (1 - k) * y1
+
+
+def label_coordinates(point1: Point, point2: Point, k: float, bending: int) -> Point:
+    """Return an approximation of the label cartesian coordinates on a bent tikz edge for position `k`.
+
+    Position `k` is a barycentric coefficient between 0 and 1, as used in `pos` tikz parameter.
+    The absolute `bending` value is that of the tikz `bending` parameter.
+    It must be positive to bend left, and negative to bend right.
+    """
+    x1, y1 = point1
+    x2, y2 = point2
+
+    # We will calculate a fast approximation of the position of the label on the tikz bent edge.
+    # Tikz uses Bézier curves internally, but I don't know the exact algorithm and anyway,
+    # we only need a quick approximation.
+    # Let's call `A` the first point, `B` the second one, and `I` the middle of the segment `(A B)`.
+    # The maximal distance between the segment `(A, B)` and the edge is when the label is positioned
+    # midway between `A` and `B`. If we call `M` the position of this midway label, then the maximal distance
+    # is `IM`.
+    #
+    # Let's make a quick sketch:
+    #
+    #                   M
+    #         N    ...  +  ...
+    #        . +        |         ..
+    #   P +    |        |             .
+    #   .      |        |               .
+    #  +--+----+--------+----------------+
+    #  A  C    J        I                B
+    #
+    # Here, `N` is the middle of the arc `A --> M`, and `J` is the middle of the segment `(A I)`.
+    #
+    # The point `C` is the barycenter corresponding to the coefficient `k` on the segment (A B),
+    # and is easy to compute.
+    # However, we want the coordinates of the point `P`, which is the real position of the tikz label
+    # on the curved edge for the same coefficient `k`.
+    # So, we have to calculate an approximation of the vector `C->P`.
+    #
+    # (Note that the vectors `J->N` and `C->P` are not exactly orthogonal to the vector `A->B`,
+    # but in practice the deviation is not so important since the bending is slight,
+    # and because `k` is often around 0.5).
+    #
+    # +--------------------------+-----+-----+--------+-------+-----+
+    # |     `k` value            |  0  |  k  |  0.25  |  0.5  |  1  |
+    # +--------------------------+-----+-----+--------+-------+-----+
+    # |  point on segment (A B)  |  A  |  C  |   J    |   I   |  B  |
+    # +--------------------------+-----+-----+--------+-------+-----+
+    # |  point on the bent edge  |  A  |  P  |   N    |   M   |  B  |
+    # +--------------------------+-----+--------------+-------+-----+
+    #
+    # Experimentally, on a tikz drawing, the distance `IM` is approximately `0.006 * bending * AB`,
+    # where `bending` is the value of the `bending` parameter of tikz.
+    #
+    # For the distance `JN`, still experimentally, the distance is approximately `0.0045 * bending * AB`
+    # (so 0.0045 instead of 0.006/2 = 0.003, because of the curving of course).
+    #
+    # Since the edge is only slightly curved, we can now approximate `A --> N` and `N --> M`
+    # portions of curves by a straight line.
+    # Then, on each straight line, the distance between the edge and the `(A, B)` segment is
+    # proportional to the position of the label on the edge.
+    #
+    # If 0 <= k <= 0.25, the distance from the label to the segment is approximately `4 * k * JN`.
+    # (since for k = 0.25, the distance is of course `JN` itself).
+    # If 0.75 <= k <= 1, the distance is `4 * (1 - k) * JN`.
+    # So the approximation formula if abs(0.5 - k) > 0.25 is:
+    #
+    #                           `distance CP = 4 * min(k, 1 - k) * JN`
+    #
+    # So, `CP = 4 * min(k, 1 - k) * 0.0045 * bending * AB` and finally:
+    #
+    #                            `CP = 0.018 * bending * min(k, 1 - k) * AB`
+    #
+    # Now, if 0.25 <= k <= 0.5, the distance from the label to the segment is approximately
+    # `JN + 4 * (k - 0.25) * (IM - JN)`, since for k = 0.25, the distance is of course `JN` itself,
+    # and for k = 0.5, the distance is `IM`.
+    # So the approximation formula for abs(0.5 - k) < 0.25 is:
+    #
+    #                       `distance CP = JN + 4 * min(k - 0.25, 0.75 - k) * (IM - JN)`
+    #
+    # This leads to:
+    #
+    #                       `CP = (0.006 * min(k - 0.25, 0.75 - k) + 0.0045) * bending * AB`
+    #
+    # The vector `I->M` is orthogonal to `A->B`, and its length is approximately `0.006 * bending * AB`.
+    # So its coordinates are `0.006 * bending * (-yAB, xAB)` for a left bending.
+    #
+    # It follows that C->P coordinates are:
+    #
+    #              `C->P = | 0.018 * bending * min(k, 1 - k) * (-yAB, xAB)` if abs(0.5 - k) > 0.25
+    #                      | (0.006 * min(k - 0.25, 0.75 - k) + 0.0045) * bending * (-yAB, xAB) else
+    #
+    x, y = barycenter(point1, point2, k)
+    if bending == 0:
+        # Small optimisation, since bending == 0 is the most frequent case.
+        return x, y
+    if abs(0.5 - k) > 0.25:
+        # 0 <= k < 0.25
+        coefficient = bending * 0.018 * min(k, 1 - k)
+    else:
+        # 0.25 <= k <= 0.5
+        coefficient = bending * (0.006 * min(k - 0.25, 0.75 - k) + 0.0045)
+    dx, dy = coefficient * (y1 - y2), coefficient * (x2 - x1)
+    return x + dx, y + dy
+
+
+def find_free_position(
+    point1: Point, point2: Point, known_positions: list[Point], bending: int = 0
+) -> tuple[float, Point]:
+    """Find a free position on the edge between point1 and point2.
+
+    Return a tuple:
+        - the best position on the segment (point1, point2): a float between 0 and 1,
+        - the coordinates of the corresponding point: a tuple of floats.
+
+    The returned position maximize the shortest distance between the new position
+    and all other existing positions.
+
+    Parameter `bending` is the corresponding tikz bending.
+    """
+    # Try to minimize collisions between two labels.
+    # This dict will store the distance between the nearest labels
+    # for each position.
+    min_dists: dict[float, float] = {}
+    # This one will store the coordinates of the label for each position.
+    coordinates: dict[float, tuple[float, float]] = {}
+    for pos in frange(0.2, 0.81, 0.05):
+        # The edge may be slightly curved, so the label position is not exactly a barycenter
+        # of the two nodes positions.
+        new_x, new_y = label_coordinates(point1, point2, pos, bending=bending)
+        min_dists[pos] = min(
+            [(new_x - x) ** 2 + (new_y - y) ** 2 for (x, y) in known_positions],
+            default=math.inf,
+        )
+        coordinates[pos] = new_x, new_y
+    pos = max(min_dists, key=min_dists.__getitem__, default=0.5)
+    return pos, coordinates[pos]
+
+
 class TikzPrinter(Generic[Node]):
     lines: list[str]
     # `nodes_positions` stores the cartesian coordinates of each of the graph's node.
-    nodes_positions: dict[Node, tuple[float, float]]
+    nodes_positions: dict[Node, Point]
     # The places already occupied by labels are stored in `labels_positions`, to avoid placing another
     # label there.
-    labels_positions: list[tuple[float, float]]
+    labels_positions: list[Point]
     graph: "AbstractGraph[Node]"
     angles: dict[Node, float]
     # Nodes numeration (useful in particular when they are shuffled):
     index: dict[Node, int]
     nodes: list[Node]
+    # For debugging:
+    _cartography: dict[tuple[Node, ...], Point]
 
     def _reset(self):
         self.lines = []
         self.nodes_positions = {}
         self.labels_positions = []
+        self._cartography = {}
         self.angles = {}
         self.index = {}
 
@@ -113,6 +263,7 @@ class TikzPrinter(Generic[Node]):
                                 intersection = segments_intersection((A, B), (C, D))
                                 if intersection is not None:
                                     self.labels_positions.append(intersection)
+                                    self._cartography[(node1, node2, node3, node4)] = intersection
 
         # Let's draw now the edges and the labels.
         #
@@ -140,14 +291,6 @@ class TikzPrinter(Generic[Node]):
 
         self.lines.append(r"\end{tikzpicture}")
         return "\n".join(self.lines)
-
-    def _calculate_label_position(self, node1: Node, node2: Node, k: float) -> Point:
-        """Return the label cartesian coordinates for position `k`.
-
-        Position `k` is a barycentric coefficient between 0 and 1."""
-        x1, y1 = self.nodes_positions[node1]
-        x2, y2 = self.nodes_positions[node2]
-        return k * x2 + (1 - k) * x1, k * y2 + (1 - k) * y1
 
     def _generate_loop(self, node: Node) -> None:
         style = "directed" if self.graph.is_directed else "undirected"
@@ -181,16 +324,16 @@ class TikzPrinter(Generic[Node]):
         if n == 0:
             bendings = []
         elif n == 1:
-            bendings = [""]  # strait line by default
+            bendings = [0]  # strait line by default
             if len(self.nodes) >= 6:
                 if node2_is_left_neighbour:
-                    bendings[0] = "bend right=30"
+                    bendings[0] = -30
                 elif node2_is_right_neighbour:
-                    bendings[0] = "bend left=30"
+                    bendings[0] = 30
         elif n == 2:
-            bendings = ["bend left=15", "bend right=15"]
+            bendings = [15, -15]
         elif n == 3:
-            bendings = ["bend left", "", "bend right"]
+            bendings = [30, 0, -30]
         else:
             assert n > _TIKZ_EXPORT_MAX_MULTIPLE_EDGES_SUPPORT
             raise NotImplementedError(
@@ -200,37 +343,19 @@ class TikzPrinter(Generic[Node]):
         for style, bending, label in zip(styles, bendings, labels):
             label_tikz_code = ""
             if label:
-                pos = 0.5
+                point1 = self.nodes_positions[node1]
+                point2 = self.nodes_positions[node2]
                 if node2_is_right_neighbour or node2_is_left_neighbour:
-                    pass
+                    pos = 0.5
+                    xy = label_coordinates(point1, point2, pos, bending=bending)
                 else:
-                    # Try to minimize collisions between two labels.
-                    # This dict will store the distance between the nearest labels
-                    # for each position.
-                    min_dists: dict[float, float] = {}
-                    # This one will store the coordinates of the label for each position.
-                    coordinates: dict[float, tuple[float, float]] = {}
-                    for pos in (
-                        # 0.1,
-                        0.2,
-                        0.3,
-                        0.4,
-                        0.5,
-                        0.6,
-                        0.7,
-                        0.8,
-                        # 0.9,
-                    ):
-                        new_x, new_y = self._calculate_label_position(node1, node2, pos)
-                        min_dists[pos] = min(
-                            [(new_x - x) ** 2 + (new_y - y) ** 2 for (x, y) in self.labels_positions],
-                            default=math.inf,
-                        )
-                        coordinates[pos] = new_x, new_y
-                    pos = max(min_dists, key=min_dists.get, default=0.5)  # type: ignore
-                    self.labels_positions.append(coordinates[pos])
+                    pos, xy = find_free_position(point1, point2, self.labels_positions, bending=bending)
+                self.labels_positions.append(xy)
+                self._cartography[(node1, node2)] = xy
                 label_tikz_code = rf"node[pos={pos}] {{\contour{{white}}{{{label}}}}}"
-            self.lines.append(rf"\draw[{style}] ({node1}) to[{bending}] {label_tikz_code} ({node2});")
+            direction = "left" if bending > 0 else "right"
+            tikz_bending = f"bend {direction}={abs(bending)}" if bending != 0 else ""
+            self.lines.append(rf"\draw[{style}] ({node1}) to[{tikz_bending}] {label_tikz_code} ({node2});")
 
 
 tikz_printer: TikzPrinter = TikzPrinter()

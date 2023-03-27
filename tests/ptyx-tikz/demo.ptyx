@@ -40,6 +40,10 @@ graph_list = [
 for graph in graph_list:
 	write(graph.as_tikz() + "\n\n")
 
+oo = float("inf")
+M = [[0,16,oo,oo,3,15,10], [oo,0,1,4,oo,oo,oo], [oo,1,0,oo,oo,oo,oo], [oo,4,2,0,oo,oo,oo], [oo,13,17,7,0,oo,oo], [15,2,oo,oo,oo,0,3], [oo,oo,oo,oo,oo,3,0]]
+write(WeightedDirectedGraph.from_matrix(M).as_tikz(options="scale=2"))
+
 #END
 
 
