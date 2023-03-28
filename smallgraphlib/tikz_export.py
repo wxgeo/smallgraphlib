@@ -205,6 +205,16 @@ class TikzPrinter(Generic[Node]):
         self.angles = {}
         self.index = {}
 
+    @staticmethod
+    def latex_preamble_additions() -> list[str]:
+        """Return the lines of LaTeX code to insert in the LaTeX preamble."""
+        return [
+            r"\usepackage{tikz}",
+            r"\usetikzlibrary{arrows.meta}",
+            r"\usepackage[outline]{contour}",
+            r"\contourlength{0.5pt}",
+        ]
+
     def tikz_code(self, graph, *, shuffle_nodes=False, options="") -> str:
         r"""Generate tikz code corresponding to this graph.
 

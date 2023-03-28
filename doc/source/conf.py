@@ -18,7 +18,6 @@ from pathlib import Path
 sys.path.insert(0, str(Path("../..").resolve()))
 
 
-
 def get_version():
     """Read version number from `pyproject.toml` file."""
     path = Path(__file__).parent.parent.parent / "pyproject.toml"
