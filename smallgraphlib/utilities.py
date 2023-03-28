@@ -96,8 +96,11 @@ class Multiset(Counter):
             raise ValueError(f"Multiset value can't be negative for key {key!r}.")
 
     def __setitem__(self, key, value):
-        if not isinstance(value, int):
-            raise ValueError(f"Multiset value must be an integer, not {value!r}.")
+        if not isinstance(value, int) or value < 0:
+            if int(value) == value and int(value) >= 0:
+                value = int(value)
+            else:
+                raise ValueError(f"Multiset value must be a positive integer, not {value!r}.")
         super().__setitem__(key, value)
         self._clean_key(key)
 
