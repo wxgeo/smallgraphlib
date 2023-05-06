@@ -27,7 +27,6 @@ def latex_Dijkstra(graph: AbstractGraph[Node], start: Node, end: Node = None) ->
     being_processed: set[Node] = {start}
     completed: set[Node] = set()
     distance_from_start[start] = 0
-    previous_nodes[start] = start
 
     # Nodes which will not change anymore (shorter path from start has been found):
     # archived: dict[Node, tuple[float, list[Node]]] = {}
@@ -39,10 +38,10 @@ def latex_Dijkstra(graph: AbstractGraph[Node], start: Node, end: Node = None) ->
         if dist == math.inf:
             return r"$+\infty$"
         if node in completed:
-            return "\cellcolor{lightgray}"
+            return r"\cellcolor{lightgray}"
         printing = str(dist)
         if node != start:
-            printing += f" $({','.join(str(node) for node in previous)})$"
+            printing += f" $({','.join(sorted(str(node) for node in previous))})$"
         if node == current:
             printing = rf"\cellcolor{{blue!20}}\textbf{{{printing}}}"
         return printing
@@ -101,7 +100,8 @@ def latex_Dijkstra(graph: AbstractGraph[Node], start: Node, end: Node = None) ->
         if target != start:
             distance = distance_from_start[target]
             lines.append(
-                f"Shorter(s) path(s) between ${start}$ and ${target}$: ${shortest_paths()}$ (length: {distance})."
+                f"Shorter(s) path(s) between ${start}$ and ${target}$: "
+                f"${shortest_paths()}$ (length: {distance})."
             )
             lines.append("")
 
