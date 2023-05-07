@@ -212,7 +212,7 @@ class TikzPrinter(Generic[Node]):
             r"\usepackage{tikz}",
             r"\usetikzlibrary{arrows.meta}",
             r"\usepackage[outline]{contour}",
-            r"\contourlength{0.5pt}",
+            r"\contourlength{0.15em}",
         ]
 
     def tikz_code(self, graph, *, shuffle_nodes=False, options="") -> str:

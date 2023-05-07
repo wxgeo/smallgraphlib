@@ -100,7 +100,7 @@ def latex_Dijkstra(graph: AbstractGraph[Node], start: Node, end: Node = None) ->
         if target != start:
             distance = distance_from_start[target]
             lines.append(
-                f"Shorter(s) path(s) between ${start}$ and ${target}$: "
+                f"Shorter(s) path(s) from ${start}$ to ${target}$: "
                 f"${shortest_paths()}$ (length: {distance})."
             )
             lines.append("")
