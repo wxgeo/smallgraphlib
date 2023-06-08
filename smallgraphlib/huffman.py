@@ -1,20 +1,20 @@
 from collections import Counter
 from operator import attrgetter
-from typing import TypeVar
 
 from smallgraphlib.custom_types import Node
 
 
-Self = TypeVar("Self")
-
-
 class Tree:
-    def __init__(self, root: Node, *branches: Self) -> None:
+    branches: tuple["Tree", ...]
+
+    def __init__(self, root: Node, *branches: "Tree") -> None:
         self.root = root
         self.branches = branches
 
 
 class HuffmanTree(Tree):
+    branches: tuple["HuffmanTree", ...]
+
     def __init__(self, *branches: "HuffmanTree", char: str = None, weight: int = None) -> None:
         if len(branches) == 2:
             if char is not None or weight is not None:
@@ -35,7 +35,6 @@ class HuffmanTree(Tree):
         }
         sort_func = attrgetter("root")
         while len(trees) >= 2:
-            print([tree.root for tree in trees])
             # Select the two smallest values
             tree1 = min(trees, key=sort_func)
             trees.remove(tree1)
