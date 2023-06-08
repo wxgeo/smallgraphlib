@@ -226,7 +226,7 @@ class TikzPrinter(Generic[Node]):
         For labeled graphs, it is recommended to load `contour` package too::
 
             \usepackage[outline]{contour}
-            \contourlength{0.5pt}
+            \contourlength{0.15em}
 
         """
         self.graph = graph

@@ -31,16 +31,16 @@ $C$ & \cellcolor{lightgray} & \cellcolor{blue!20}\textbf{12 $(C)$} & \cellcolor{
 $B$ & \cellcolor{lightgray} & \cellcolor{lightgray} & \cellcolor{lightgray} & \cellcolor{lightgray} & \cellcolor{lightgray} & \cellcolor{blue!20}\textbf{14 $(G)$} & \cellcolor{lightgray} & F \cellcolor{blue!20}\textbf{14 $(G)$}\\\hline
 \end{tabular}
 
-Shorter(s) path(s) between $A$ and $B$: $A-E-D-C-B$ (length: 12).
+Shorter(s) path(s) from $A$ to $B$: $A-E-D-C-B$ (length: 12).
 
-Shorter(s) path(s) between $A$ and $C$: $A-E-D-C$ (length: 11).
+Shorter(s) path(s) from $A$ to $C$: $A-E-D-C$ (length: 11).
 
-Shorter(s) path(s) between $A$ and $D$: $A-E-D$ (length: 9).
+Shorter(s) path(s) from $A$ to $D$: $A-E-D$ (length: 9).
 
-Shorter(s) path(s) between $A$ and $E$: $A-E$ (length: 3).
+Shorter(s) path(s) from $A$ to $E$: $A-E$ (length: 3).
 
-Shorter(s) path(s) between $A$ and $F$: $A-G-F$ (length: 14).
+Shorter(s) path(s) from $A$ to $F$: $A-G-F$ (length: 14).
 
-Shorter(s) path(s) between $A$ and $G$: $A-G$ (length: 10).
+Shorter(s) path(s) from $A$ to $G$: $A-G$ (length: 10).
 """
     )
