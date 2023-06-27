@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "smallgraphlib"
-version = "0.6.4"
+version = "0.7.1"
 description = "Simple library for handling small graphs, including Tikz code generation."
 authors = ["Nicolas Pourcelot <nicolas.pourcelot@gmail.com>"]
 repository = "https://github.com/wxgeo/smallgraphlib"
@@ -11,7 +11,7 @@ keywords = ["graph", "tikz", "latex"]
 [tool.poetry.dependencies]
 python = "^3.10"
 
-[tool.poetry.dev-dependencies]
+[tool.poetry.group.dev.dependencies]
 pytest = "^7"
 mypy = "^1.0"
 flake8 = "^6"
@@ -22,13 +22,19 @@ sphinx-rtd-theme = "^1.0.0"#
 myst-parser = "^0.18.0"
 # To test compatibility with sympy.
 sympy = "^1.10.1"
+# Version 7.29+ are buggy !
+python-semantic-release = "7.28.1"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
 
+[tool.semantic_release]
+version_variable = "pyproject.toml:version"
+
 [tool.mypy]
 implicit_optional = true
+warn_unused_ignores = true
 
 [tool.black]
 line-length = 110

@@ -6,5 +6,14 @@ doc: .
 	poetry run make -C doc html
 
 tox:
-	black -l 110 .
+	black .
 	poetry run tox
+
+version:
+	poetry run semantic-release version
+
+build: version
+	poetry build
+
+publish: build
+	poetry publish
