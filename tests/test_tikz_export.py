@@ -23,6 +23,7 @@ def test_tikz():
         [oo, oo, oo, oo, oo, 3, 0],
     ]
     WeightedDirectedGraph.from_matrix(M).as_tikz()
+    WeightedDirectedGraph.from_matrix(M).as_tikz(border="dotted")
 
 
 def test_tikz_support():

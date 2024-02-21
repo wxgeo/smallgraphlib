@@ -47,10 +47,11 @@ class AbstractLabeledGraph(AbstractGraph, ABC, Generic[Label]):
 
     @cached_property
     def labeled_edges(self) -> tuple[LabeledEdge, ...]:
-        return tuple(  # type: ignore
+        # noinspection PyTypeChecker
+        return tuple(
             sorted(
                 (
-                    *edge,  # type: ignore
+                    *edge,
                     label,
                 )
                 for edge, labels in self._labels.items()
@@ -78,7 +79,7 @@ class AbstractLabeledGraph(AbstractGraph, ABC, Generic[Label]):
             edge_label_dict = {}
         edge_label_dict.update(edge_label)
         nodes = set(chain(*(edge for edge in edge_label_dict)))
-        return cls(nodes, *((*edge, label) for edge, label in edge_label_dict.items()))  # type: ignore
+        return cls(nodes, *((*edge, label) for edge, label in edge_label_dict.items()))
 
     @classmethod
     def from_string(cls: Type[_AbstractLabeledGraph], string: str) -> _AbstractLabeledGraph:

@@ -215,7 +215,7 @@ class TikzPrinter(Generic[Node]):
             r"\contourlength{0.15em}",
         ]
 
-    def tikz_code(self, graph, *, shuffle_nodes=False, options="") -> str:
+    def tikz_code(self, graph, *, shuffle_nodes=False, border: str = None, options="") -> str:
         r"""Generate tikz code corresponding to this graph.
 
         `Tikz` package must be loaded in the latex preamble, with `arrows.meta` library::
@@ -228,12 +228,22 @@ class TikzPrinter(Generic[Node]):
             \usepackage[outline]{contour}
             \contourlength{0.15em}
 
+        If set, `border` have to be a combination of tikz path drawing styles,
+        like "dotted", or "dashed,blue".
         """
+        if border:
+            return "".join(
+                [
+                    rf"\begin{{tikzpicture}}\node[rounded corners,draw,inner sep=2pt,{border}]{{",
+                    self.tikz_code(graph, shuffle_nodes=shuffle_nodes, options=options),
+                    r"};\end{tikzpicture}",
+                ]
+            )
         self.graph = graph
         self._reset()
         self.lines = [
             r"\providecommand{\contour}[2]{#2}"  # avoid an error if package contour is not loaded.
-            r"\begin{tikzpicture}["
+            r"\begin{tikzpicture}[solid,black,"
             r"every node/.style = {font={\scriptsize}},"
             r"vertex/.style = {draw, circle,font={\scriptsize},inner sep=2},"
             "directed/.style = {-{Stealth[scale=1.1]}},"
@@ -281,7 +291,7 @@ class TikzPrinter(Generic[Node]):
         # since it is in fact the same edge.
         # An easy way to do that is to keep index[node2] always superior or equal to index[node1].
         #
-        # Generating an simple-to-read graph is not so easy.
+        # Generating a simple-to-read graph is not so easy.
         # One should avoid labels' collisions notably.
         # For the edges joining adjacent nodes, the label should always be placed midway for readability.
         # For the other edges, different positions are tried to minimize collisions' risk.

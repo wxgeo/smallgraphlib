@@ -82,7 +82,7 @@ class AbstractGraph(ABC, Generic[Node]):
     @staticmethod
     def _matrix_as_tuple_of_tuples(matrix: Iterable[Iterable]) -> Tuple[Tuple, ...]:
         if hasattr(matrix, "tolist"):  # for numpy or sympy
-            matrix = matrix.tolist()  # type: ignore
+            matrix = matrix.tolist()
         M = tuple(tuple(iterable) for iterable in matrix)
         # Test if M is correct
         n = len(M)
@@ -117,7 +117,7 @@ class AbstractGraph(ABC, Generic[Node]):
 
         edges = cls._get_edges_from_adjacency_matrix(M)
 
-        g = cls(range(1, n + 1), *edges)  # type: ignore
+        g = cls(range(1, n + 1), *edges)
         if nodes_names:
             g.rename_nodes(dict(enumerate(list(nodes_names)[: len(g.nodes)], start=1)))
         return g
@@ -231,6 +231,8 @@ class AbstractGraph(ABC, Generic[Node]):
         >>> g.is_isomorphic_to(g2)
         True
         """
+        # Sort nodes before shuffling, to make shuffling deterministic with a given random.seed.
+        # nodes = sorted(self.nodes)
         nodes = list(self.nodes)
         random.shuffle(nodes)
         self.rename_nodes(dict((old_name, new_name) for old_name, new_name in zip(self.nodes, nodes)))
@@ -307,7 +309,7 @@ class AbstractGraph(ABC, Generic[Node]):
     def __eq__(self, other: Any):
         # Attention, there may be multiple edges, so don't use sets to compare edges !
         return (
-            type(self) == type(other)
+            type(self) is type(other)
             and self.nodes_set == other.nodes_set
             and Counter(self.edges) == Counter(other.edges)
         )
@@ -741,7 +743,7 @@ class AbstractGraph(ABC, Generic[Node]):
         """Overwrite this method to modify tikz value for some labels."""
         return self.labels(node1, node2)
 
-    def as_tikz(self, *, shuffle_nodes=False, options="") -> str:
+    def as_tikz(self, *, shuffle_nodes=False, border: str = None, options="") -> str:
         r"""Generate tikz code corresponding to this graph.
 
         `Tikz` package must be loaded in the latex preamble, with `arrows.meta` library::
@@ -754,8 +756,10 @@ class AbstractGraph(ABC, Generic[Node]):
             \usepackage[outline]{contour}
             \contourlength{0.5pt}
 
+        If set, `border` have to be a combination of tikz path drawing styles,
+        like "dotted", or "dashed,blue".
         """
-        return tikz_printer.tikz_code(self, shuffle_nodes=shuffle_nodes, options=options)
+        return tikz_printer.tikz_code(self, shuffle_nodes=shuffle_nodes, border=border, options=options)
 
 
 class InvalidGraphAttribute(AttributeError):

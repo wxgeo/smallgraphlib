@@ -5,17 +5,14 @@ from smallgraphlib.custom_types import Node
 
 
 class Tree:
-    branches: tuple["Tree", ...]
-
     def __init__(self, root: Node, *branches: "Tree") -> None:
         self.root = root
-        self.branches = branches
+        self.branches: tuple["Tree", ...] = branches
 
 
 class HuffmanTree(Tree):
-    branches: tuple["HuffmanTree", ...]
-
     def __init__(self, *branches: "HuffmanTree", char: str = None, weight: int = None) -> None:
+        self.branches: tuple["HuffmanTree", ...]
         if len(branches) == 2:
             if char is not None or weight is not None:
                 raise ValueError("Char and weight can't be set, except for leaves.")

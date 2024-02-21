@@ -1,5 +1,5 @@
 from abc import ABC
-from typing import Iterable, Generic, TypeVar, NewType, cast
+from typing import Iterable, Generic, TypeVar, NewType, cast, Final
 
 from smallgraphlib.string2automaton import StringToAutomatonParser
 
@@ -10,7 +10,7 @@ from smallgraphlib.utilities import cached_property
 _T = TypeVar("_T", bound="Automaton")
 Char = NewType("Char", str)
 
-GREEK_LETTERS = (
+GREEK_LETTERS: Final[tuple[str, ...]] = (
     "alpha",
     "beta",
     "gamma",

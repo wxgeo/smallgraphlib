@@ -34,9 +34,9 @@ class Tree:
             if edges_labels:  # should be empty now
                 raise ValueError("Unknown edges: " + ", ".join(str(edge) for edge in edges_labels))
             if all(isinstance(value, Real) for value in edges_labels.values()):
-                self._graph = WeightedGraph(nodes, *labeled_edges)  # type: ignore
+                self._graph = WeightedGraph(nodes, *labeled_edges)
             else:
-                self._graph = LabeledGraph(nodes, *labeled_edges)  # type: ignore
+                self._graph = LabeledGraph(nodes, *labeled_edges)
 
     @property
     def root(self) -> Node:  # type: ignore
