@@ -67,6 +67,18 @@ class AbstractGraph(ABC, Generic[Node]):
     # ------------------
 
     @classmethod
+    def from_dict(cls: Type[_AbstractGraph], d: dict[Node, Iterable[Node]]) -> _AbstractGraph:
+        """DirectedGraph.from_dict({1: [2, 3], 2: [], 3: [1]}) will generate a graph of
+        3 nodes, 1, 2 and 3, with edges 1->2, 1->3 and 3->1."""
+        nodes: set[Node] = set()
+        edges: list[Tuple[Node, Node]] = []
+        for start, ends in d.items():
+            nodes.add(start)
+            nodes.update(ends)
+            edges.extend((start, end) for end in ends)
+        return cls(nodes, *edges)
+
+    @classmethod
     def from_string(cls: Type[_AbstractGraph], string: str) -> _AbstractGraph:
         """DirectedGraph.from_string("A:B,C B:C C") will generate a graph of 3 nodes, A, B and C, with
         edges A->B, A->C and B->C."""

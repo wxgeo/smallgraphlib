@@ -241,7 +241,7 @@ def test_complete_bipartite():
     assert g.diameter == 2
 
 
-def test_graph_constructor():
+def test_graph_string():
     g = graph("A:B,C B:C C")
     assert g.degree == 3
     assert not g.is_directed
@@ -258,6 +258,12 @@ def test_graph_constructor():
     g = graph("A:B='some text with space',C=text_without_space B:C=2.5 C D")
     assert not g.is_directed
     assert g.labels("A", "B") == ["some text with space"]
+
+
+def test_graph_from_dict():
+    g = DirectedGraph.from_dict({1: (2, 2, 3), 4: []})
+    assert sorted(g.nodes) == [1, 2, 3, 4]
+    assert sorted(g.edges) == [(1, 2), (1, 2), (1, 3)]
 
 
 def test_single_node_renaming():
