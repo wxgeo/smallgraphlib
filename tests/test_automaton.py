@@ -138,9 +138,11 @@ def test_Automaton_repr_eq():
 def test_Acceptor_alphabet_name():
     g1 = Acceptor.from_string(">I:a--1;b / (1):a|b--I")
     g2 = Acceptor.from_string(">I:a--1;b / (1):**--I")
+    g5 = Acceptor.from_string(">I:a--1;b / (1):ALL--I")
     g3 = Acceptor.from_string(">I:a--1;b / (1):A--I", alphabet_name="A")
     g4 = Acceptor.from_string(r">I:a--1;b / (1):\Sigma--I", alphabet_name=r"\Sigma")
     assert g2 == g1
+    assert g2 == g5
     assert g3 == g1
     assert g4 == g1
     assert g1._tikz_labels("1", "I") == [r"$a$,$b$"]
@@ -153,6 +155,10 @@ def test_Acceptor_tikz():
     Acceptor.from_string(">I:a--I|1  /  (1)--b--I|1").as_tikz()
     Acceptor.from_string(">I:a--I;b--1 / (1)--a--1;b--I").as_tikz()
     Acceptor.from_string(">(I):a--1 / 1:b--2 / (2):b--I").as_tikz()
+
+
+def test_Acceptor_tikz_bug():
+    Acceptor.from_string(">I:a|b").as_tikz()
 
 
 def test_epsilon_transition():

@@ -1,7 +1,7 @@
 import math
 import random
 
-from smallgraphlib import WeightedDirectedGraph, random_graph
+from smallgraphlib import WeightedDirectedGraph, random_graph, Graph
 from smallgraphlib.tikz_export import (
     segments_intersection,
     barycenter,
@@ -31,6 +31,11 @@ def test_tikz_support():
         random.seed(seed)
         g = random_graph(4, 6, directed=True)
         g.as_tikz()
+
+
+def test_tikz_single_node():
+    g = Graph(["I"])
+    g.as_tikz()
 
 
 def test_intersection():

@@ -302,12 +302,13 @@ class TikzPrinter(Generic[Node]):
 
         # Then, draw the edges joining neighbours, since the label position is fixed.
         # (The label is always positioned midway because those edges are short).
-        for i, node in enumerate(nodes):
-            self._generate_edge(node, nodes[(i + 1) % len(nodes)])
+        if len(nodes) >= 2:
+            for i, node in enumerate(nodes):
+                self._generate_edge(node, nodes[(i + 1) % len(nodes)])
 
-        for node1 in nodes:
-            for node2 in nodes[self.index[node1] + 2 :]:
-                self._generate_edge(node1, node2)
+            for node1 in nodes:
+                for node2 in nodes[self.index[node1] + 2 :]:
+                    self._generate_edge(node1, node2)
 
         self.lines.append(r"\end{tikzpicture}")
         return "\n".join(self.lines)

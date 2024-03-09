@@ -210,7 +210,7 @@ class Acceptor(Automaton, Generic[Node]):
     ) -> "Acceptor":
         """Constructor used to generate an automaton from a string.
 
-            >>> Acceptor.from_string(">(I)--a|b--1  /  (1)--a--2;b--3  /  (2)--a--1|I  /  3")
+            >>> Acceptor.from_string(">(I):a|b--1  /  (1):a--2;b--3  /  (2):a--1|I  /  3")
 
         will generate an automaton of 4 states: `I`, `1`, `2` and `3`,
         each state information being separated by `/`.
@@ -220,14 +220,14 @@ class Acceptor(Automaton, Generic[Node]):
             - The parentheses `()` around states `I`, `1` and `2` mean those states will be final.
             - The `>` before state `I` means it's the initial state.
 
-        After the state name, `--` will introduce the eventual transitions:
+        After the state name, `:` will introduce the eventual transitions:
 
-            - `I--a|b--1` means that reading `a` or `b` while being in state `I` leads to state `1`.
-            - `1--a--2|b--3` means that in state `1`, reading `a` leads to state `2`
+            - `I:a|b--1` means that reading `a` or `b` while being in state `I` leads to state `1`.
+            - `1:a--2;b--3` means that in state `1`, reading `a` leads to state `2`
               and reading `b` leads to state `3`.
-            - `2--a--1|I` means that in state `2`, reading `a` leads either to state `1` or to state `I`.
+            - `2:a--1|I` means that in state `2`, reading `a` leads either to state `1` or to state `I`.
 
-        If the letter is left empty, like in `2-- --1`, an epsilon-transition is assumed
+        If the letter is left empty, like in `2:--1`, an epsilon-transition is assumed
         (transition without reading any letter).
 
         Separators may be changed using `sep` keyword:
@@ -236,18 +236,23 @@ class Acceptor(Automaton, Generic[Node]):
             ...    ">(I):a,b:1 ; (1):a:2+b:3 ; (2):a:1,I ; 3", sep=(";", ":", "+", ":", ",")
             ...    )
 
-        If a transition applies for every letter, one may use the alphabet name or `**` instead of listing
-        all the letters.
+        If a transition applies for every letter, one may use the alphabet name, `**` or `ALL`
+        instead of listing all the letters.
 
-            >>> Acceptor.from_string(">I--a--1;b / (1)--**--I")
+            >>> Acceptor.from_string(">I:a--1;b / (1):**--I")
         """
         data = StringToAutomatonParser(sep).parse(string)
         if alphabet is None:
             # `**` notation stands for all alphabet's letters.
-            alphabet = {letter for state, next_state, letter in data.transitions} - {"**", alphabet_name, ""}
+            alphabet = {letter for state, next_state, letter in data.transitions} - {
+                "**",
+                alphabet_name,
+                "",
+                "ALL",
+            }
         transitions: list[tuple[str, str, str]] = []
         for state, next_state, letter in data.transitions:
-            if letter == alphabet_name or letter == "**":
+            if letter == alphabet_name or letter == "**" or letter == "ALL":
                 transitions.extend((state, next_state, alpha) for alpha in alphabet)
             else:
                 transitions.append((state, next_state, letter))
