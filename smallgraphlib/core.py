@@ -17,6 +17,8 @@ from typing import (
     Iterator,
     Sequence,
     Type,
+    Callable,
+    Self,
 )
 
 from smallgraphlib.custom_types import _AbstractGraph, Node, Edge, EdgeLike
@@ -748,6 +750,33 @@ class AbstractGraph(ABC, Generic[Node]):
             visited.add(node)
             yield node
             queue.extend(successor for successor in self._successors[node] if successor not in visited)
+
+    def find_path(
+        self, start: Node, end: Node, _filter: Callable[[Self, Node, Node], bool] = (lambda _, __, ___: True)
+    ) -> list[Node]:
+        """Return a path between nodes `start` and `end`, if any, or an empty list.
+
+        If defined, `_filter` is a boolean function, which takes three arguments: the calling class, the current node
+        and its successor.  If `_filter(self, node1, node2)` returns `False`, the edge (node1, node2), if it exists,
+        will be ignored.
+        """
+        previous: dict[Node, Node] = {}
+        queue: deque[Node] = deque([start])
+        while end not in previous and len(queue) > 0:
+            # BFS
+            node = queue.popleft()
+            for successor in self.successors(node):
+                if _filter(self, node, successor):
+                    # If successor was never seen before, append it to queue.
+                    if successor not in previous:
+                        previous[successor] = node
+                        queue.append(successor)
+        if end in previous:
+            path = [end]
+            while path[-1] != start:
+                path.append(previous[path[-1]])
+            return list(reversed(path))
+        return []
 
     def _tikz_specific_node_style(self, node: Node) -> str:
         """Overwrite this method to add a specific tikz style to some nodes."""

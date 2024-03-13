@@ -15,7 +15,7 @@ class Tree(Generic[Node]):
 
 class HuffmanTree(Tree[tuple[int, str]]):
     def __init__(self, *branches: "HuffmanTree", char: str = None, weight: int = None) -> None:
-        self.branches: tuple["HuffmanTree", ...]
+        self.branches: tuple["HuffmanTree", ...] = branches  # Just for Pycharm to handle correctly the type!
         if len(branches) == 2:
             if char is not None or weight is not None:
                 raise ValueError("Char and weight can't be set, except for leaves.")

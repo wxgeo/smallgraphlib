@@ -270,8 +270,16 @@ class AbstractWeightedGraph(AbstractLabeledGraph, ABC, Generic[Node, Label]):
             g.rename_nodes(dict(enumerate(list(nodes_names)[: len(g.nodes)], start=1)))
         return g
 
+    def get_path_capacity(self, path: list[Node]):
+        """Return the capacity of the path, which is the smallest weight of any of its edges."""
+        return min(self.weight(node1, node2) for node1, node2 in zip(path[:-1], path[1:]))
 
-class WeightedGraph(AbstractWeightedGraph, LabeledGraph, Generic[Node, Label]):
+    def get_path_weight(self, path: list[Node]):
+        """Return the weight of the path, which is the sum of those of its edges."""
+        return sum(self.weight(node1, node2) for node1, node2 in zip(path[:-1], path[1:]))
+
+
+class WeightedGraph(AbstractWeightedGraph, LabeledGraph, Generic[Node]):
     """A weighted undirected graph, i.e. an undirected graph where all edges have a positive weight."""
 
     @staticmethod
@@ -351,7 +359,7 @@ class WeightedGraph(AbstractWeightedGraph, LabeledGraph, Generic[Node, Label]):
         return WeightedGraph(connected_nodes, *weighted_edges)
 
 
-class WeightedDirectedGraph(AbstractWeightedGraph, LabeledDirectedGraph):
+class WeightedDirectedGraph(AbstractWeightedGraph, LabeledDirectedGraph, Generic[Node]):
     """A directed graph with weights (i.e. positive floats) associated to its edges."""
 
     @staticmethod

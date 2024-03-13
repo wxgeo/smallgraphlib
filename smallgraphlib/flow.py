@@ -1,18 +1,18 @@
-from typing import Iterable
-from collections import deque
+from typing import Iterable, Generic, Callable, Self
 
-from smallgraphlib.labeled_graphs import WeightedDirectedGraph, WeightedEdge
+from smallgraphlib.labeled_graphs import WeightedDirectedGraph
 
-from smallgraphlib.basic_graphs import DirectedGraph
-from smallgraphlib.custom_types import Node, EdgeLike
-from smallgraphlib.utilities import cached_property
+from smallgraphlib.custom_types import Node
+from smallgraphlib.utilities import cached_property, clear_cache
+
+CapacityEdge = tuple[Node, Node, int]
 
 
-class FlowNetwork(WeightedDirectedGraph):
+class FlowNetwork(WeightedDirectedGraph, Generic[Node]):
     def __init__(
         self,
         nodes: Iterable[Node],
-        *weighted_edges: WeightedEdge,
+        *weighted_edges: CapacityEdge,
         sort_nodes: bool = True,
     ):
         self._initialized = False
@@ -44,27 +44,54 @@ class FlowNetwork(WeightedDirectedGraph):
             raise ValueError("No sink detected!")
         return sinks[0]
 
-    def get_path(self, start: Node, end: Node) -> list[Node]:
-        """Return a path between nodes `start` and `end`, if any, or an empty list."""
-        previous: dict[Node, Node] = {}
-        queue: deque[Node] = deque([start])
-        while end not in previous and len(queue) > 0:
-            # BFS
-            node = queue.popleft()
-            for successor in self.successors(node):
-                # If successor was never seen before, append it to queue.
-                if successor not in previous:
-                    previous[successor] = node
-                    queue.append(successor)
-        if end in previous:
-            path = [end]
-            while path[-1] != start:
-                path.append(previous[path[-1]])
-            return list(reversed(path))
-        return []
+    def get_residual(self, current_flow: "FlowNetwork[Node]") -> WeightedDirectedGraph[Node]:
+        capacity = self.as_dict()
+        current = current_flow.as_dict()
+        if set(capacity) != set(current):
+            raise ValueError("Both flows must have the same edges.")
+        residual: dict[tuple[Node, Node], int] = {}
+        for key in capacity:
+            residual[key] = capacity[key] - current[key]
+            residual[(key[1], key[0])] = current[key]
+        return WeightedDirectedGraph.from_dict(residual)
+
+    def find_path(
+        self,
+        start: Node,
+        end: Node,
+        _filter: Callable[[Self, Node, Node], bool] = (
+            lambda self, node1, node2: self.weight(node1, node2) > 0
+        ),
+    ) -> list[Node]:
+        return super().find_path(start, end, _filter=_filter)
 
     def get_max_flow(self) -> "FlowNetwork":
-        flow = self.copy()
+        def _filter(self, node1, node2):
+            return self.weight(node1, node2) > 0
+
+        flow: FlowNetwork[Node] = FlowNetwork.from_dict(dict.fromkeys(self.as_dict(), 0))
+        while (
+            len(
+                path := (residual := self.get_residual(flow)).find_path(
+                    self.source, self.sink, _filter=_filter
+                )
+            )
+            > 0
+        ):
+            additional_capacity = residual.get_path_capacity(path)
+            assert additional_capacity > 0
+            for node1, node2 in zip(path[:-1], path[1:]):
+                flow.set_capacity(node1, node2, flow.weight(node1, node2) + additional_capacity)
+        return flow
+
+    def get_max_flow_value(self) -> float:
+        return sum(
+            self.get_max_flow().weight(self.source, successor) for successor in self.successors(self.source)
+        )
+
+    @clear_cache
+    def set_capacity(self, node1, node2, value: int) -> None:
+        self._labels[(node1, node2)] = [value]
 
     # def get_residual_network(self, flow: "Flow") -> "Flow":
     #     ...
