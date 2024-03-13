@@ -6,11 +6,9 @@ Created on Sat May  7 12:24:58 2022
 @author: nicolas
 """
 from typing import (
-    Tuple,
-    Dict,
-    List,
     FrozenSet,
     Sequence,
+    Generic,
 )
 
 from smallgraphlib.core import (
@@ -23,7 +21,7 @@ from smallgraphlib.utilities import (
 )
 
 
-class Graph(AbstractGraph):
+class Graph(AbstractGraph, Generic[Node]):
     """A graph with undirected edges.
 
     >>> G = Graph((1, 2, 3), {1, 3}, {1, 2}, {2, 1}, {1})
@@ -32,7 +30,7 @@ class Graph(AbstractGraph):
     @staticmethod
     def _get_edges_from_adjacency_matrix(
         matrix: Sequence[Sequence[int]],
-    ) -> List[Tuple[int, int]]:
+    ) -> list[tuple[int, int]]:
         edges = []
         for i in range(len(matrix)):
             for j in range(i + 1):  # we must only deal with i <= j, since it is an undirected graph.
@@ -90,8 +88,8 @@ class Graph(AbstractGraph):
         return self._test_connection_from_node(next(iter(self.nodes)))
 
     @cached_property
-    def greedy_coloring(self) -> Dict[Node, int]:
-        coloring: Dict[Node, int] = {}
+    def greedy_coloring(self) -> dict[Node, int]:
+        coloring: dict[Node, int] = {}
         # Sort nodes by reversed degree, then alphabetically
         nodes = sorted(self.nodes, key=(lambda _node: (-self.node_degree(_node), _node)))
         for node in nodes:
@@ -136,7 +134,7 @@ class Graph(AbstractGraph):
         return all(self.are_adjacents(node1, node2) for node1 in nodes_group for node2 in other_group)
 
 
-class DirectedGraph(AbstractGraph):
+class DirectedGraph(AbstractGraph, Generic[Node]):
     """A graph with directed edges.
 
     >>> G = DirectedGraph((1, 2, 3), (1, 3), (1, 2), (2, 1), (1, 1))
@@ -145,7 +143,7 @@ class DirectedGraph(AbstractGraph):
     @staticmethod
     def _get_edges_from_adjacency_matrix(
         matrix: Sequence[Sequence[int]],
-    ) -> List[Tuple[int, int]]:
+    ) -> list[tuple[int, int]]:
         edges = []
         for i in range(len(matrix)):
             for j in range(len(matrix)):
@@ -189,9 +187,9 @@ class DirectedGraph(AbstractGraph):
         return start_found and end_found
 
     @cached_property
-    def levels(self) -> Tuple[FrozenSet[Node], ...]:
+    def levels(self) -> tuple[FrozenSet[Node], ...]:
         graph = self.copy()
-        levels: List[FrozenSet] = []
+        levels: list[FrozenSet] = []
         while True:
             level = set()
             for node in graph.nodes:
@@ -266,7 +264,7 @@ class DirectedGraph(AbstractGraph):
         return M
 
     @cached_property
-    def transitive_closure_matrix(self) -> Tuple[Tuple[int, ...], ...]:
+    def transitive_closure_matrix(self) -> tuple[tuple[int, ...], ...]:
         """Return the matrix of the transitive closure."""
         # Make a mutable copy of the adjacency matrix.
         M = [list(line) for line in self.adjacency_matrix]

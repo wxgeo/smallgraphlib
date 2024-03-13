@@ -5,7 +5,7 @@ from abc import ABC, abstractmethod
 from itertools import chain
 from math import inf
 from numbers import Real
-from typing import Iterable, Tuple, Dict, List, TypeVar, Generic, Any, Sequence, Type
+from typing import Iterable, TypeVar, Generic, Any, Sequence, Type
 
 from smallgraphlib.basic_graphs import Graph, DirectedGraph
 from smallgraphlib.core import AbstractGraph, InvalidGraphAttribute
@@ -15,11 +15,11 @@ from smallgraphlib.utilities import cached_property
 _AbstractLabeledGraph = TypeVar("_AbstractLabeledGraph", bound="AbstractLabeledGraph")
 _AbstractWeightedGraph = TypeVar("_AbstractWeightedGraph", bound="AbstractWeightedGraph")
 Label = TypeVar("Label")
-LabeledEdge = Tuple[Node, Node, Label]
-WeightedEdge = Tuple[Node, Node, float]
+LabeledEdge = tuple[Node, Node, Label]
+WeightedEdge = tuple[Node, Node, float]
 
 
-class AbstractLabeledGraph(AbstractGraph, ABC, Generic[Label]):
+class AbstractLabeledGraph(AbstractGraph, ABC, Generic[Node, Label]):
     """Abstract class for all labeled graphs, don't use it directly."""
 
     def __init__(
@@ -28,8 +28,8 @@ class AbstractLabeledGraph(AbstractGraph, ABC, Generic[Label]):
         *labeled_edges: LabeledEdge,
         sort_nodes: bool = True,
     ):
-        edges: List[Edge] = []
-        self._labels: Dict[Edge, List[Label]] = {}
+        edges: list[Edge] = []
+        self._labels: dict[Edge, list[Label]] = {}
         for *edge, label in labeled_edges:
             edges.append(edge)  # type: ignore
             self._labels.setdefault(self._edge(*edge), []).append(label)
@@ -110,8 +110,8 @@ class AbstractLabeledGraph(AbstractGraph, ABC, Generic[Label]):
         """
         # Convert spaces inside labels to null characters, to make splitting easier.
         string = re.sub("""'[^']*'|"[^"]*""", (lambda m: m.group().replace(" ", "\x00")), string)
-        nodes: List[str] = []
-        edges: List[Tuple[str, str, Any]] = []
+        nodes: list[str] = []
+        edges: list[tuple[str, str, Any]] = []
         label: Any
         for substring in string.split():
             node, *remaining = substring.split(":", 1)
@@ -132,14 +132,14 @@ class AbstractLabeledGraph(AbstractGraph, ABC, Generic[Label]):
                     else:
                         label = None
                     edges.append((node, successor.strip(), label))
-        return cls(nodes, *edges)  # type: ignore
+        return cls(nodes, *edges)
 
-    def labels(self, node1: Node, node2: Node) -> List[str]:
+    def labels(self, node1: Node, node2: Node) -> list[str]:
         labels = self._labels.get(self._edge(node1, node2), [])
         assert len(labels) == self.count_edges(node1, node2, count_undirected_loops_twice=False)
         return [str(label if label is not None else "") for label in labels]
 
-    def rename_nodes(self, node_names: Dict[Node, Node]) -> None:
+    def rename_nodes(self, node_names: dict[Node, Node]) -> None:
         super().rename_nodes(node_names)
         # Rename nodes in self._labels dict.
         old_labels = self._labels.copy()
@@ -165,7 +165,7 @@ class LabeledDirectedGraph(AbstractLabeledGraph, DirectedGraph):
     pass
 
 
-class AbstractWeightedGraph(AbstractLabeledGraph, ABC):
+class AbstractWeightedGraph(AbstractLabeledGraph, ABC, Generic[Node, Label]):
     """Abstract class for all weighted graphs, don't use it directly."""
 
     def __init__(
@@ -193,7 +193,7 @@ class AbstractWeightedGraph(AbstractLabeledGraph, ABC):
             return False
 
     @property
-    def weights(self) -> Dict[Edge, List[float]]:
+    def weights(self) -> dict[Edge, list[float]]:
         return self._labels
 
     def weight(self, node1: Node, node2: Node, *, aggregator=min, default: float = inf) -> float:
@@ -240,7 +240,7 @@ class AbstractWeightedGraph(AbstractLabeledGraph, ABC):
     @abstractmethod
     def _get_edges_from_weights_matrix(
         matrix: Sequence[Sequence[float]],
-    ) -> List[Tuple[int, int, float]]:
+    ) -> list[tuple[int, int, float]]:
         ...
 
     @classmethod
@@ -265,19 +265,19 @@ class AbstractWeightedGraph(AbstractLabeledGraph, ABC):
 
         edges = cls._get_edges_from_weights_matrix(M)
 
-        g = cls(range(1, n + 1), *edges)  # type: ignore
+        g = cls(range(1, n + 1), *edges)
         if nodes_names:
-            g.rename_nodes(dict(enumerate(list(nodes_names)[: len(g.nodes)], start=1)))  # type: ignore
+            g.rename_nodes(dict(enumerate(list(nodes_names)[: len(g.nodes)], start=1)))
         return g
 
 
-class WeightedGraph(AbstractWeightedGraph, LabeledGraph):
+class WeightedGraph(AbstractWeightedGraph, LabeledGraph, Generic[Node, Label]):
     """A weighted undirected graph, i.e. an undirected graph where all edges have a positive weight."""
 
     @staticmethod
     def _get_edges_from_weights_matrix(
         matrix: Sequence[Sequence[float]],
-    ) -> List[Tuple[int, int, float]]:
+    ) -> list[tuple[int, int, float]]:
         edges = []
         for i in range(len(matrix)):
             for j in range(i + 1):  # we must only deal with i <= j, since it is an undirected graph.
@@ -309,13 +309,13 @@ class WeightedGraph(AbstractWeightedGraph, LabeledGraph):
         """
         # Nodes and edges of the spanning tree.
         last_connected_node = self.nodes[0]
-        connected_nodes: List[Node] = [last_connected_node]  # type: ignore
-        weighted_edges: List[WeightedEdge] = []
+        connected_nodes: list[Node] = [last_connected_node]
+        weighted_edges: list[WeightedEdge] = []
 
         # Nodes which may be connected, with the current cost of connection, i.e. the minimal edge's weight
         # enabling to connect it to the spanning tree.
-        cheapest_cost: Dict[Node, float] = {}  # type: ignore
-        cheapest_edge: Dict[Node, Node] = {}  # type: ignore
+        cheapest_cost: dict[Node, float] = {}
+        cheapest_edge: dict[Node, Node] = {}
         unreached_nodes = set(self.nodes) - set(connected_nodes)
 
         while True:
@@ -357,7 +357,7 @@ class WeightedDirectedGraph(AbstractWeightedGraph, LabeledDirectedGraph):
     @staticmethod
     def _get_edges_from_weights_matrix(
         matrix: Sequence[Sequence[float]],
-    ) -> List[Tuple[int, int, float]]:
+    ) -> list[tuple[int, int, float]]:
         edges = []
         for i in range(len(matrix)):
             for j in range(len(matrix)):

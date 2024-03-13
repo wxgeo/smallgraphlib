@@ -1,5 +1,5 @@
 import random
-from typing import List, Tuple, Iterable
+from typing import Iterable
 
 
 from smallgraphlib.custom_types import Node, Edge
@@ -77,8 +77,8 @@ def perfect_binary_tree(height: int):
 
     In a perfect binary tree, each node has two children, except in last level.
     """
-    nodes: List[int] = []
-    edges: List[Edge] = []
+    nodes: list[int] = []
+    edges: list[Edge] = []
     for level in range(height):
         nodes.extend(range(1 << level, 1 << level + 1))
     for level in range(height - 1):
@@ -151,8 +151,8 @@ def random_graph(
     if degree > max_degree:
         raise ValueError(f"Degree must not exceed {max_degree} with given contraints.")
 
-    nodes: List[int] = list(range(1, order + 1))
-    edges: List[Tuple[int, int]] = []
+    nodes: list[int] = list(range(1, order + 1))
+    edges: list[tuple[int, int]] = []
 
     # fmt: off
     # Keep track of remaining edges possibilities, for each (start, end) nodes couple.

@@ -1,16 +1,19 @@
 from collections import Counter
 from operator import attrgetter
+from typing import Generic
 
 from smallgraphlib.custom_types import Node
 
 
-class Tree:
+class Tree(Generic[Node]):
+    """A tree defined as a recursive structure."""
+
     def __init__(self, root: Node, *branches: "Tree") -> None:
         self.root = root
         self.branches: tuple["Tree", ...] = branches
 
 
-class HuffmanTree(Tree):
+class HuffmanTree(Tree[tuple[int, str]]):
     def __init__(self, *branches: "HuffmanTree", char: str = None, weight: int = None) -> None:
         self.branches: tuple["HuffmanTree", ...]
         if len(branches) == 2:
@@ -23,6 +26,8 @@ class HuffmanTree(Tree):
             raise ValueError(f"There must be either 0 or 2 branches, not {len(branches)}.")
         char = min(branch.char for branch in branches) if branches else char
         weight = sum(branch.weight for branch in branches) if branches else weight
+        assert char is not None
+        assert weight is not None
         super().__init__((weight, char), *branches)
 
     @classmethod
@@ -42,11 +47,11 @@ class HuffmanTree(Tree):
         return trees.pop()
 
     @property
-    def weight(self):
+    def weight(self) -> int:
         return self.root[0]
 
     @property
-    def char(self):
+    def char(self) -> str:
         return self.root[1]
 
     @property
@@ -119,12 +124,12 @@ class HuffmanTree(Tree):
             for key, value in branch.labels.items()
         }
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         if self.is_leaf:
             return f"HuffmanTree(char={self.char}, weight={self.weight})"
         return f"HuffmanTree({self.left_branch!r}, {self.right_branch!r})"
 
-    def __str__(self):
+    def __str__(self) -> str:
         lines = []
         shift = len(str(self.weight)) + 1
         for n, line in enumerate(str(self.left_branch).split("\n")):

@@ -1,5 +1,5 @@
 from numbers import Real
-from typing import Iterable, Any, Dict, Set, Tuple, Iterator
+from typing import Iterable, Any, Set, Iterator, Generic
 
 from smallgraphlib import Graph, WeightedGraph, LabeledGraph
 from smallgraphlib.core import (
@@ -10,7 +10,7 @@ from smallgraphlib.core import (
 from smallgraphlib.custom_types import Node, Edge
 
 
-class Tree:
+class Tree(Generic[Node]):
     """A rooted tree."""
 
     def __init__(
@@ -18,14 +18,14 @@ class Tree:
         nodes: Iterable[Node],
         root: Node = None,
         *edges: Edge,
-        nodes_labels: Dict[Node, Any] = None,
-        edges_labels: Dict[Edge, Any] = None,
+        nodes_labels: dict[Node, Any] = None,
+        edges_labels: dict[Edge, Any] = None,
     ):
         if root is None:
             root = next(iter(nodes))
         self._root = root
         if edges_labels is None:
-            self._graph = Graph(nodes, *edges)
+            self._graph: Graph[Node] = Graph(nodes, *edges)
         else:
             edges_labels = edges_labels.copy()
             labeled_edges = []
@@ -39,18 +39,18 @@ class Tree:
                 self._graph = LabeledGraph(nodes, *labeled_edges)
 
     @property
-    def root(self) -> Node:  # type: ignore
+    def root(self) -> Node:
         return self._root
 
-    def as_graph(self) -> AbstractGraph:
+    def as_graph(self) -> AbstractGraph[Node]:
         return self._graph.copy()
 
     @property
-    def nodes(self) -> Tuple[Node, ...]:
+    def nodes(self) -> tuple[Node, ...]:
         return self._graph.nodes
 
     @property
-    def edges(self) -> Tuple[Edge, ...]:
+    def edges(self) -> tuple[Edge, ...]:
         return self._graph.edges
 
     def children(self, node: Node) -> Set[Node]:

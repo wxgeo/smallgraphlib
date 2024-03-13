@@ -11,8 +11,6 @@ from typing import (
     Set,
     Iterable,
     Any,
-    Dict,
-    List,
     Generic,
     Counter as CounterType,
     Optional,
@@ -51,9 +49,9 @@ class AbstractGraph(ABC, Generic[Node]):
         then two edges are added, one from A to B and one from B to A.
         Note that in that case, adding {A} will result in two edges too.
         """
-        self._successors: Dict[Node, CounterType[Node]] = {}
+        self._successors: dict[Node, CounterType[Node]] = {}
         if self.is_directed:
-            self._predecessors: Dict[Node, CounterType[Node]] = {}
+            self._predecessors: dict[Node, CounterType[Node]] = {}
         else:
             self._predecessors = self._successors
         # Nodes must be added before edges.
@@ -71,7 +69,7 @@ class AbstractGraph(ABC, Generic[Node]):
         """DirectedGraph.from_dict({1: [2, 3], 2: [], 3: [1]}) will generate a graph of
         3 nodes, 1, 2 and 3, with edges 1->2, 1->3 and 3->1."""
         nodes: set[Node] = set()
-        edges: list[Tuple[Node, Node]] = []
+        edges: list[tuple[Node, Node]] = []
         for start, ends in d.items():
             nodes.add(start)
             nodes.update(ends)
@@ -82,8 +80,8 @@ class AbstractGraph(ABC, Generic[Node]):
     def from_string(cls: Type[_AbstractGraph], string: str) -> _AbstractGraph:
         """DirectedGraph.from_string("A:B,C B:C C") will generate a graph of 3 nodes, A, B and C, with
         edges A->B, A->C and B->C."""
-        nodes: List[str] = []
-        edges: List[Tuple[str, str]] = []
+        nodes: list[str] = []
+        edges: list[tuple[str, str]] = []
         for substring in string.split():
             node, *remaining = substring.split(":", 1)
             nodes.append(node.strip())
@@ -92,7 +90,7 @@ class AbstractGraph(ABC, Generic[Node]):
         return cls(nodes, *edges)
 
     @staticmethod
-    def _matrix_as_tuple_of_tuples(matrix: Iterable[Iterable]) -> Tuple[Tuple, ...]:
+    def _matrix_as_tuple_of_tuples(matrix: Iterable[Iterable]) -> tuple[Tuple, ...]:
         if hasattr(matrix, "tolist"):  # for numpy or sympy
             matrix = matrix.tolist()
         M = tuple(tuple(iterable) for iterable in matrix)
@@ -106,7 +104,7 @@ class AbstractGraph(ABC, Generic[Node]):
     @abstractmethod
     def _get_edges_from_adjacency_matrix(
         matrix: Sequence[Sequence[int]],
-    ) -> List[Tuple[int, int]]:
+    ) -> list[tuple[int, int]]:
         ...
 
     @classmethod
@@ -140,7 +138,7 @@ class AbstractGraph(ABC, Generic[Node]):
 
     # Nodes must be ordered, to generate the matrix, so do *not* return a set.
     @cached_property
-    def nodes(self) -> Tuple[Node, ...]:
+    def nodes(self) -> tuple[Node, ...]:
         return tuple(self._successors)
 
     @cached_property
@@ -184,7 +182,7 @@ class AbstractGraph(ABC, Generic[Node]):
                     counter[new_name] = counter.pop(old_name)
 
     @clear_cache
-    def rename_nodes(self, node_names: Dict[Node, Node]) -> None:
+    def rename_nodes(self, node_names: dict[Node, Node]) -> None:
         if not node_names:
             return
         # First, we must assure the atomicity of the renaming operation:
@@ -223,7 +221,7 @@ class AbstractGraph(ABC, Generic[Node]):
         # for example, we must avoid that applying {A -> B, B -> C} will result in A −> C !
         # The solution is to use temporary names when renaming.
         # Something like {A -> tmp_B, B -> tmp_C} and then {tmp_B -> B, tmp_C -> C}.
-        remaining_translation: List[Node] = []
+        remaining_translation: list[Node] = []
         # Use list() to make a copy of the dictionary keys and values, since we modify the dictionary.
         for i, (old_name, new_name) in enumerate(list(node_names.items())):
             self.rename_node(old_name, "\00" + str(i))
@@ -254,7 +252,7 @@ class AbstractGraph(ABC, Generic[Node]):
     # ------------
 
     @cached_property
-    def edges(self) -> Tuple[Edge, ...]:
+    def edges(self) -> tuple[Edge, ...]:
         edges_count: CounterType[Edge] = Multiset()
         for node in self.nodes:
             for successor in self.successors(node):
@@ -270,7 +268,7 @@ class AbstractGraph(ABC, Generic[Node]):
         return frozenset(self.edges)
 
     @staticmethod
-    def _get_edge_extremities(edge: EdgeLike) -> Tuple[Node, Node]:
+    def _get_edge_extremities(edge: EdgeLike) -> tuple[Node, Node]:
         nodes = iter(edge)
         start = next(nodes)
         try:
@@ -336,23 +334,23 @@ class AbstractGraph(ABC, Generic[Node]):
 
         def count_in_and_out_degrees(
             graph: AbstractGraph,
-        ) -> CounterType[Tuple[int, int]]:
+        ) -> CounterType[tuple[int, int]]:
             return Counter((graph.in_out_degree(node_) for node_ in graph.nodes))
 
         if count_in_and_out_degrees(self) != count_in_and_out_degrees(other):
             return False
         assert self.order == other.order and self.degree == other.degree
 
-        degrees_to_nodes_for_other_graph: Dict[Tuple[int, int], List[Node]] = {}
+        degrees_to_nodes_for_other_graph: dict[tuple[int, int], list[Node]] = {}
         for node in other.nodes:
             degrees_to_nodes_for_other_graph.setdefault(other.in_out_degree(node), []).append(node)
         nodes_to_degrees_for_self = {node: self.in_out_degree(node) for node in self.nodes}
 
         remaining_self_nodes = set(self.nodes)
         remaining_other_nodes = set(other.nodes)
-        used_nodes: List[Node] = [remaining_self_nodes.pop()]
-        corresponding_nodes_possibilities: Dict[Node, Optional[List[Node]]] = {}
-        reversed_mapping: Dict[Node, Node] = {}
+        used_nodes: list[Node] = [remaining_self_nodes.pop()]
+        corresponding_nodes_possibilities: dict[Node, Optional[list[Node]]] = {}
+        reversed_mapping: dict[Node, Node] = {}
         order = self.order
 
         adjacency_test_methods = [(self.successors, other.successors)]
@@ -510,7 +508,7 @@ class AbstractGraph(ABC, Generic[Node]):
     def weight_matrix(self):
         return tuple(tuple(self.weight(node1, node2) for node2 in self.nodes) for node1 in self.nodes)
 
-    def labels(self, node1: Node, node2: Node) -> List[str]:
+    def labels(self, node1: Node, node2: Node) -> list[str]:
         n = self.count_edges(node1, node2, count_undirected_loops_twice=False)
         return n * [""]
 
@@ -520,15 +518,15 @@ class AbstractGraph(ABC, Generic[Node]):
         return self.out_degree(node)
 
     @property
-    def all_degrees(self) -> Dict[Node, int]:
+    def all_degrees(self) -> dict[Node, int]:
         return {node: self.node_degree(node) for node in self.nodes}
 
     @property
-    def all_in_degrees(self) -> Dict[Node, int]:
+    def all_in_degrees(self) -> dict[Node, int]:
         return {node: self.in_degree(node) for node in self.nodes}
 
     @property
-    def all_out_degrees(self) -> Dict[Node, int]:
+    def all_out_degrees(self) -> dict[Node, int]:
         return {node: self.out_degree(node) for node in self.nodes}
 
     def in_degree(self, node: Node) -> int:
@@ -537,7 +535,7 @@ class AbstractGraph(ABC, Generic[Node]):
     def out_degree(self, node: Node) -> int:
         return sum(self._successors[node].values())
 
-    def in_out_degree(self, node: Node) -> Tuple[int, int]:
+    def in_out_degree(self, node: Node) -> tuple[int, int]:
         return self.in_degree(node), self.out_degree(node)
 
     def successors(self, node: Node) -> Set[Node]:
@@ -550,7 +548,7 @@ class AbstractGraph(ABC, Generic[Node]):
         return self.__class__(self.nodes, *self.edges)
 
     @cached_property
-    def adjacency_matrix(self) -> Tuple[Tuple[int, ...], ...]:
+    def adjacency_matrix(self) -> tuple[tuple[int, ...], ...]:
         """Get the adjacency matrix of the graph.
 
         If operations on the matrix are needed, the matrix should be converted to a `numpy` or `sympy` matrix:
@@ -591,14 +589,14 @@ class AbstractGraph(ABC, Generic[Node]):
     def _edge(node1: Node, node2: Node = None) -> Edge:
         ...
 
-    def _dijkstra(self, start: Node, end: Node = None) -> Tuple[Dict[Node, float], Dict[Node, List[Node]]]:
+    def _dijkstra(self, start: Node, end: Node = None) -> tuple[dict[Node, float], dict[Node, list[Node]]]:
         """Implementation of Dijkstra Algorithm."""
         if start not in self.nodes:
             raise ValueError(f"Unknown node {start!r}.")
         if end is not None and end not in self.nodes:
             raise ValueError(f"Unknown node {end!r}.")
-        lengths: Dict[Node, float] = {node: (0 if node == start else math.inf) for node in self.nodes}
-        last_step: Dict[Node, List[Node]] = {node: [] for node in self.nodes}
+        lengths: dict[Node, float] = {node: (0 if node == start else math.inf) for node in self.nodes}
+        last_step: dict[Node, list[Node]] = {node: [] for node in self.nodes}
         never_selected_nodes = set(self.nodes)
         selected_node = start
         while selected_node != end and len(never_selected_nodes) > 1:
@@ -631,11 +629,11 @@ class AbstractGraph(ABC, Generic[Node]):
     def diameter(self) -> float:
         return max(self.distance(node1, node2) for node1 in self.nodes for node2 in self.nodes)
 
-    def shortest_paths(self, start: Node, end: Node) -> Tuple[float, List[List[Node]]]:
+    def shortest_paths(self, start: Node, end: Node) -> tuple[float, list[list[Node]]]:
         """Implementation of Dijkstra Algorithm."""
         lengths, last_step = self._dijkstra(start, end)
 
-        def generate_paths(path: List[Node]) -> List[List[Node]]:
+        def generate_paths(path: list[Node]) -> list[list[Node]]:
             if path[0] == start:
                 return [path]
             paths = []
@@ -654,8 +652,8 @@ class AbstractGraph(ABC, Generic[Node]):
         """Return a node iterator, using a prefix DFS."""
         if start is None:
             start = self.nodes[0]
-        stack: List[Node] = [start]
-        previous_nodes: List[Optional[Node]] = [None]
+        stack: list[Node] = [start]
+        previous_nodes: list[Optional[Node]] = [None]
         # If the graph isn't a rooted tree, there is no notion of parent.
         # If we want to use DFS to test if the graph is a tree, we must try to visit all adjacents nodes
         # except the one we come from, and see if there were already visited.
@@ -704,7 +702,7 @@ class AbstractGraph(ABC, Generic[Node]):
         def inorder_dfs(node: Node) -> Iterator[Node]:
             visited.add(node)
             # Eliminate visited nodes from the list of successors *before* splitting it.
-            successors: List[Node] = [
+            successors: list[Node] = [
                 successor for successor in self._successors[node] if successor not in visited
             ]
             for successor in successors[:1]:
