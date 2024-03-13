@@ -14,7 +14,6 @@ python = "^3.10"
 [tool.poetry.group.dev.dependencies]
 pytest = "^7"
 mypy = "^1.8"
-flake8 = "^6"
 black = "^22.1.0"
 tox = "^4.1.2"
 sphinx-autodoc-typehints = "^1.18.3"
@@ -24,6 +23,7 @@ myst-parser = "^0.18.0"
 sympy = "^1.10.1"
 # Version 7.29+ are buggy !
 python-semantic-release = "7.28.1"
+ruff = "^0.3.2"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
@@ -42,6 +42,17 @@ line-length = 110
 [tool.pytest.ini_options]
 doctest_optionflags = "NORMALIZE_WHITESPACE IGNORE_EXCEPTION_DETAIL"
 
+[tool.ruff]
+line-length = 110
+fix = true
+
+[tool.ruff.lint]
+ignore = ["E203"]
+
+[tool.ruff.lint.extend-per-file-ignores]
+"tests/test_latex_export.py" = ["E501"]
+
+
 [tool.tox]
 legacy_tox_ini = """
 [tox]
@@ -53,8 +64,8 @@ allowlist_externals = poetry
 commands =
     poetry install -v
     poetry run black smallgraphlib tests
+    poetry run ruff check smallgraphlib tests
     poetry run pytest tests
     poetry run pytest --doctest-modules
     poetry run mypy smallgraphlib tests
-    poetry run flake8 --max-line-length 110 --ignore=E203,W503,W391 --per-file-ignores="tests/test_latex_export.py:E501"
 """
