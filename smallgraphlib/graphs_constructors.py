@@ -19,9 +19,14 @@ def graph(nodes=None, *edges, directed=False, **labeled_edges):
     """Factory function to create graphs with various syntaxes.
 
     >>> graph("A:B,C B:C C")
+    Graph(('A', 'B', 'C'), {'A', 'B'}, {'A', 'C'}, {'B', 'C'})
     >>> graph(AB=5, BC=7, AC=8, directed=True)
-    >>> graph("A:B=5,C=8 B:C=inf", directed=True)
-    >>> graph("A:B='some text with space',C=text_without_space B:C=2.5 D")
+    WeightedDirectedGraph(('A', 'B', 'C'), ('A', 'B', 5), ('A', 'C', 8), ('B', 'C', 7))
+    >>> graph("A:B=5,C=8 B:C=inf C", directed=True)
+    WeightedDirectedGraph(('A', 'B', 'C'), ('A', 'B', 5), ('A', 'C', 8), ('B', 'C', inf))
+    >>> graph("A:B='some text with space',C=text_without_space B:C=2.5 C D")
+    LabeledGraph(('A', 'B', 'C', 'D'), ('A', 'B', 'some text with space'),
+                 ('A', 'C', 'text_without_space'), ('B', 'C', 2.5))
 
     This is intended mainly for quick interactive use (or one-time-use scripts),
     since its interface is not very clean and may change frequently.

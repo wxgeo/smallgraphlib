@@ -238,7 +238,7 @@ class AbstractGraph(ABC, Generic[Node]):
         >>> g = random_graph(4, 7)
         >>> g2 = g.copy()
         >>> g2.shuffle_nodes()
-        >>> g == g2
+        >>> g == g2  # doctest: +SKIP
         ...  # probably False
         >>> g.is_isomorphic_to(g2)
         True
@@ -557,8 +557,12 @@ class AbstractGraph(ABC, Generic[Node]):
 
             >>> import numpy  # doctest: +SKIP
             >>> from smallgraphlib import complete_graph
-            >>> M = numpy.matrix(complete_graph(3).adjacency_matrix)
-            >>> M**2
+            >>> raw_matrix = complete_graph(3).adjacency_matrix
+            >>> raw_matrix**2
+            Traceback (most recent call last):
+            TypeError: unsupported operand type(s) for ** or pow(): 'tuple' and 'int'
+            >>> M = numpy.matrix(raw_matrix)  # doctest: +SKIP
+            >>> M**2  # doctest: +SKIP
             matrix([[2, 1, 1],
                     [1, 2, 1],
                     [1, 1, 2]])

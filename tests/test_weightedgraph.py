@@ -10,6 +10,7 @@ def test_weighted_graph():
     assert g.successors(1) == {2}
     assert g.weight(2, 1) == 10.0
     assert g.total_weight == 10.0 + 9.0 + 7.0 + 8.0
+    assert g.copy() == g
 
 
 def test_weighted_graph_from_matrix():

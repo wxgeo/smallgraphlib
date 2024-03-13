@@ -39,6 +39,9 @@ warn_unused_ignores = true
 [tool.black]
 line-length = 110
 
+[tool.pytest.ini_options]
+doctest_optionflags = "NORMALIZE_WHITESPACE IGNORE_EXCEPTION_DETAIL"
+
 [tool.tox]
 legacy_tox_ini = """
 [tox]
@@ -51,6 +54,7 @@ commands =
     poetry install -v
     poetry run black smallgraphlib tests
     poetry run pytest tests
+    poetry run pytest --doctest-modules
     poetry run mypy smallgraphlib tests
     poetry run flake8 --max-line-length 110 --ignore=E203,W503,W391 --per-file-ignores="tests/test_latex_export.py:E501"
 """

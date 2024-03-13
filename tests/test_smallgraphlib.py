@@ -226,6 +226,7 @@ def test_remove_edges():
 
 def test_simple():
     g = Graph("ABCDE", "AB", "BA", "AC", "AD", "EA", "EC")
+    g.__repr__()
     assert not g.is_simple
     g.remove_edges("AB")
     assert g.is_simple
@@ -258,6 +259,9 @@ def test_graph_string():
     g = graph("A:B='some text with space',C=text_without_space B:C=2.5 C D")
     assert not g.is_directed
     assert g.labels("A", "B") == ["some text with space"]
+    g = graph("A:B=5,C=8 B:C=inf C")
+    assert g.nodes == ("A", "B", "C")
+    assert g.weight("B", "C") == float("inf")
 
 
 def test_graph_from_dict():

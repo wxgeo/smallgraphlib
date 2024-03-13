@@ -45,13 +45,18 @@ class AbstractLabeledGraph(AbstractGraph, ABC, Generic[Label]):
         labeled_edges = (repr(labeled_edge) for labeled_edge in self.labeled_edges)
         return f"{self.__class__.__name__}({tuple(self.nodes)!r}, {', '.join(labeled_edges)})"
 
+    def copy(self):
+        return self.__class__(self.nodes, *self.labeled_edges)
+
     @cached_property
     def labeled_edges(self) -> tuple[LabeledEdge, ...]:
         # noinspection PyTypeChecker
         return tuple(
             sorted(
                 (
-                    *edge,
+                    *(
+                        sorted(edge) if isinstance(edge, (set, frozenset)) else edge
+                    ),  # Sorting nodes will help in making doctests deterministic.
                     label,
                 )
                 for edge, labels in self._labels.items()
@@ -59,18 +64,24 @@ class AbstractLabeledGraph(AbstractGraph, ABC, Generic[Label]):
             )
         )
 
+    def as_dict(self) -> dict[tuple[Node, Node], Label]:
+        return {(node1, node2): label for node1, node2, label in self.labeled_edges}
+
     @classmethod
     def from_dict(
         cls: Type[_AbstractLabeledGraph], edge_label_dict: dict = None, /, **edge_label
     ) -> _AbstractLabeledGraph:
         """Construct a directed graph using a {edge_name: label} dictionnary (or keywords).
 
-        All edges' names must be two letters strings (like "AB"), each letter representing a node.
+        All edges' names must be either:
+            - two letters strings (like "AB"), each letter representing a node,
+            - or a couple of nodes (like ("A", "B") or (1, 2)).
         Nodes' names are automatically deduced from edges' names.
 
         >>> g1 = LabeledGraph.from_dict(AB=1, AC=3, BC=4)
         >>> g2 = LabeledGraph.from_dict({"AB": 1, "AC": 3, "BC": 4})
-        >>> g1 == g2
+        >>> g3 = LabeledGraph.from_dict({("A", "B"): 1, ("A", "C"): 3, ("B", "C"): 4})
+        >>> g1 == g2 == g3
         True
         >>> g1.nodes
         ('A', 'B', 'C')
@@ -86,6 +97,10 @@ class AbstractLabeledGraph(AbstractGraph, ABC, Generic[Label]):
         """LabeledGraph.from_string("A:B=label,C='other label' B:C=5 C D:C")
         will generate a graph of 4 nodes, A, B, C and D, with edges A->B, A->C, B->C and C->D
         and respective labels 'label', 'other label', 5 and `None`.
+
+        >>> LabeledGraph.from_string("A:B=label,C='other label' B:C=5 C D:C")
+        LabeledGraph(('A', 'B', 'C', 'D'), ('A', 'B', 'label'), ('A', 'C', 'other label'),
+                     ('B', 'C', 5), ('C', 'D', None))
 
         Note that labels containing a space must be surrounded by single or double quotes.
         Labels containing only digits will be converted to numbers (integers or floats),

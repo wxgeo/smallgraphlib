@@ -5,7 +5,7 @@ from smallgraphlib.string2automaton import StringToAutomatonParser
 
 from smallgraphlib.custom_types import Node
 from smallgraphlib.labeled_graphs import LabeledEdge, LabeledDirectedGraph
-from smallgraphlib.utilities import cached_property
+from smallgraphlib.utilities import cached_property, set_repr
 
 _T = TypeVar("_T", bound="Automaton")
 Char = NewType("Char", str)
@@ -193,11 +193,18 @@ class Acceptor(Automaton, Generic[Node]):
         )
 
     def __repr__(self):
+        # Sort set elements to make doctests deterministic.
+        initial_states = set_repr(self.initial_states)
+        final_states = set_repr(self.final_states)
+        indicate_alphabet_name = (
+            "" if self.alphabet_name is None else f", alphabet_name={self.alphabet_name!r}"
+        )
+
         return (
             f"{self.__class__.__name__}({self.states!r}, "
             f"{', '.join(repr(transition) for transition in self.transitions)}, "
-            f"alphabet={''.join(self.alphabet)!r}, initial_states={set(self.initial_states)!r}, "
-            f"final_states={set(self.final_states)!r}, alphabet_name={self.alphabet_name!r})"
+            f"alphabet={''.join(self.alphabet)!r}, initial_states={initial_states}, "
+            f"final_states={final_states}{indicate_alphabet_name})"
         )
 
     @classmethod
@@ -210,7 +217,11 @@ class Acceptor(Automaton, Generic[Node]):
     ) -> "Acceptor":
         """Constructor used to generate an automaton from a string.
 
-            >>> Acceptor.from_string(">(I):a|b--1  /  (1):a--2;b--3  /  (2):a--1|I  /  3")
+            >>> s = ">(I):a|b--1  /  (1):a--2;b--3  /  (2):a--1|I  /  3"
+            >>> Acceptor.from_string(s)
+            Acceptor(('1', '2', '3', 'I'), ('1', '2', 'a'), ('1', '3', 'b'), ('2', '1', 'a'), ('2', 'I', 'a'),
+                     ('I', '1', 'a'), ('I', '1', 'b'),
+                     alphabet='ab', initial_states={'I'}, final_states={'1', '2', 'I'})
 
         will generate an automaton of 4 states: `I`, `1`, `2` and `3`,
         each state information being separated by `/`.
@@ -235,11 +246,22 @@ class Acceptor(Automaton, Generic[Node]):
             >>> Acceptor.from_string(
             ...    ">(I):a,b:1 ; (1):a:2+b:3 ; (2):a:1,I ; 3", sep=(";", ":", "+", ":", ",")
             ...    )
+            Acceptor(('1', '2', '3', 'I'), ('1', '2', 'a'), ('1', '3', 'b'), ('2', '1', 'a'), ('2', 'I', 'a'),
+                     ('I', '1', 'a'), ('I', '1', 'b'),
+                     alphabet='ab', initial_states={'I'}, final_states={'1', '2', 'I'})
 
         If a transition applies for every letter, one may use the alphabet name, `**` or `ALL`
         instead of listing all the letters.
 
-            >>> Acceptor.from_string(">I:a--1;b / (1):**--I")
+            >>> acceptor = Acceptor.from_string(">I:a--1;b / (1):**--I")
+            >>> acceptor
+            Acceptor(('1', 'I'), ('1', 'I', 'a'), ('1', 'I', 'b'), ('I', '1', 'a'), ('I', 'I', 'b'),
+            alphabet='ab', initial_states={'I'}, final_states={'1'})
+            >>> acceptor == Acceptor.from_string(">I:a--1;b / (1):ALL--I")
+            True
+            >>> Acceptor.from_string(">I:a--1;b / (1):S--I", alphabet_name="S")
+            Acceptor(('1', 'I'), ('1', 'I', 'a'), ('1', 'I', 'b'), ('I', '1', 'a'), ('I', 'I', 'b'),
+            alphabet='ab', initial_states={'I'}, final_states={'1'}, alphabet_name='S')
         """
         data = StringToAutomatonParser(sep).parse(string)
         if alphabet is None:
@@ -275,7 +297,7 @@ class Transducer(Automaton, Generic[Node]):
         >>> from smallgraphlib import Transducer
         >>> transducer = Transducer.from_string(">I:a--1;b / 1:b;a[#]--I")
         >>> transducer.translate("aababba")  # Count the number of "ba" substrings
-        "##"
+        '##'
     """
 
     def __init__(
@@ -383,6 +405,7 @@ class Transducer(Automaton, Generic[Node]):
         For example, the following automaton prints a "#" character for each "ba" substring read.
 
             >>> Transducer.from_string(">I:a--1;b / 1:b;a[#]--I")
+            Transducer(('1', 'I'), ('1', '1', 'b'), ('1', 'I', 'a'), ('I', '1', 'a'), ('I', 'I', 'b'))
 
         Extensive syntax description can be found in `Acceptor.from_string()` documentation.
         """

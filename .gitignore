@@ -6,3 +6,4 @@ __pycache__
 /.pytest_cache/
 /dist/
 /tests/ptyx-tikz/demo.pdf 
+tests/.pytest_cache

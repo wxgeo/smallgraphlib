@@ -27,7 +27,10 @@ def cached_property(f):
 
 
 def clear_cache(f):
-    """Decorator to indicate that a function must invalidate the cache."""
+    """Decorator to indicate that a method must invalidate the class cache when called.
+
+    If the class have a method `on_clear_cache()`, it will be called too.
+    """
 
     @wraps(f)
     def cached_f(self=None, *args, **kw):
@@ -36,6 +39,10 @@ def clear_cache(f):
             self._cache.clear()
         except AttributeError:
             self._cache = {}
+        try:
+            self.on_clear_cache()
+        except AttributeError:
+            pass
         return result
 
     return cached_f
@@ -69,8 +76,8 @@ class Multiset(Counter):
         >>> s
         Multiset({'a': 2})
         >>> s["b"] -= 1
-        ...
-        ValueError: Multiset value can't be negative for key 'b'.
+        Traceback (most recent call last):
+        ValueError: Multiset value must be a positive integer, not -1.
 
     Trying to set negative values will raise a ValueError.
 
@@ -126,3 +133,20 @@ def frange(start: float, end: float, step: float = 1) -> Generator[float, None, 
     while count < end:
         yield count
         count += step
+
+
+def set_repr(obj: object) -> str:
+    """Represent sets and (unnested) frozensets in a deterministic way, by sorting elements.
+
+    >>> set_repr({4, 3, 2})
+    '{2, 3, 4}'
+    >>> set_repr(frozenset({3, 2, 4}))
+    '{2, 3, 4}'
+
+    For any other objects, it just calls python default repr().
+    >>> set_repr(45.)
+    '45.0'
+    """
+    if isinstance(obj, (set, frozenset)):
+        return f"{{{', '.join(set_repr(elt) for elt in sorted(obj))}}}"
+    return repr(obj)

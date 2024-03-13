@@ -58,8 +58,11 @@ class Graph(AbstractGraph):
         return super().is_isomorphic_to(other)
 
     def __repr__(self):
-        edges = (repr(set(edge)) for edge in self.edges)
-        return f"Graph({tuple(self.nodes)!r}, {', '.join(edges)})"
+        # Sort nodes in edges for undirected graphs, so that doctests
+        # can be deterministic.
+        edges_as_couples = sorted(sorted(edge) for edge in self.edges)
+        edges = ", ".join(f"{{{node1!r}, {node2!r}}}" for node1, node2 in edges_as_couples)
+        return f"Graph({tuple(self.nodes)!r}, {edges})"
 
     @property
     def is_directed(self):
