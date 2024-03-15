@@ -67,9 +67,23 @@ class AbstractGraph(ABC, Generic[Node]):
     # ------------------
 
     @classmethod
-    def from_dict(cls: Type[_AbstractGraph], d: dict[Node, Iterable[Node]]) -> _AbstractGraph:
-        """DirectedGraph.from_dict({1: [2, 3], 2: [], 3: [1]}) will generate a graph of
-        3 nodes, 1, 2 and 3, with edges 1->2, 1->3 and 3->1."""
+    def from_dict(
+        cls: Type[_AbstractGraph], d: dict[Node, Iterable[Node]] = None, /, **successors: Iterable[Node]
+    ) -> _AbstractGraph:
+        """Generate a graph from a dictionary of nodes, each node being associated with its successors.
+
+        For example `DirectedGraph.from_dict({1: [2, 3], 2: [], 3: [1]})` will generate a graph of
+        3 nodes, 1, 2 and 3, with edges 1->2, 1->3 and 3->1.
+
+            >>> from smallgraphlib import DirectedGraph
+            >>> DirectedGraph.from_dict({1: [2, 3], 2: [], 3: [1]})
+            DirectedGraph((1, 2, 3), (1, 2), (1, 3), (3, 1))
+            >>> DirectedGraph.from_dict(A="BC", B="", C="A")
+            DirectedGraph(('A', 'B', 'C'), ('A', 'B'), ('A', 'C'), ('C', 'A'))
+        """
+        if d is None:
+            d = {}
+        d.update(successors)  # type: ignore
         nodes: set[Node] = set()
         edges: list[tuple[Node, Node]] = []
         for start, ends in d.items():
@@ -95,12 +109,12 @@ class AbstractGraph(ABC, Generic[Node]):
     def _matrix_as_tuple_of_tuples(matrix: Iterable[Iterable]) -> tuple[Tuple, ...]:
         if hasattr(matrix, "tolist"):  # for numpy or sympy
             matrix = matrix.tolist()
-        M = tuple(tuple(iterable) for iterable in matrix)
+        tuple_matrix = tuple(tuple(iterable) for iterable in matrix)
         # Test if M is correct
-        n = len(M)
-        if any(len(line) != n for line in M):
+        n = len(tuple_matrix)
+        if any(len(line) != n for line in tuple_matrix):
             raise ValueError("All matrix lines must be the same length.")
-        return M
+        return tuple_matrix
 
     @staticmethod
     @abstractmethod
@@ -119,15 +133,15 @@ class AbstractGraph(ABC, Generic[Node]):
         (`int` or any integer type inheriting from `numbers.Integral`).
         """
         # Convert iterable to matrix.
-        M = cls._matrix_as_tuple_of_tuples(matrix)
+        tuple_matrix = cls._matrix_as_tuple_of_tuples(matrix)
         # Test if M is correct
-        n = len(M)
-        for line in M:
+        n = len(tuple_matrix)
+        for line in tuple_matrix:
             for val in line:
                 if not (isinstance(val, Integral) and int(val) >= 0):
                     raise ValueError(f"All matrix values must be positive integers, but {val!r} is not.")
 
-        edges = cls._get_edges_from_adjacency_matrix(M)
+        edges = cls._get_edges_from_adjacency_matrix(tuple_matrix)
 
         g = cls(range(1, n + 1), *edges)
         if nodes_names:

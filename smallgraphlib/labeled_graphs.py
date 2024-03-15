@@ -69,7 +69,10 @@ class AbstractLabeledGraph(AbstractGraph, ABC, Generic[Node, Label]):
 
     @classmethod
     def from_dict(
-        cls: Type[_AbstractLabeledGraph], edge_label_dict: dict = None, /, **edge_label
+        cls: Type[_AbstractLabeledGraph],
+        edge_label_dict: dict[str | tuple[Node, Node], Label] = None,  # type: ignore
+        /,
+        **edge_label: Label,  # type: ignore
     ) -> _AbstractLabeledGraph:
         """Construct a directed graph using a {edge_name: label} dictionnary (or keywords).
 
@@ -88,7 +91,7 @@ class AbstractLabeledGraph(AbstractGraph, ABC, Generic[Node, Label]):
         """
         if edge_label_dict is None:
             edge_label_dict = {}
-        edge_label_dict.update(edge_label)
+        edge_label_dict.update(edge_label)  # type: ignore
         nodes = set(chain(*(edge for edge in edge_label_dict)))
         return cls(nodes, *((*edge, label) for edge, label in edge_label_dict.items()))
 

@@ -53,7 +53,7 @@ class FlowNetwork(WeightedDirectedGraph, Generic[Node]):
         for key in capacity:
             residual[key] = capacity[key] - current[key]
             residual[(key[1], key[0])] = current[key]
-        return WeightedDirectedGraph.from_dict(residual)
+        return WeightedDirectedGraph.from_dict(residual)  # type: ignore
 
     def find_path(
         self,
