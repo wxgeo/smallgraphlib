@@ -24,6 +24,7 @@ sympy = "^1.10.1"
 # Version 7.29+ are buggy !
 python-semantic-release = "7.28.1"
 ruff = "^0.3.2"
+numpy = "^1.26.4"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

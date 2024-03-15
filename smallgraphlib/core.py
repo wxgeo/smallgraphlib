@@ -555,17 +555,17 @@ class AbstractGraph(ABC, Generic[Node]):
 
         If operations on the matrix are needed, the matrix should be converted to a `numpy` or `sympy` matrix:
 
-            >>> import numpy  # doctest: +SKIP
+            >>> import numpy
             >>> from smallgraphlib import complete_graph
             >>> raw_matrix = complete_graph(3).adjacency_matrix
-            >>> raw_matrix**2
+            >>> raw_matrix * raw_matrix
             Traceback (most recent call last):
-            TypeError: unsupported operand type(s) for ** or pow(): 'tuple' and 'int'
-            >>> M = numpy.matrix(raw_matrix)  # doctest: +SKIP
-            >>> M**2  # doctest: +SKIP
-            matrix([[2, 1, 1],
-                    [1, 2, 1],
-                    [1, 1, 2]])
+            TypeError: can't multiply sequence by non-int of type 'tuple'
+            >>> M = numpy.array(raw_matrix)
+            >>> M @ M  # `@` is the operator corresponding to matrix multiplication
+            array([[2, 1, 1],
+                   [1, 2, 1],
+                   [1, 1, 2]])
 
         Return:
             A matrix of integers, as a tuple of tuples.
