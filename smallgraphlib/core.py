@@ -517,7 +517,7 @@ class AbstractGraph(ABC, Generic[Node]):
     def weight(self, node1: Node, node2: Node) -> float:
         if node1 == node2:
             return 0
-        elif self.are_adjacents(node1, node2):
+        elif node2 in self.successors(node1):
             return 1
         else:
             return math.inf

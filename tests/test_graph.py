@@ -249,3 +249,18 @@ def test_transitivity():
     assert not g.is_transitive
     assert g.transitive_closure_matrix == ((1, 1), (1, 1))
     assert DirectedGraph("ABCD", "AB", "BA", "AC", "AD", "AA", "BB", "BC", "BD").is_transitive
+
+
+def test_weight_matrix():
+    g = DirectedGraph((1, 2, 3, 4), (1, 1), (2, 1), (3, 3), (3, 4), (1, 4))
+    inf = float("inf")
+    assert g.weight(1, 1) == 0
+    assert g.weight(1, 2) == inf
+    assert g.weight(2, 1) == 1
+    assert g.weight_matrix == ((0, inf, inf, 1), (1, 0, inf, inf), (inf, inf, 0, 1), (inf, inf, inf, 0))
+
+
+def test_distance_matrix():
+    g = DirectedGraph((1, 2, 3, 4), (1, 1), (2, 1), (3, 3), (4, 3), (1, 4))
+    inf = float("inf")
+    assert g.distance_matrix == ((0, inf, 2, 1), (1, 0, 3, 2), (inf, inf, 0, inf), (inf, inf, 1, 0))
