@@ -1,16 +1,44 @@
 import math
 import random
-from typing import Generic, TYPE_CHECKING
+from typing import Generic, TYPE_CHECKING, Final
 
-from smallgraphlib.utilities import frange
+from smallgraphlib.utilities import frange, cached_property, clear_cache
 
-from smallgraphlib.custom_types import Node, Segment, Point
+from smallgraphlib.custom_types import Node, Segment, Point, Label
 
 if TYPE_CHECKING:
     from smallgraphlib.core import AbstractGraph
-
+    from smallgraphlib.labeled_graphs import AbstractLabeledGraph
+    from smallgraphlib.automatons import Automaton, Transducer, Char, Acceptor
+    from smallgraphlib.flow import FlowNetwork
 
 _TIKZ_EXPORT_MAX_MULTIPLE_EDGES_SUPPORT = 3
+
+GREEK_LETTERS: Final[tuple[str, ...]] = (
+    "alpha",
+    "beta",
+    "gamma",
+    "delta",
+    "epsilon",
+    "zeta",
+    "eta",
+    "theta",
+    "iota",
+    "kappa",
+    "lambda",
+    "mu",
+    "nu",
+    "xi",
+    "pi",
+    "rho",
+    "sigma",
+    "tau",
+    "upsilon",
+    "phi",
+    "chi",
+    "psi",
+    "omega",
+)
 
 
 def segments_intersection(segment1: Segment, segment2: Segment, eps: float = 10**-8) -> Point | None:
@@ -189,20 +217,22 @@ class TikzPrinter(Generic[Node]):
     # The places already occupied by labels are stored in `labels_positions`, to avoid placing another
     # label there.
     labels_positions: list[Point]
-    graph: "AbstractGraph[Node]"
-    angles: dict[Node, float]
     # Nodes numeration (useful in particular when they are shuffled):
     index: dict[Node, int]
-    nodes: list[Node]
     # For debugging:
     _cartography: dict[tuple[Node, ...], Point]
 
+    def __init__(self, graph: "AbstractGraph[Node]", shuffle_nodes=False):
+        self.graph: "AbstractGraph[Node]" = graph
+        self._reset()
+        self.shuffle_nodes: bool = shuffle_nodes
+
+    @clear_cache
     def _reset(self):
         self.lines = []
         self.nodes_positions = {}
         self.labels_positions = []
         self._cartography = {}
-        self.angles = {}
         self.index = {}
 
     @staticmethod
@@ -215,7 +245,28 @@ class TikzPrinter(Generic[Node]):
             r"\contourlength{0.15em}",
         ]
 
-    def tikz_code(self, graph, *, shuffle_nodes=False, border: str = None, options="") -> str:
+    @cached_property
+    def angles(self) -> dict[Node, float]:
+        """Overwrite this method to modify tikz automatic nodes' placement."""
+        theta = 360 / self.graph.order
+        return {node: i * theta for i, node in enumerate(self.nodes)}
+
+    @cached_property
+    def nodes(self) -> tuple[Node, ...]:
+        nodes = list(self.graph.nodes)
+        if self.shuffle_nodes:
+            random.shuffle(nodes)
+        return tuple(nodes)
+
+    def specific_node_style(self, node: Node) -> str:
+        """Overwrite this method to add a specific tikz style to some nodes."""
+        return ""
+
+    def labels(self, node1: Node, node2: Node) -> list[str]:
+        """Overwrite this method to modify tikz value for some labels."""
+        return self.graph.labels(node1, node2)
+
+    def tikz_code(self, *, border: str = None, options="") -> str:
         r"""Generate tikz code corresponding to this graph.
 
         `Tikz` package must be loaded in the latex preamble, with `arrows.meta` library::
@@ -235,11 +286,10 @@ class TikzPrinter(Generic[Node]):
             return "".join(
                 [
                     rf"\begin{{tikzpicture}}\node[rounded corners,draw,inner sep=2pt,{border}]{{",
-                    self.tikz_code(graph, shuffle_nodes=shuffle_nodes, options=options),
+                    self.tikz_code(options=options),
                     r"};\end{tikzpicture}",
                 ]
             )
-        self.graph = graph
         self._reset()
         self.lines = [
             r"\providecommand{\contour}[2]{#2}"  # avoid an error if package contour is not loaded.
@@ -252,15 +302,13 @@ class TikzPrinter(Generic[Node]):
             f"{options}"
             "]"
         ]
-        theta = 360 / self.graph.order
-        nodes = self.nodes = list(self.graph.nodes)
-        if shuffle_nodes:
-            random.shuffle(nodes)
+        # theta = 360 / self.graph.order
+        nodes = self.nodes  # = list(self.graph.nodes)
         self.index = {node: i for i, node in enumerate(nodes)}
         # All nodes are placed around a circle, creating a regular polygon.
         for i, node in enumerate(nodes):
-            angle = self.angles[node] = i * theta
-            specific_style = self.graph._tikz_specific_node_style(node)
+            angle = self.angles[node]
+            specific_style = self.specific_node_style(node)
             self.lines.append(rf"\node[vertex,{specific_style}] ({node}) at ({angle}:1cm) {{${node}$}};")
 
         for node in nodes:
@@ -315,8 +363,7 @@ class TikzPrinter(Generic[Node]):
 
     def _generate_loop(self, node: Node) -> None:
         style = "directed" if self.graph.is_directed else "undirected"
-        # n: int = self._tikz_count_edges(node, node)
-        for i, label in enumerate(self.graph._tikz_labels(node, node), start=1):
+        for i, label in enumerate(self.labels(node, node), start=1):
             self.lines.append(
                 rf"\draw[{style}] ({node}) to "
                 f"[out={self.angles[node] - 45},in={self.angles[node] + 45},looseness={1 + i * 4}] "
@@ -338,7 +385,7 @@ class TikzPrinter(Generic[Node]):
         else:
             data = [("undirected", node1, node2)]
         for direction, nodeA, nodeB in data:
-            _labels = self.graph._tikz_labels(nodeA, nodeB)
+            _labels = self.labels(nodeA, nodeB)
             labels.extend(_labels)
             styles += len(_labels) * [direction]
         n = len(styles)
@@ -379,4 +426,130 @@ class TikzPrinter(Generic[Node]):
             self.lines.append(rf"\draw[{style}] ({node1}) to[{tikz_bending}] {label_tikz_code} ({node2});")
 
 
-tikz_printer: TikzPrinter = TikzPrinter()
+class TikzLabeledGraphPrinter(TikzPrinter, Generic[Node, Label]):
+    def __init__(self, graph: "AbstractLabeledGraph[Node, Label]", shuffle_nodes=False):
+        self.graph: "AbstractLabeledGraph[Node, Label]" = graph  # For Pycharm
+        super().__init__(graph, shuffle_nodes=shuffle_nodes)
+
+    def labels(self, node1: Node, node2: Node) -> list[str]:
+        """Overwrite this method to modify tikz value for some labels."""
+        labels = self.graph._labels.get(self.graph._edge(node1, node2), [])
+
+        def format_(label):
+            # Note: math.isinf() supports `sympy.oo` too.
+            if label is None:
+                return ""
+            elif math.isinf(label) and label > 0:
+                return r"$\infty$"
+            elif math.isinf(label) and label < 0:
+                return r"$-\infty$"
+            else:
+                return str(label)
+
+        return [format_(label) for label in labels]
+
+
+class TikzAutomatonPrinter(TikzPrinter, Generic[Node]):
+    def __init__(self, graph: "Automaton[Node]", shuffle_nodes=False):
+        self.graph: "Automaton[Node]" = graph  # For Pycharm
+        super().__init__(graph, shuffle_nodes=shuffle_nodes)
+
+    def specific_node_style(self, node: Node) -> str:
+        styles = []
+        if node in self.graph.initial_states:
+            styles.append("rectangle")
+        return ",".join(styles)
+
+    def labels(self, node1, node2) -> list[str]:
+        labels = sorted(self.graph.labels(node1, node2))
+        if (
+            self.graph.alphabet_name is not None
+            and sorted(labels) == list(self.graph.alphabet)
+            and len(self.graph.alphabet) > 1
+        ):
+            return [self._latex(self.graph.alphabet_name)]
+        return [",".join(self._latex(label) for label in labels)] if labels else []
+
+    @staticmethod
+    def _latex(label: str) -> str:
+        label = label.replace("#", r"\#")
+        if label in GREEK_LETTERS:
+            label = "\\" + label
+        return f"${label}$" if label else r"$\varepsilon$"
+
+
+class TikzAcceptorPrinter(TikzAutomatonPrinter, Generic[Node]):
+    def __init__(self, graph: "Acceptor[Node]", shuffle_nodes=False):
+        self.graph: "Acceptor[Node]" = graph  # For Pycharm
+        super().__init__(graph, shuffle_nodes=shuffle_nodes)
+
+    def specific_node_style(self, node: Node) -> str:
+        styles = [super().specific_node_style(node)]
+        if node in self.graph.final_states:
+            styles.append("double,fill=lightgray")
+        return ",".join(styles)
+
+
+class TikzTransducerPrinter(TikzAutomatonPrinter, Generic[Node]):
+    def __init__(self, graph: "Transducer[Node]", shuffle_nodes=False):
+        self.graph: "Transducer[Node]" = graph  # For Pycharm
+        super().__init__(graph, shuffle_nodes=shuffle_nodes)
+
+    def labels(self, node1: Node, node2: Node) -> list[str]:
+        # Associate to each output word all the input letters than can produce it.
+        words: dict[str, set[Char]] = {}
+        for letter in self.graph.alphabet:
+            if self.graph.next_state(node1, letter) == node2:
+                words.setdefault(self.graph.next_word(node1, letter), set()).add(letter)
+
+        labels: list[str] = []
+        for word, letters in words.items():
+            sorted_letters = sorted(letters)
+            if sorted_letters == list(self.graph.alphabet) and self.graph.alphabet_name is not None:
+                letters_str = self.graph.alphabet_name
+            else:
+                letters_str = ",".join(sorted_letters)
+            letters_str = self._latex(letters_str)
+            if word:
+                letters_str += rf"\fbox{{{self._latex(word)}}}"
+            labels.append(letters_str)
+        return labels
+
+
+class TikzFlowNetworkPrinter(TikzPrinter, Generic[Node]):
+    def __init__(self, graph: "FlowNetwork[Node]", shuffle_nodes=False):
+        self.graph: "FlowNetwork[Node]" = graph  # For Pycharm
+        super().__init__(graph, shuffle_nodes=shuffle_nodes)
+
+    @cached_property
+    def nodes(self) -> tuple[Node, ...]:
+        """Return nodes in a nice order for tikz export."""
+        source = self.graph.source
+        sink = self.graph.sink
+        # When exporting graph as a tikz picture, all nodes are displayed on a circle.
+        # However, since it is a network flow, it is better to display source and sink at both extremities
+        # of the drawing (source at left, sink at right).
+        # We'll try to display nodes in a nice way too, detecting paths, to minimize edges' crossings,
+        # # though it's not so obvious...
+        angles: dict[Node, float] = {
+            source: 180,  # Display the source at the extreme-left of the graph.
+            sink: 0,  # Display the sink at the extreme-right of the graph.
+        }
+        path = self.graph.find_path(source, sink)
+        assert path[0] == source and path[-1] == sink
+        # If we find a path from source to sink, we display its nodes from left to right, on the top of the graph.
+        # We must remove source and sink from path, since there are already handled.
+        paths: tuple[list[Node], list[Node]] = (
+            path[1:-1],
+            self.graph.find_path(source, sink, _filter_nodes=path[1:-1])[1:-1],
+        )
+        assert len(paths) == 2
+        remaining_nodes = self.graph.nodes_set - set(paths[0]) - set(paths[1]) - {source, sink}
+        for i, node in enumerate(remaining_nodes):
+            paths[i % 2].append(node)
+
+        for j, path in enumerate(paths):
+            theta = 180 / (len(path) + 1)
+            for i, node in enumerate(reversed(path) if j == 0 else path, start=1):
+                angles[node] = j * 180 + i * theta
+        return tuple(node for angle, node in sorted((angle, node) for node, angle in angles.items()))

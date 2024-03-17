@@ -1,4 +1,5 @@
 from smallgraphlib.flow import FlowNetwork
+from smallgraphlib.tikz_export import TikzFlowNetworkPrinter
 
 
 def test_FlowNetwork():
@@ -16,3 +17,9 @@ def test_FlowNetwork():
         ("S", "B", 3),
     )
     assert f.get_max_flow_value() == 7
+
+
+def test_flow_tikz():
+    f = FlowNetwork.from_dict(SA=10, AC=2, SB=3, AB=4, BD=5, DC=3, CP=6, DP=4)
+    f.as_tikz()
+    assert TikzFlowNetworkPrinter(f).nodes in (("P", "D", "B", "S", "A", "C"), ("P", "C", "A", "S", "B", "D"))

@@ -155,7 +155,7 @@ class DirectedGraph(AbstractGraph, Generic[Node]):
         return super().is_isomorphic_to(other)
 
     def __repr__(self):
-        edges = (repr(edge) for edge in self.edges)
+        edges = sorted(repr(edge) for edge in self.edges)
         return f"DirectedGraph({tuple(self.nodes)!r}, {', '.join(edges)})"
 
     @property

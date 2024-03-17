@@ -9,18 +9,18 @@ from typing import Iterable, TypeVar, Generic, Any, Sequence, Type
 
 from smallgraphlib.basic_graphs import Graph, DirectedGraph
 from smallgraphlib.core import AbstractGraph, InvalidGraphAttribute
-from smallgraphlib.custom_types import Node, Edge
+from smallgraphlib.custom_types import Node, Edge, Label, LabeledEdge, WeightedEdge
+from smallgraphlib.tikz_export import TikzLabeledGraphPrinter
 from smallgraphlib.utilities import cached_property
 
 _AbstractLabeledGraph = TypeVar("_AbstractLabeledGraph", bound="AbstractLabeledGraph")
 _AbstractWeightedGraph = TypeVar("_AbstractWeightedGraph", bound="AbstractWeightedGraph")
-Label = TypeVar("Label")
-LabeledEdge = tuple[Node, Node, Label]
-WeightedEdge = tuple[Node, Node, float]
 
 
 class AbstractLabeledGraph(AbstractGraph, ABC, Generic[Node, Label]):
     """Abstract class for all labeled graphs, don't use it directly."""
+
+    printer = TikzLabeledGraphPrinter
 
     def __init__(
         self,
@@ -216,23 +216,6 @@ class AbstractWeightedGraph(AbstractLabeledGraph, ABC, Generic[Node, Label]):
             return 0
         values = self.weights.get(self._edge(node1, node2), [default])
         return aggregator(values)
-
-    def _tikz_labels(self, node1: Node, node2: Node) -> list[str]:
-        """Overwrite this method to modify tikz value for some labels."""
-        labels = self._labels.get(self._edge(node1, node2), [])
-
-        def format_(label):
-            # Note: math.isinf() supports `sympy.oo` too.
-            if label is None:
-                return ""
-            elif math.isinf(label) and label > 0:
-                return r"$\infty$"
-            elif math.isinf(label) and label < 0:
-                return r"$-\infty$"
-            else:
-                return str(label)
-
-        return [format_(label) for label in labels]
 
     @cached_property
     def total_weight(self) -> float:

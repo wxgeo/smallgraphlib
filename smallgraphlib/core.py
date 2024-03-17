@@ -23,7 +23,7 @@ from typing import (
 
 from smallgraphlib.custom_types import _AbstractGraph, Node, Edge, EdgeLike
 from smallgraphlib.utilities import cached_property, Multiset, clear_cache
-from smallgraphlib.tikz_export import tikz_printer
+from smallgraphlib.tikz_export import TikzPrinter
 
 
 class Traversal(Enum):
@@ -37,6 +37,8 @@ class NodeAlreadyFoundError(RuntimeError):
 
 
 class AbstractGraph(ABC, Generic[Node]):
+    printer = TikzPrinter
+
     def __init__(
         self,
         nodes: Iterable[Node],
@@ -637,9 +639,22 @@ class AbstractGraph(ABC, Generic[Node]):
         lengths, _ = self._dijkstra(start, end)
         return lengths[end]
 
+    # @cached_property
+    # def distance_matrix(self):
+    #     return tuple(tuple(self.distance(node1, node2) for node2 in self.nodes) for node1 in self.nodes)
+
     @cached_property
-    def distance_matrix(self):
-        return tuple(tuple(self.distance(node1, node2) for node2 in self.nodes) for node1 in self.nodes)
+    def distance_matrix(self) -> tuple[tuple[float, ...], ...]:
+        """Compute the distance matrix, using Roy-Floyd-Warshall algorithm."""
+        matrix = [list(row) for row in self.weight_matrix]
+        n = self.order
+        for k in range(n):
+            for i in range(n):
+                for j in range(n):
+                    # Try to use node k to find a shorter path.
+                    matrix[i][j] = min(matrix[i][j], matrix[i][k] + matrix[k][j])
+        # Making result immutable is much safer for user, since we use caching.
+        return tuple(tuple(row) for row in matrix)
 
     @cached_property
     def diameter(self) -> float:
@@ -766,21 +781,29 @@ class AbstractGraph(ABC, Generic[Node]):
             queue.extend(successor for successor in self._successors[node] if successor not in visited)
 
     def find_path(
-        self, start: Node, end: Node, _filter: Callable[[Self, Node, Node], bool] = (lambda _, __, ___: True)
+        self,
+        start: Node,
+        end: Node,
+        _filter_edges: Callable[[Self, Node, Node], bool] = (lambda _, __, ___: True),
+        _filter_nodes: Callable[[Self, Node], bool] | Iterable[Node] = (),
     ) -> list[Node]:
         """Return a path between nodes `start` and `end`, if any, or an empty list.
 
-        If defined, `_filter` is a boolean function, which takes three arguments: the calling class, the current node
-        and its successor.  If `_filter(self, node1, node2)` returns `False`, the edge (node1, node2), if it exists,
-        will be ignored.
+        If defined, `_filter_edges` is a boolean function, which takes three arguments: the calling class,
+        the current node and its successor.
+        If `_filter(self, node1, node2)` returns `False`, the edge (node1, node2), if it exists, will be ignored.
         """
         previous: dict[Node, Node] = {}
         queue: deque[Node] = deque([start])
+        if callable(_filter_nodes):
+            _filter_nodes = set(node for node in self.nodes if _filter_nodes(self, node))
+        else:
+            _filter_nodes = set(_filter_nodes)
         while end not in previous and len(queue) > 0:
             # BFS
             node = queue.popleft()
             for successor in self.successors(node):
-                if _filter(self, node, successor):
+                if _filter_edges(self, node, successor) and node not in _filter_nodes:
                     # If successor was never seen before, append it to queue.
                     if successor not in previous:
                         previous[successor] = node
@@ -792,13 +815,22 @@ class AbstractGraph(ABC, Generic[Node]):
             return list(reversed(path))
         return []
 
-    def _tikz_specific_node_style(self, node: Node) -> str:
-        """Overwrite this method to add a specific tikz style to some nodes."""
-        return ""
+    # ------------------
+    #    Tikz support
+    # ==================
 
-    def _tikz_labels(self, node1: Node, node2: Node) -> list[str]:
-        """Overwrite this method to modify tikz value for some labels."""
-        return self.labels(node1, node2)
+    # def _tikz_specific_node_style(self, node: Node) -> str:
+    #     """Overwrite this method to add a specific tikz style to some nodes."""
+    #     return ""
+    #
+    # def _tikz_labels(self, node1: Node, node2: Node) -> list[str]:
+    #     """Overwrite this method to modify tikz value for some labels."""
+    #     return self.labels(node1, node2)
+    #
+    # def _tikz_angles(self, node: Node) -> dict[Node, float]:
+    #     """Overwrite this method to modify tikz automatic nodes' placement."""
+    #     theta = 360 / self.order
+    #     return {node: i * theta for i, node in enumerate(self.nodes)}
 
     def as_tikz(self, *, shuffle_nodes=False, border: str = None, options="") -> str:
         r"""Generate tikz code corresponding to this graph.
@@ -816,7 +848,7 @@ class AbstractGraph(ABC, Generic[Node]):
         If set, `border` have to be a combination of tikz path drawing styles,
         like "dotted", or "dashed,blue".
         """
-        return tikz_printer.tikz_code(self, shuffle_nodes=shuffle_nodes, border=border, options=options)
+        return self.printer(self, shuffle_nodes=shuffle_nodes).tikz_code(border=border, options=options)
 
 
 class InvalidGraphAttribute(AttributeError):

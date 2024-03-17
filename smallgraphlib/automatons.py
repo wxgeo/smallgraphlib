@@ -1,40 +1,15 @@
 from abc import ABC
-from typing import Iterable, Generic, TypeVar, NewType, cast, Final
+from typing import Iterable, Generic, TypeVar, NewType, cast
 
 from smallgraphlib.string2automaton import StringToAutomatonParser
 
-from smallgraphlib.custom_types import Node
-from smallgraphlib.labeled_graphs import LabeledEdge, LabeledDirectedGraph
+from smallgraphlib.custom_types import Node, LabeledEdge
+from smallgraphlib.labeled_graphs import LabeledDirectedGraph
+from smallgraphlib.tikz_export import TikzTransducerPrinter, TikzAcceptorPrinter, TikzAutomatonPrinter
 from smallgraphlib.utilities import cached_property, set_repr
 
 _T = TypeVar("_T", bound="Automaton")
 Char = NewType("Char", str)
-
-GREEK_LETTERS: Final[tuple[str, ...]] = (
-    "alpha",
-    "beta",
-    "gamma",
-    "delta",
-    "epsilon",
-    "zeta",
-    "eta",
-    "theta",
-    "iota",
-    "kappa",
-    "lambda",
-    "mu",
-    "nu",
-    "xi",
-    "pi",
-    "rho",
-    "sigma",
-    "tau",
-    "upsilon",
-    "phi",
-    "chi",
-    "psi",
-    "omega",
-)
 
 
 class UnknownState(RuntimeError):
@@ -46,6 +21,10 @@ class UnknownLetter(RuntimeError):
 
 
 class Automaton(LabeledDirectedGraph, ABC, Generic[Node]):
+    """Base class for all automata. Don't use it directly."""
+
+    printer = TikzAutomatonPrinter  # type: ignore
+
     def __init__(
         self,
         states: Iterable[Node],
@@ -112,31 +91,12 @@ class Automaton(LabeledDirectedGraph, ABC, Generic[Node]):
                 f"Invalid {state_type}state: {state}. The states of this automaton are {self.states}."
             )
 
-    def _tikz_specific_node_style(self, node: Node) -> str:
-        styles = []
-        if node in self.initial_states:
-            styles.append("rectangle")
-        return ",".join(styles)
-
-    def _tikz_labels(self, node1, node2) -> list[str]:
-        labels = sorted(self.labels(node1, node2))
-        if (
-            self.alphabet_name is not None
-            and sorted(labels) == list(self.alphabet)
-            and len(self.alphabet) > 1
-        ):
-            return [self._latex(self.alphabet_name)]
-        return [",".join(self._latex(label) for label in labels)] if labels else []
-
-    @staticmethod
-    def _latex(label: str) -> str:
-        label = label.replace("#", r"\#")
-        if label in GREEK_LETTERS:
-            label = "\\" + label
-        return f"${label}$" if label else r"$\varepsilon$"
-
 
 class Acceptor(Automaton, Generic[Node]):
+    """An acceptor, i.e. a finite state automaton which defines a language by accepting or rejecting words."""
+
+    printer = TikzAcceptorPrinter  # type: ignore
+
     def __init__(
         self,
         states: Iterable[Node],
@@ -164,12 +124,6 @@ class Acceptor(Automaton, Generic[Node]):
     @cached_property
     def transitions(self) -> tuple[LabeledEdge, ...]:
         return self.labeled_edges
-
-    def _tikz_specific_node_style(self, node: Node) -> str:
-        styles = [super()._tikz_specific_node_style(node)]
-        if node in self.final_states:
-            styles.append("double,fill=lightgray")
-        return ",".join(styles)
 
     def recognize(self, word: str, _start: Iterable[Node] = None) -> bool:
         states = set(_start) if _start is not None else self.initial_states
@@ -300,6 +254,8 @@ class Transducer(Automaton, Generic[Node]):
         '##'
     """
 
+    printer = TikzTransducerPrinter  # type: ignore
+
     def __init__(
         self,
         states: Iterable[Node],
@@ -372,26 +328,6 @@ class Transducer(Automaton, Generic[Node]):
             output.append(self.next_word(state, letter))
             state = self.next_state(state, letter)
         return "".join(output)
-
-    def _tikz_labels(self, node1: Node, node2: Node) -> list[str]:
-        # Associate to each output word all the input letters than can produce it.
-        words: dict[str, set[Char]] = {}
-        for letter in self.alphabet:
-            if self.next_state(node1, letter) == node2:
-                words.setdefault(self.next_word(node1, letter), set()).add(letter)
-
-        labels: list[str] = []
-        for word, letters in words.items():
-            sorted_letters = sorted(letters)
-            if sorted_letters == list(self.alphabet) and self.alphabet_name is not None:
-                letters_str = self.alphabet_name
-            else:
-                letters_str = ",".join(sorted_letters)
-            letters_str = self._latex(letters_str)
-            if word:
-                letters_str += rf"\fbox{{{self._latex(word)}}}"
-            labels.append(letters_str)
-        return labels
 
     @classmethod
     def from_string(

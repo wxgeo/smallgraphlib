@@ -3,6 +3,7 @@ import pytest
 from smallgraphlib.string2automaton import StringToAutomatonParser
 
 from smallgraphlib import Acceptor, Transducer
+from smallgraphlib.tikz_export import TikzAcceptorPrinter
 
 
 def test_StringToAutomatonParser():
@@ -57,7 +58,7 @@ def test_Acceptor_from_string():
 def acceptor_from_string_2():
     g = Acceptor.from_string(r">I:\Sigma;0--1 / (1)", alphabet_name=r"\Sigma", alphabet="01")
     assert g.labels("I", "1") == ["0"]
-    assert g._tikz_labels("I", "1") == ["$0$"]
+    assert TikzAcceptorPrinter(g).labels("I", "1") == ["$0$"]
 
 
 def test_Acceptor_deterministic():
@@ -145,10 +146,14 @@ def test_Acceptor_alphabet_name():
     assert g2 == g5
     assert g3 == g1
     assert g4 == g1
-    assert g1._tikz_labels("1", "I") == [r"$a$,$b$"]
-    assert g2._tikz_labels("1", "I") == [r"$a$,$b$"]
-    assert g3._tikz_labels("1", "I") == [r"$A$"]
-    assert g4._tikz_labels("1", "I") == [r"$\Sigma$"]
+
+    def tikz_label(g, node1, node2):
+        return TikzAcceptorPrinter(g).labels(node1, node2)
+
+    assert tikz_label(g1, "1", "I") == [r"$a$,$b$"]
+    assert tikz_label(g2, "1", "I") == [r"$a$,$b$"]
+    assert tikz_label(g3, "1", "I") == [r"$A$"]
+    assert tikz_label(g4, "1", "I") == [r"$\Sigma$"]
 
 
 def test_Acceptor_tikz():

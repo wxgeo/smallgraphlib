@@ -2,17 +2,20 @@ from typing import Iterable, Generic, Callable, Self
 
 from smallgraphlib.labeled_graphs import WeightedDirectedGraph
 
-from smallgraphlib.custom_types import Node
+from smallgraphlib.custom_types import Node, WeightedEdge
+from smallgraphlib.tikz_export import TikzFlowNetworkPrinter
 from smallgraphlib.utilities import cached_property, clear_cache
 
-CapacityEdge = tuple[Node, Node, int]
+# CapacityEdge = tuple[Node, Node, int]
 
 
 class FlowNetwork(WeightedDirectedGraph, Generic[Node]):
+    printer = TikzFlowNetworkPrinter  # type: ignore
+
     def __init__(
         self,
         nodes: Iterable[Node],
-        *weighted_edges: CapacityEdge,
+        *weighted_edges: WeightedEdge,
         sort_nodes: bool = True,
     ):
         self._initialized = False
@@ -49,31 +52,34 @@ class FlowNetwork(WeightedDirectedGraph, Generic[Node]):
         current = current_flow.as_dict()
         if set(capacity) != set(current):
             raise ValueError("Both flows must have the same edges.")
-        residual: dict[tuple[Node, Node], int] = {}
+        residual: dict[tuple[Node, Node], float] = {}
         for key in capacity:
             residual[key] = capacity[key] - current[key]
             residual[(key[1], key[0])] = current[key]
+        # Residual network may not have a source or a sink,
+        # so declare it as a WeightedDirectedGraph instead.
         return WeightedDirectedGraph.from_dict(residual)  # type: ignore
 
     def find_path(
         self,
         start: Node,
         end: Node,
-        _filter: Callable[[Self, Node, Node], bool] = (
+        _filter_edges: Callable[[Self, Node, Node], bool] = (
             lambda self, node1, node2: self.weight(node1, node2) > 0
         ),
+        _filter_nodes: Callable[[Self, Node], bool] | Iterable[Node] = (),
     ) -> list[Node]:
-        return super().find_path(start, end, _filter=_filter)
+        return super().find_path(start, end, _filter_edges=_filter_edges, _filter_nodes=_filter_nodes)
 
     def get_max_flow(self) -> "FlowNetwork":
-        def _filter(self, node1, node2):
-            return self.weight(node1, node2) > 0
+        def _filter_edges(self_: WeightedDirectedGraph, node1_: Node, node2_: Node) -> bool:
+            return self_.weight(node1_, node2_) > 0
 
         flow: FlowNetwork[Node] = FlowNetwork.from_dict(dict.fromkeys(self.as_dict(), 0))
         while (
             len(
                 path := (residual := self.get_residual(flow)).find_path(
-                    self.source, self.sink, _filter=_filter
+                    self.source, self.sink, _filter_edges=_filter_edges
                 )
             )
             > 0
@@ -90,8 +96,5 @@ class FlowNetwork(WeightedDirectedGraph, Generic[Node]):
         )
 
     @clear_cache
-    def set_capacity(self, node1, node2, value: int) -> None:
+    def set_capacity(self, node1, node2, value: float) -> None:
         self._labels[(node1, node2)] = [value]
-
-    # def get_residual_network(self, flow: "Flow") -> "Flow":
-    #     ...
