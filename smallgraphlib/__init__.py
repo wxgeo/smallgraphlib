@@ -2,6 +2,7 @@ from importlib import metadata
 
 from smallgraphlib.automatons import Acceptor, Transducer
 from smallgraphlib.basic_graphs import Graph, DirectedGraph
+from smallgraphlib.flow import FlowNetwork
 from smallgraphlib.labeled_graphs import (
     WeightedGraph,
     WeightedDirectedGraph,
@@ -36,4 +37,5 @@ __all__ = [
     "InvalidGraphAttribute",
     "Acceptor",
     "Transducer",
+    "FlowNetwork",
 ]
