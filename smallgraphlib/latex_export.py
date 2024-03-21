@@ -146,11 +146,12 @@ def latex_WelshPowell(graph: Graph[Node]) -> str:
         [
             r"\begin{tabular}{|l|*{" + str(graph.order) + "}{c|}}",
             r"\hline",
-            "nodes & " + " & ".join(nodes),
+            r"\cellcolor{blue!10} nodes & " + " & ".join(nodes) + r"\\",
             r"\hline",
-            "degrees & " + " & ".join(degrees),
+            r"\cellcolor{blue!10} degrees & " + " & ".join(degrees) + r"\\",
             r"\hline",
-            "colors & " + " & ".join(colors),
+            r"\cellcolor{blue!10} colors & " + " & ".join(colors) + r"\\",
             r"\hline",
+            r"\end{tabular}",
         ]
     )

@@ -51,10 +51,11 @@ def test_latex_welsh_powell():
     assert latex_WelshPowell(g) == (
         "\\begin{tabular}{|l|*{7}{c|}}\n"
         "\\hline\n"
-        "nodes & B & G & A & D & E & F & C\n"
+        "\\cellcolor{blue!10} nodes & B & G & A & D & E & F & C\\\\\n"
         "\\hline\n"
-        "degrees & 6 & 5 & 4 & 4 & 4 & 4 & 3\n"
+        "\\cellcolor{blue!10} degrees & 6 & 5 & 4 & 4 & 4 & 4 & 3\\\\\n"
         "\\hline\n"
-        "colors & red & blue & blue & green & green & orange & orange\n"
-        "\\hline"
+        "\\cellcolor{blue!10} colors & red & blue & blue & green & green & orange & orange\\\\\n"
+        "\\hline\n"
+        "\\end{tabular}"
     )
