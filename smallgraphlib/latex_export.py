@@ -1,8 +1,33 @@
 import math
 from typing import Iterable
 
+from smallgraphlib.basic_graphs import Graph
+
 from smallgraphlib.core import AbstractGraph
 from smallgraphlib.custom_types import Node
+
+COLORS = [
+    "red",
+    "blue",
+    "green",
+    "orange",
+    "magenta",
+    "cyan",
+    "violet",
+    "brown",
+    "pink",
+    "yellow",
+    "purple",
+    "gray",
+    "black",
+    "silver",
+    "sienna",
+    "white",
+    "maroon",
+    "beige",
+    "salmon",
+    "olive",
+]
 
 
 def latex_Dijkstra(graph: AbstractGraph[Node], start: Node, end: Node = None) -> str:
@@ -106,3 +131,26 @@ def latex_Dijkstra(graph: AbstractGraph[Node], start: Node, end: Node = None) ->
             lines.append("")
 
     return "\n" + "\n".join(lines)
+
+
+def latex_WelshPowell(graph: Graph[Node]) -> str:
+    """Generate the LaTeX code of a table ordering nodes by degrees and attributing each a color."""
+    nodes: list[str] = []
+    degrees: list[str] = []
+    colors: list[str] = []
+    for node, color_num in graph.greedy_coloring.items():
+        nodes.append(node)
+        degrees.append(str(graph.all_degrees[node]))
+        colors.append(COLORS[color_num] if color_num < len(COLORS) else str(color_num))
+    return "\n".join(
+        [
+            r"\begin{tabular}{|l|*{" + str(graph.order) + "}{c|}}",
+            r"\hline",
+            "nodes & " + " & ".join(nodes),
+            r"\hline",
+            "degrees & " + " & ".join(degrees),
+            r"\hline",
+            "colors & " + " & ".join(colors),
+            r"\hline",
+        ]
+    )

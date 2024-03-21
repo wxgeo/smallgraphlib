@@ -1,6 +1,7 @@
 import math
 
-from smallgraphlib import WeightedDirectedGraph
+from smallgraphlib import WeightedDirectedGraph, Graph
+from smallgraphlib.latex_export import latex_Dijkstra, latex_WelshPowell
 
 
 def test_latex_dijstra():
@@ -15,7 +16,6 @@ def test_latex_dijstra():
         [oo, oo, oo, oo, oo, 4, 0],
     ]
     g = WeightedDirectedGraph.from_matrix(M, nodes_names="ABCDEFG")
-    from smallgraphlib.latex_export import latex_Dijkstra
 
     assert (
         latex_Dijkstra(g, "A")
@@ -43,4 +43,18 @@ Shorter(s) path(s) from $A$ to $F$: $A-G-F$ (length: 14).
 
 Shorter(s) path(s) from $A$ to $G$: $A-G$ (length: 10).
 """
+    )
+
+
+def test_latex_welsh_powell():
+    g = Graph.from_string("A:B,D,E,F B:C,D,E,F,G C:E,G D:F,G E:G F:G G")
+    assert latex_WelshPowell(g) == (
+        "\\begin{tabular}{|l|*{7}{c|}}\n"
+        "\\hline\n"
+        "nodes & B & G & A & D & E & F & C\n"
+        "\\hline\n"
+        "degrees & 6 & 5 & 4 & 4 & 4 & 4 & 3\n"
+        "\\hline\n"
+        "colors & red & blue & blue & green & green & orange & orange\n"
+        "\\hline"
     )
