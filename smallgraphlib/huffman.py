@@ -126,11 +126,13 @@ class HuffmanTree(Tree[tuple[int, str]]):
 
     def __repr__(self) -> str:
         if self.is_leaf:
-            return f"HuffmanTree(char={self.char}, weight={self.weight})"
+            return f"HuffmanTree(char={self.char!r}, weight={self.weight})"
         return f"HuffmanTree({self.left_branch!r}, {self.right_branch!r})"
 
     def __str__(self) -> str:
         lines = []
+        if self.is_leaf:
+            return f"({self.char})"
         shift = len(str(self.weight)) + 1
         for n, line in enumerate(str(self.left_branch).split("\n")):
             if n == 0:
@@ -144,6 +146,22 @@ class HuffmanTree(Tree[tuple[int, str]]):
             else:
                 lines.append((shift + 1) * " " + line)
         return "\n".join(lines)
+
+    def as_dict(self):
+        if self.is_leaf:
+            return {self.root: []}
+        else:
+            return (
+                {self.root: [branch.root for branch in self.branches]}
+                | self.left_branch.as_dict()
+                | self.right_branch.as_dict()
+            )
+
+    # def __eq__(self, other):
+    #     return isinstance(other, HuffmanTree) and (
+    #         (self.is_leaf and other.is_leaf and self.root == other.root)
+    #         or (other.left_branch == self.left_branch and other.right_branch == self.right_branch)
+    #     )
 
 
 def encode(text: str) -> str:
