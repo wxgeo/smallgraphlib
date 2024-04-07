@@ -25,6 +25,7 @@ sympy = "^1.10.1"
 python-semantic-release = "7.28.1"
 ruff = "^0.3.2"
 numpy = "^1.26.4"
+pytest-pythonhashseed = "^1.0.1"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
@@ -66,7 +67,7 @@ commands =
     poetry install -v
     poetry run black smallgraphlib tests
     poetry run ruff check smallgraphlib tests
-    poetry run pytest tests
+    poetry run pytest --pythonhashseed 0 tests
     poetry run pytest --doctest-modules
     poetry run mypy smallgraphlib tests
 """
