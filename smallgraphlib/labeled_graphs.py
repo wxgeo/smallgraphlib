@@ -165,7 +165,7 @@ class LabeledGraph(AbstractLabeledGraph, Graph):
 
 
 class LabeledDirectedGraph(AbstractLabeledGraph, DirectedGraph):
-    pass
+    """A labeled directed graph."""
 
 
 class AbstractWeightedGraph(AbstractLabeledGraph, ABC, Generic[Node, Label]):

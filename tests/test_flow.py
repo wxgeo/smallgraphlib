@@ -23,3 +23,19 @@ def test_flow_tikz():
     f = FlowNetwork.from_dict(SA=10, AC=2, SB=3, AB=4, BD=5, DC=3, CP=6, DP=4)
     f.as_tikz()
     assert TikzFlowNetworkPrinter(f).nodes in (("P", "D", "B", "S", "A", "C"), ("P", "C", "A", "S", "B", "D"))
+
+
+def test_flow_same_edges_bug():
+    g = FlowNetwork(
+        ("A", "B", "C", "D", "P", "S"),
+        ("A", "B", 6),
+        ("A", "C", 15),
+        ("B", "C", 12),
+        ("B", "D", 11),
+        ("C", "P", 4),
+        ("D", "C", 1),
+        ("D", "P", 16),
+        ("S", "A", 14),
+        ("S", "B", 7),
+    )
+    assert g.get_max_flow_value() == 15

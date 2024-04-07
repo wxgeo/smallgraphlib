@@ -3,6 +3,7 @@ from operator import attrgetter
 from typing import Generic
 
 from smallgraphlib.custom_types import Node
+from smallgraphlib.utilities import cached_property
 
 
 class Tree(Generic[Node]):
@@ -11,6 +12,10 @@ class Tree(Generic[Node]):
     def __init__(self, root: Node, *branches: "Tree") -> None:
         self.root = root
         self.branches: tuple["Tree", ...] = branches
+
+    @cached_property
+    def height(self) -> int:
+        return max((branch.height + 1 for branch in self.branches), default=0)
 
 
 class HuffmanTree(Tree[tuple[int, str]]):
@@ -83,7 +88,7 @@ class HuffmanTree(Tree[tuple[int, str]]):
         # On pourrait par exemple décider que par convention les 3 premiers bits servent à encoder le
         # nombre de bits finaux inutiles.
         # Accessoirement, il faudrait aussi que la chaîne de caractères intègre le dictionnaire de compression
-        # en début de chaîne, et donc se mettre d'accord sur un format, etc.
+        # en début de chaîne, et en conséquence se mettre d'accord sur un format, etc.
         if buffer:
             compressed.append(sum(2**i * int(c) for i, c in enumerate(buffer[:8])))
         return bytes(compressed)
@@ -163,8 +168,54 @@ class HuffmanTree(Tree[tuple[int, str]]):
     #         or (other.left_branch == self.left_branch and other.right_branch == self.right_branch)
     #     )
 
+    def as_tikz(self, *, leaf_style="fill=blue!20", options="") -> str:
+        """Generate Tikz code corresponding to the huffman tree.
+
+        Needed libraries:
+            \\usepackage{tikz}
+            \\usetikzlibrary{calc}
+        """
+        lines = [
+            r"\begin{tikzpicture}[solid,black,"
+            r'every node/.style = {draw, circle, font={\scriptsize}, inner sep=1, minimum height={height("I") + 2pt}},'
+            rf"leaf/.style = {{{leaf_style}}},"
+            f"{options}"
+            "]"
+        ]
+        lines.extend(_tikz_for_huffman_tree(self))
+        lines.append(r"\end{tikzpicture}")
+        return "\n".join(lines)
+
 
 def encode(text: str) -> str:
     """Return a string of `0` and `1` representing the bits of a text encoded using Huffman algorithm."""
     tree = HuffmanTree.from_text(text)
     return tree.encode(text)
+
+
+def _tikz_for_huffman_tree(
+    tree: HuffmanTree,
+    gap=None,
+    _x=0.0,
+    _y=0.0,
+    _parent: str = None,
+) -> list[str]:
+    if gap is None:
+        gap = 2 ** (tree.height - 2)
+    if tree.char.isalnum():
+        char = tree.char
+    else:
+        char = str(ord(tree.char))
+    current = f"{char}-{tree.weight}"
+    node_text = tree.char if tree.is_leaf else str(tree.weight)
+    if node_text == " ":
+        node_text = r"\textvisiblespace{}"
+    lines = [rf"\node[{'leaf' if tree.is_leaf else ''}] ({current}) at ({_x},{_y}) {{{node_text}}};"]
+    if _parent is not None:
+        lines.append(rf"\draw ({_parent}) -- ({current});")
+    gap = gap / 2
+    _y -= 1
+    if not tree.is_leaf:
+        lines.extend(_tikz_for_huffman_tree(tree.left_branch, gap=gap, _parent=current, _x=_x - gap, _y=_y))
+        lines.extend(_tikz_for_huffman_tree(tree.right_branch, gap=gap, _parent=current, _x=_x + gap, _y=_y))
+    return lines

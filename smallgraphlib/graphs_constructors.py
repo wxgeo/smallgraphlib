@@ -89,6 +89,13 @@ def perfect_binary_tree(height: int):
     return Graph(nodes, *edges)
 
 
+def cycle_graph(n: int, directed=False):
+    """Return a cycle graph (also called circular graph) of order n."""
+    nodes = list(range(1, n + 1))
+    edges = ((i, i % len(nodes) + 1) for i in nodes)
+    return (DirectedGraph if directed else Graph)(nodes, *edges)
+
+
 def random_graph(
     order: int,
     degree: int,

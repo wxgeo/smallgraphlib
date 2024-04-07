@@ -15,6 +15,7 @@ from smallgraphlib.graphs_constructors import (
     graph,
     random_graph,
     perfect_binary_tree,
+    cycle_graph,
 )
 from smallgraphlib.core import Traversal, InvalidGraphAttribute
 
@@ -30,6 +31,7 @@ __all__ = [
     "LabeledDirectedGraph",
     "random_graph",
     "complete_graph",
+    "cycle_graph",
     "graph",
     "complete_bipartite_graph",
     "perfect_binary_tree",

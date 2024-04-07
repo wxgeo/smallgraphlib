@@ -1,3 +1,4 @@
+import math
 from typing import Iterable, Generic, Callable, Self
 
 from smallgraphlib.labeled_graphs import WeightedDirectedGraph
@@ -51,6 +52,8 @@ class FlowNetwork(WeightedDirectedGraph, Generic[Node]):
         capacity = self.as_dict()
         current = current_flow.as_dict()
         if set(capacity) != set(current):
+            print(f"{capacity=}")
+            print(f"{current=}")
             raise ValueError("Both flows must have the same edges.")
         residual: dict[tuple[Node, Node], float] = {}
         for key in capacity:
@@ -85,9 +88,13 @@ class FlowNetwork(WeightedDirectedGraph, Generic[Node]):
             > 0
         ):
             additional_capacity = residual.get_path_capacity(path)
-            assert additional_capacity > 0
+            assert additional_capacity > 0 and not math.isinf(additional_capacity)
             for node1, node2 in zip(path[:-1], path[1:]):
-                flow.set_capacity(node1, node2, flow.weight(node1, node2) + additional_capacity)
+                if (node1, node2) in flow.edges:
+                    flow.set_capacity(node1, node2, flow.weight(node1, node2) + additional_capacity)
+                else:
+                    assert (node2, node1) in flow.edges
+                    flow.set_capacity(node2, node1, flow.weight(node2, node1) - additional_capacity)
         return flow
 
     def get_max_flow_value(self) -> float:
