@@ -1,4 +1,4 @@
-from smallgraphlib.flow import FlowNetwork
+from smallgraphlib.flow_networks import FlowNetwork
 from smallgraphlib.tikz_export import TikzFlowNetworkPrinter
 
 

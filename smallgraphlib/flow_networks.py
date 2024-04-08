@@ -1,7 +1,7 @@
 import math
 from typing import Iterable, Generic, Callable, Self
 
-from smallgraphlib.labeled_graphs import WeightedDirectedGraph
+from smallgraphlib.weighted_graphs import WeightedDirectedGraph
 
 from smallgraphlib.custom_types import Node, WeightedEdge
 from smallgraphlib.tikz_export import TikzFlowNetworkPrinter

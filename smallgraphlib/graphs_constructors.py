@@ -8,9 +8,8 @@ from smallgraphlib.basic_graphs import Graph, DirectedGraph
 from smallgraphlib.labeled_graphs import (
     LabeledDirectedGraph,
     LabeledGraph,
-    WeightedDirectedGraph,
-    WeightedGraph,
 )
+from smallgraphlib.weighted_graphs import WeightedGraph, WeightedDirectedGraph
 from smallgraphlib.utilities import Multiset
 from smallgraphlib.tikz_export import _TIKZ_EXPORT_MAX_MULTIPLE_EDGES_SUPPORT
 

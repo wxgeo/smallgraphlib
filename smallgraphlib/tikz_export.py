@@ -10,7 +10,7 @@ if TYPE_CHECKING:
     from smallgraphlib.core import AbstractGraph
     from smallgraphlib.labeled_graphs import AbstractLabeledGraph
     from smallgraphlib.automatons import Automaton, Transducer, Char, Acceptor
-    from smallgraphlib.flow import FlowNetwork
+    from smallgraphlib.flow_networks import FlowNetwork
 
 _TIKZ_EXPORT_MAX_MULTIPLE_EDGES_SUPPORT = 3
 
