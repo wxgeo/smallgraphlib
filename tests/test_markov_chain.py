@@ -1,4 +1,4 @@
-from smallgraphlib.markov_chain import MarkovChain
+from smallgraphlib.markov_chain import MarkovChain, gaussian_elimination
 
 
 def test_markov_chain_from_string():
@@ -11,3 +11,10 @@ def test_markov_chain_from_string():
     assert g.probability("A", "A") == 0.4
     assert g.probability("B", "B") == 0.1
     assert g.transition_matrix == ((0.4, 0.6), (0.9, 0.1))
+    assert g.stable_state == (0.6, 0.4)
+
+
+def test_gaussian_elimination():
+    matrix = [[1, 2, 3], [2, 2, 1]]
+    gaussian_elimination(matrix)
+    assert matrix == [[1, 0, -2], [0, 1, 2.5]]
