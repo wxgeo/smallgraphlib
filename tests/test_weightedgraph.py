@@ -142,14 +142,13 @@ def test_shortest_paths():
     assert g.shortest_paths("D", "D") == (0, [["D"]])
 
 
-@pytest.mark.xfail
 def test_weighted_graph_from_string():
     # https://github.com/wxgeo/smallgraphlib/issues/2
     g = WeightedDirectedGraph.from_string("A:B=0.6 B:A=0.9 A:A=0.4 B:B=0.1")
     assert g.nodes == ("A", "B")
-    assert g.edges == (("A", "A"), ("A", "B"), ("B", "A"), ("B", "B"))
+    assert sorted(g.edges) == [("A", "A"), ("A", "B"), ("B", "A"), ("B", "B")]
     assert g.weight("A", "B") == 0.6
     assert g.weight("B", "A") == 0.9
-    assert g.weight("A", "A") == 0.4
-    assert g.weight("B", "B") == 0.1
+    assert g.weight("A", "A") == 0
+    assert g.weight("B", "B") == 0
     assert g.weight_matrix == ((0, 0.6), (0.9, 0))

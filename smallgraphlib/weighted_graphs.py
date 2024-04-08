@@ -14,7 +14,53 @@ from smallgraphlib.utilities import cached_property
 _AbstractWeightedGraph = TypeVar("_AbstractWeightedGraph", bound="AbstractWeightedGraph")
 
 
-class AbstractWeightedGraph(AbstractLabeledGraph, ABC, Generic[Node, Label]):
+class AbstractNumericGraph(AbstractLabeledGraph, ABC, Generic[Node, Label]):
+    """Abstract class for all graphs labeled with positive numeric values, don't use it directly."""
+
+    def __init__(
+        self,
+        nodes: Iterable[Node],
+        *weighted_edges: WeightedEdge,
+        sort_nodes: bool = True,
+    ):
+        super().__init__(nodes, *weighted_edges, sort_nodes=sort_nodes)
+        for edge, labels in self._labels.items():
+            for label in labels:
+                if not self._is_positive_number(label):
+                    raise ValueError(f"Edge {edge} weight must be a positive real number, not {label!r}.")
+
+    @staticmethod
+    def _is_positive_number(value: Any) -> bool:
+        """Test if a value is a positive real number (including positive infinity)."""
+        try:
+            if isinstance(value, Real):
+                return float(value) >= 0
+            else:
+                # We must support sympy.oo, but isinstance(sympy.oo, Real) return False.
+                return float(value) == math.inf and value != "inf"  # do not accept string "inf" !
+        except (TypeError, ValueError):
+            return False
+
+    def _edge_value(self, node1: Node, node2: Node, *, aggregator=min, default: float = inf) -> float:
+        """
+        Return the weight of the edge joining node1 and node2.
+
+        If edge does not exist, return default value.
+
+        Args:
+            node1: Node
+            node2: Node
+            aggregator: function used to aggregate values if there are several edges
+            between `node1` and `node2` (default is `min`)
+            default: value returned if `node1` and `node2` are not adjacents (default is `inf`).
+        Return:
+            float | None
+        """
+        values = self._labels.get(self._edge(node1, node2), [default])
+        return aggregator(values)
+
+
+class AbstractWeightedGraph(AbstractNumericGraph, ABC, Generic[Node, Label]):
     """Abstract class for all weighted graphs, don't use it directly."""
 
     def __init__(
@@ -26,42 +72,15 @@ class AbstractWeightedGraph(AbstractLabeledGraph, ABC, Generic[Node, Label]):
         super().__init__(nodes, *weighted_edges, sort_nodes=sort_nodes)
         for edge, weights in self.weights.items():
             for weight in weights:
-                if not self._is_weight(weight):
+                if not self._is_positive_number(weight):
                     raise ValueError(f"Edge {edge} weight must be a positive real number, not {weight!r}.")
 
-    @staticmethod
-    def _is_weight(value: Any) -> bool:
-        """Test if a value is a positive real number (including positive infinity)."""
-        try:
-            if isinstance(value, Real):
-                return float(value) >= 0
-            else:
-                # We must support sympy.oo, but isinstance(sympy.oo, Real) return False.
-                return float(value) == math.inf and value != "inf"  # do not accept string "inf" !
-        except (TypeError, ValueError):
-            return False
+    def weight(self, node1: Node, node2: Node) -> float:
+        return 0 if node1 == node2 else self._edge_value(node1, node2, aggregator=min, default=inf)
 
     @property
     def weights(self) -> dict[Edge, list[float]]:
         return self._labels
-
-    def weight(self, node1: Node, node2: Node, *, aggregator=min, default: float = inf) -> float:
-        """
-        Return the weight of the edge joining node1 and node2.
-
-        Args:
-            node1: Node
-            node2: Node
-            aggregator: function used to aggregate values if there are several edges
-            between `node1` and `node2` (default is `min`)
-            default: value returned if `node1` and `node2` are not adjacents (default is `inf`).
-        Return:
-            float
-        """
-        if node1 == node2:
-            return 0
-        values = self.weights.get(self._edge(node1, node2), [default])
-        return aggregator(values)
 
     @cached_property
     def total_weight(self) -> float:
@@ -92,7 +111,7 @@ class AbstractWeightedGraph(AbstractLabeledGraph, ABC, Generic[Node, Label]):
         n = len(M)
         for line in M:
             for val in line:
-                if not cls._is_weight(val):
+                if not cls._is_positive_number(val):
                     raise ValueError(f"All matrix values must be positive real numbers, but {val!r} is not.")
 
         edges = cls._get_edges_from_weights_matrix(M)
@@ -101,10 +120,6 @@ class AbstractWeightedGraph(AbstractLabeledGraph, ABC, Generic[Node, Label]):
         if nodes_names:
             g.rename_nodes(dict(enumerate(list(nodes_names)[: len(g.nodes)], start=1)))
         return g
-
-    def get_path_capacity(self, path: list[Node]):
-        """Return the capacity of the path, which is the smallest weight of any of its edges."""
-        return min(self.weight(node1, node2) for node1, node2 in zip(path[:-1], path[1:]))
 
     def get_path_weight(self, path: list[Node]):
         """Return the weight of the path, which is the sum of those of its edges."""
