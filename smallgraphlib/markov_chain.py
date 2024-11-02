@@ -62,24 +62,24 @@ class MarkovChain(AbstractNumericGraph, DirectedGraph):
     def stable_state(self) -> tuple[float, ...]:
         T = self.transition_matrix
         n = len(T)
-        # T = (T11 T12 T13)
-        #     (T21 T22 T23)
-        #     (T31 T32 T33)
+        # T = ⎡T₁₁ T₁₂ T₁₃⎤
+        #     ⎜T₂₁ T₂₂ T₂₃⎟
+        #     ⎣T₃₁ T₃₂ T₃₃⎦
         # P = (x y (1-x-y))
-        # PT = P <=> / T11 x + T21 y + T31 (1-x-y) = x
-        #            \ T12 x + T22 y + T32 (1-x-y) = x
-        #              (third equation isn't necessary)
-        #        <=> / (T11-T31-1) x + (T21-T31) y + T31 = 0
-        #            \ (T12-T32) x + (T22-T32-1) y + T32 = 0
-        # M = ((T11-T31-1) (T21-T31)   T31)
-        #     ((T12-T32)   (T22-T32-1) T32)
+        # P × T = P <=> ⎧ T₁₁x + T₂₁y + T₃₁(1-x-y) = x
+        #               ⎩ T₁₂x + T₂₂y + T₃₂(1-x-y) = y
+        #               (third equation isn't necessary)
+        #           <=> ⎧ (T₁₁ - T₃₁ - 1)x + (T₂₁ - T₃₁)y + T₃₁ = 0
+        #               ⎩ (T₁₂ - T₃₂)x + (T₂₂ - T₃₂ - 1)y + T₃₂ = 0
+        # M = ⎡(T₁₁ - T₃₁ - 1) (T₂₁ - T₃₁)   T₃₁⎤
+        #     ⎣(T₁₂ - T₃₂)   (T₂₂ - T₃₂ - 1) T₃₂⎦
         M = [[T[i][j] - T[n - 1][j] - (i == j) for i in range(n - 1)] + [T[n - 1][j]] for j in range(n - 1)]
         gaussian_elimination(M)
         # Gaussian elimination:
-        # M' = (1 0 M'31)
-        #      (0 1 M'32)
-        # x = -M'31
-        # y = -M'32
+        # M' = ⎡1 0 M'₃₁⎤
+        #      ⎣0 1 M'₃₂⎦
+        # x = -M'₃₁
+        # y = -M'₃₂
         # z = 1 - (x + y)
         solutions = [-M[i][n - 1] for i in range(n - 1)]
         return tuple(solutions) + (1 - sum(solutions),)

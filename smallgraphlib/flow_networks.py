@@ -45,7 +45,12 @@ class FlowNetwork(Network, Generic[Node]):
         self.on_clear_cache()
 
     def on_clear_cache(self):
-        # Test existence of source and sink.
+        """Test if the flow network has a unique source and a unique sink.
+
+        A `ValueError` is raised else.
+        This should be called each time the flownetwork configuration is changed.
+        """
+        # Test existence of source and sink, by calling corresponding properties.
         if self._initialized:
             _ = self.source
             _ = self.sink
