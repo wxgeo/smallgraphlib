@@ -8,7 +8,7 @@ Created on Sat May  7 12:24:58 2022
 from typing import (
     FrozenSet,
     Sequence,
-    Generic,
+    Generic, Self,
 )
 
 from smallgraphlib.core import (
@@ -58,9 +58,22 @@ class Graph(AbstractGraph, Generic[Node]):
     def __repr__(self):
         # Sort nodes in edges for undirected graphs, so that doctests
         # can be deterministic.
-        edges_as_couples = sorted(sorted(edge) for edge in self.edges)
-        edges = ", ".join(f"{{{node1!r}, {node2!r}}}" for node1, node2 in edges_as_couples)
+        sorted_edges = sorted(sorted(edge) for edge in self.edges)
+
+        def repr_edge(edge: list[Node]) -> str:
+            if len(edge) == 2:
+                node1, node2 = sorted(edge)
+                return f"{{{node1!r}, {node2!r}}}"
+            else:
+                assert len(edge) == 1
+                node, = edge
+                return f"{{{node!r}}}"
+
+        edges = ", ".join(repr_edge(edge) for edge in sorted_edges)
         return f"Graph({tuple(self.nodes)!r}, {edges})"
+    def simplify(self, remove_loops:bool = True) -> Self:
+        """Return the simplified graph: loops and duplicate edges are removed."""
+        return self.__class__(self.nodes, *(edge for edge in self.edges_set if len(edge) == 2 or not remove_loops))
 
     @property
     def is_directed(self):
@@ -187,6 +200,18 @@ class DirectedGraph(AbstractGraph, Generic[Node]):
         return start_found and end_found
 
     @cached_property
+    def sources(self) -> frozenset[Node]:
+        return frozenset(node for node, in_degree in self.all_in_degrees.items() if in_degree == 0)
+
+    @cached_property
+    def sinks(self) -> frozenset[Node]:
+        return frozenset(node for node, out_degree in self.all_out_degrees.items() if out_degree == 0)
+
+    def simplify(self, remove_loops: bool=True) -> Self:
+        """Return the simplified graph: loops and duplicate edges are removed."""
+        return self.__class__(self.nodes, *(edge for edge in self.edges_set if edge[0] != edge[1] or not remove_loops))
+
+    @cached_property
     def levels(self) -> tuple[FrozenSet[Node], ...]:
         graph = self.copy()
         levels: list[FrozenSet] = []
@@ -277,9 +302,46 @@ class DirectedGraph(AbstractGraph, Generic[Node]):
             M = new_M
 
     @cached_property
+    def transitive_closure(self) -> Self:
+        return self.__class__.from_matrix(self.transitive_closure_matrix, self.nodes)
+
+    @cached_property
     def is_transitive(self) -> bool:
         """Test if the graph is transitive.
 
         A directed graph is transitive if for every i->j and j->k edges,
         there is also an i->k edge."""
         return self.adjacency_matrix == self.transitive_closure_matrix
+
+    @cached_property
+    def transitive_reduction(self) -> Self:
+        """Compute the transitive reduction of the graph."""
+        g = self.simplify(remove_loops=False)
+
+        def filter_edges(_: Self, n1: Node, n2: Node) -> bool:
+            return (node1, node2) != (n1, n2)
+
+        for edge in g.edges:
+            node1, node2 = edge
+            if g.find_path(node1, node2, _filter_edges=filter_edges):
+                g.remove_edges(edge)
+        return g
+
+    @cached_property
+    def is_totally_ordered(self) -> bool:
+        if len(self.sources) != 1:
+            return False
+        if len(self.sinks) != 1:
+            return False
+        g = self.transitive_reduction
+        if g.degree != g.order - 1:
+            return False
+        already_seen = set(g.sources)
+        assert len(already_seen) == 1, already_seen
+        current = next(iter(g.sources))
+        while g.out_degree(current) == 1:
+            current = next(iter(g.successors(current)))
+            if current in already_seen:
+                return False
+            already_seen.add(current)
+        return len(already_seen) == g.order

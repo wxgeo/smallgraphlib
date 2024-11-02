@@ -133,14 +133,38 @@ def test_remove_edges():
         frozenset({"E", "A"}),
         frozenset({"E", "C"}),
     }
+    g = DirectedGraph((1, 2, 3, 4), (3, 1), (4, 1), (4, 3))
+    g.remove_edges((3, 1), (4, 1))
+    assert g.edges == ((4, 3),)
+    with pytest.raises(ValueError):
+        g.remove_edges((4, 3), (3, 1))
+    g.remove_edges((4, 3), (3, 1), ignore_missing=True)
+    assert g.edges == ()
 
 
 def test_simple():
     g = Graph("ABCDE", "AB", "BA", "AC", "AD", "EA", "EC")
-    g.__repr__()
     assert not g.is_simple
     g.remove_edges("AB")
     assert g.is_simple
+    g2 = Graph((1, 2, 3), {1, 3}, {1, 2}, {2, 1}, {1})
+    assert not g2.is_simple
+    assert (g3 := g2.simplify()).is_simple
+    assert g3 == Graph((1, 2, 3), {1, 3}, {1, 2})
+    g4 = DirectedGraph("ABCDE", "AB", "BA", "AC", "AD", "EA", "EC", "AA", "AD")
+    assert not g4.is_simple
+    g5 = g4.simplify()
+    assert g5.is_simple
+    assert g5 == DirectedGraph("ABCDE", "AB", "BA", "AC", "AD", "EA", "EC")
+
+def test_repr():
+    g = Graph("ABCDE", "AB", "BA", "AC", "AD", "EA", "EC")
+    assert eval(repr(g)) == g
+    assert repr(g) == ("Graph(('A', 'B', 'C', 'D', 'E'),"
+                       " {'A', 'B'}, {'A', 'B'}, {'A', 'C'}, {'A', 'D'}, {'A', 'E'}, {'C', 'E'})")
+    g2 = Graph((1, 2, 3), {1, 3}, {1, 2}, {2, 1}, {1})
+    assert eval(repr(g2)) == g2
+    assert repr(g2) == "Graph((1, 2, 3), {1}, {1, 2}, {1, 2}, {1, 3})"
 
 
 def test_graph_from_dict():
@@ -251,6 +275,17 @@ def test_transitivity():
     assert DirectedGraph("ABCD", "AB", "BA", "AC", "AD", "AA", "BB", "BC", "BD").is_transitive
 
 
+def test_transitive_reduction():
+    g = DirectedGraph((1,2,3,4), (1,2), (2, 3), (3, 4), (1, 3), (1, 4), (4, 4))
+    assert g.transitive_reduction == DirectedGraph((1,2,3,4), (1,2), (2, 3), (3, 4), (4,4))
+    g = DirectedGraph((1,2,3,4), (1,2), (2, 3), (3, 1), (1, 1), (1, 3), (4, 4))
+    assert g.transitive_reduction == DirectedGraph((1,2,3,4), (1,2), (2, 3), (3, 1), (4,4))
+
+def test_transitive_closure():
+    g = DirectedGraph((1,2,3), (1,2), (2, 3), (3, 1))
+    assert g.transitive_closure == DirectedGraph((1,2,3), (1,1), (1, 2), (1, 3),(2,1), (2, 2), (2, 3),(3,1), (3, 2), (3, 3))
+
+
 def test_weight_matrix():
     g = DirectedGraph((1, 2, 3, 4), (1, 1), (2, 1), (3, 3), (3, 4), (1, 4))
     inf = float("inf")
@@ -264,3 +299,21 @@ def test_distance_matrix():
     g = DirectedGraph((1, 2, 3, 4), (1, 1), (2, 1), (3, 3), (4, 3), (1, 4))
     inf = float("inf")
     assert g.distance_matrix == ((0, inf, 2, 1), (1, 0, 3, 2), (inf, inf, 0, inf), (inf, inf, 1, 0))
+
+
+def test_sources_sinks():
+    g = DirectedGraph((1, 2, 3, 4, 5), (1, 4), (2, 1), (2, 4), (3, 4))
+    assert g.sources == {2, 3, 5}
+    assert g.sinks == {4, 5}
+
+def test_totally_ordered():
+    g = DirectedGraph((1, 2, 3, 4, 5), (1, 4), (2, 1), (2, 4), (3, 4))
+    assert not g.is_totally_ordered
+    g = DirectedGraph((1, 2, 3, 4, 5), (1, 2), (2, 3), (3, 4))
+    assert not g.is_totally_ordered
+    g = DirectedGraph((1, 2, 3, 4, 5), (1, 2), (2, 3), (3, 4), (4, 5))
+    assert g.is_totally_ordered
+    g = DirectedGraph((1, 2, 3, 4, 5), (1, 2), (2, 3), (3, 4), (4, 1))
+    assert not g.is_totally_ordered
+    g = DirectedGraph((1, 2, 3, 4, 5))
+    assert not g.is_totally_ordered
