@@ -300,6 +300,7 @@ class AbstractGraph(ABC, Generic[Node]):
             pass
         return start, end
 
+
     def _test_edges(self, *edges: EdgeLike) -> None:
         edges_nodes = set(chain(*edges))
         nodes = set(self.nodes)
@@ -320,21 +321,29 @@ class AbstractGraph(ABC, Generic[Node]):
                 self._predecessors[start][end] += 1
 
     @clear_cache
-    def remove_edges(self, *edges: EdgeLike) -> None:
+    def remove_edges(self, *edges: EdgeLike, ignore_missing=False) -> None:
         self._test_edges(*edges)
 
         for edge in edges:
             start, end = self._get_edge_extremities(edge)
-            self._successors[start][end] -= 1
-            self._predecessors[end][start] -= 1
+            try:
+                self._successors[start][end] -= 1
+                self._predecessors[end][start] -= 1
+            except ValueError:
+                if not ignore_missing:
+                    raise ValueError(f"Edge not found: ({start}, {end}).")
             # if self.is_directed:
             #     self._successors[end][start] -= 1
+
+    @abstractmethod
+    def simplify(self, remove_loops: bool = True) -> Self:
+        ...
 
     # ----------
     # Comparison
     # ----------
 
-    def __eq__(self, other: Any):
+    def __eq__(self, other: Any) -> bool:
         # Attention, there may be multiple edges, so don't use sets to compare edges !
         return (
             type(self) is type(other)
