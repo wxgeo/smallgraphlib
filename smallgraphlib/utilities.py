@@ -191,7 +191,7 @@ def _handle_greek_letter(match: re.Match) -> str:
     return word
 
 
-def latexify(label: object, default="") -> str:
+def latexify(label: object, default="", wrap: bool = True) -> str:
     """
     Prettify label using LaTeX.
 
@@ -201,16 +201,18 @@ def latexify(label: object, default="") -> str:
         - "S10" -> "$S_{10}$"
         - "-oo" -> "$-\\infty$"
         - float("+inf") -> "$\\infty$"
+
+    By default, label is wrapped with surrounding $, but this can be disabled by setting `wrap=False`.
     """
     if label is None:
         return ""
     elif label == "oo":
-        return r"$\infty$"
+        label = r"\infty"
     elif label == "-oo":
-        return r"$-\infty$"
+        label = r"-\infty"
     try:
         if math.isinf(label):  # type: ignore
-            return r"$\infty$" if label > 0 else r"$-\infty$"  # type: ignore
+            label = r"$\infty$" if label > 0 else r"$-\infty$"  # type: ignore
     except TypeError:
         pass
     label = str(label)
@@ -222,4 +224,6 @@ def latexify(label: object, default="") -> str:
     # Handle greek letters
     label = re.sub("[^\\W\\d_]+", _handle_greek_letter, label)
     # A -> $A$
-    return f"${label}$" if label else default
+    if wrap:
+        label = f"${label}$"
+    return label if label else default

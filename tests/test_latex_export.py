@@ -63,7 +63,7 @@ def test_latex_welsh_powell():
 
 def test_latex_welsh_powell2():
     g = Graph.from_subgraphs("P1,P7 P2,P3,P4,P8 P5,P6,P8 P1,P4,P5 P3,P7 P6,P3")
-    result = r"""\begin{tabular}{|l|*{8}{c|}}
+    expected = r"""\begin{tabular}{|l|*{8}{c|}}
     \hline
     \cellcolor{blue!10} nodes & $P_{3}$ & $P_{4}$ & $P_{8}$ & $P_{5}$ & $P_{1}$ & $P_{2}$ & $P_{6}$ & $P_{7}$\\
     \hline
@@ -73,12 +73,12 @@ def test_latex_welsh_powell2():
     \hline
 \end{tabular}
 """
-    assert latex_WelshPowell(g) == result
+    assert latex_WelshPowell(g) == expected
 
 
 def test_latex_degrees_table():
     g = LabeledDirectedGraph.from_string("s5:s1=a1 s2:s1=a2 s4:s5=a3 s4:s2=a4 s3:s2=a5 s3:s3=a6 s1")
-    result = r"""\begin{tabular}{|l|*{5}{c|}}
+    expected = r"""\begin{tabular}{|l|*{5}{c|}}
     \hline
     \cellcolor{blue!10} nodes & $s_{1}$ & $s_{2}$ & $s_{3}$ & $s_{4}$ & $s_{5}$\\
     \hline
@@ -88,4 +88,28 @@ def test_latex_degrees_table():
     \hline
 \end{tabular}
 """
-    assert latex_degrees_table(g) == result
+    assert latex_degrees_table(g) == expected
+
+
+def test_matrices():
+    g = LabeledDirectedGraph.from_string("s5:s1=a1 s2:s1=a2 s4:s5=a3 s4:s2=a4 s3:s2=a5 s3:s3=a6 s1")
+    # Adjacency matrix
+    expected = r"""$\begin{pmatrix}
+0 & 0 & 0 & 0 & 0\\
+1 & 0 & 0 & 0 & 0\\
+0 & 1 & 1 & 0 & 0\\
+0 & 1 & 0 & 0 & 1\\
+1 & 0 & 0 & 0 & 0\\
+\end{pmatrix}$
+"""
+    assert g.latex_adjacency_matrix() == expected
+    # Distance matrix
+    expected = r"""$\begin{pmatrix}
+0 & $\infty$ & $\infty$ & $\infty$ & $\infty$\\
+1 & 0 & $\infty$ & $\infty$ & $\infty$\\
+2 & 1 & 0 & $\infty$ & $\infty$\\
+2 & 1 & $\infty$ & 0 & 1\\
+1 & $\infty$ & $\infty$ & $\infty$ & 0\\
+\end{pmatrix}$
+"""
+    assert g.latex_distance_matrix() == expected

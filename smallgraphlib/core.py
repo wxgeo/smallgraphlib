@@ -22,6 +22,7 @@ from typing import (
 )
 
 from smallgraphlib.custom_types import _AbstractGraph, Node, Edge, EdgeLike
+from smallgraphlib.printers.latex import latex_matrix
 from smallgraphlib.utilities import cached_property, Multiset, clear_cache
 from smallgraphlib.printers.tikz import TikzPrinter
 
@@ -823,22 +824,9 @@ class AbstractGraph(ABC, Generic[Node]):
             return list(reversed(path))
         return []
 
-    # ------------------
-    #    Tikz support
-    # ==================
-
-    # def _tikz_specific_node_style(self, node: Node) -> str:
-    #     """Overwrite this method to add a specific tikz style to some nodes."""
-    #     return ""
-    #
-    # def _tikz_labels(self, node1: Node, node2: Node) -> list[str]:
-    #     """Overwrite this method to modify tikz value for some labels."""
-    #     return self.labels(node1, node2)
-    #
-    # def _tikz_angles(self, node: Node) -> dict[Node, float]:
-    #     """Overwrite this method to modify tikz automatic nodes' placement."""
-    #     theta = 360 / self.order
-    #     return {node: i * theta for i, node in enumerate(self.nodes)}
+    # ----------------------------
+    #    Tikz and LaTeX export
+    # ============================
 
     def as_tikz(self, *, shuffle_nodes=False, border: str = None, options="", preamble=False) -> str:
         r"""Generate tikz code corresponding to this graph.
@@ -859,6 +847,12 @@ class AbstractGraph(ABC, Generic[Node]):
         return self.printer(self, shuffle_nodes=shuffle_nodes).tikz_code(
             border=border, options=options, preamble=preamble
         )
+
+    def latex_adjacency_matrix(self, env: str = "pmatrix") -> str:
+        return latex_matrix(self.adjacency_matrix, env=env)
+
+    def latex_distance_matrix(self, env: str = "pmatrix") -> str:
+        return latex_matrix(self.distance_matrix, env=env)
 
 
 class InvalidGraphAttribute(AttributeError):

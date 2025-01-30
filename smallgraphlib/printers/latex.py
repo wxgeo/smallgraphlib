@@ -1,11 +1,12 @@
 import math
-from typing import Iterable, Sequence
+from typing import Iterable, Sequence, TYPE_CHECKING
 
-from smallgraphlib.basic_graphs import Graph
-
-from smallgraphlib.core import AbstractGraph
 from smallgraphlib.custom_types import Node
 from smallgraphlib.utilities import latexify
+
+if TYPE_CHECKING:
+    from smallgraphlib.basic_graphs import Graph
+    from smallgraphlib.core import AbstractGraph
 
 COLORS = [
     "red",
@@ -31,7 +32,7 @@ COLORS = [
 ]
 
 
-def latex_Dijkstra(graph: AbstractGraph[Node], start: Node, end: Node = None) -> str:
+def latex_Dijkstra(graph: "AbstractGraph[Node]", start: Node, end: Node = None) -> str:
     """Generate the LaTeX code of a table corresponding to Dijkstra algorithm's steps.
 
     If `end` is `None`, only stop when the shorter path to all other nodes have been found.
@@ -155,7 +156,7 @@ def _latex_table(rows: dict[str, list[str]]) -> str:
     return "\n".join(lines)
 
 
-def latex_WelshPowell(graph: Graph[Node]) -> str:
+def latex_WelshPowell(graph: "Graph[Node]") -> str:
     """Generate the LaTeX code of a table ordering nodes by degrees and attributing each a color."""
     data: dict[str, list[str]] = {"nodes": [], "degrees": [], "colors": []}
     for node, color_num in graph.greedy_coloring.items():
@@ -165,7 +166,7 @@ def latex_WelshPowell(graph: Graph[Node]) -> str:
     return _latex_table(data)
 
 
-def latex_degrees_table(graph: AbstractGraph[Node]) -> str:
+def latex_degrees_table(graph: "AbstractGraph[Node]") -> str:
     """Return the latex code of a table giving all the node degrees."""
     data: dict[str, list[str]] = {"nodes": []}
     for node in graph.nodes:
@@ -178,12 +179,10 @@ def latex_degrees_table(graph: AbstractGraph[Node]) -> str:
     return _latex_table(data)
 
 
-def _latex_matrix(matrix: Sequence[Sequence[object]], env: str = "pmatrix") -> str:
+def latex_matrix(matrix: Sequence[Sequence[object]], env: str = "pmatrix", wrap: bool = True) -> str:
+    """Return the LaTeX code of a matrix."""
     lines = [f"\\begin{{{env}}}"]
-    lines += [(" & ".join(str(item) for item in row) + r"\\") for row in matrix]
+    lines += [(" & ".join(latexify(item, wrap=False) for item in row) + r"\\") for row in matrix]
     lines.append(f"\\end{{{env}}}")
-    return "\n".join(lines) + "\n"
-
-
-def latex_adjacency_matrix(graph: AbstractGraph) -> str:
-    return _latex_matrix(graph.adjacency_matrix)
+    latex = "\n".join(lines)
+    return (f"${latex}$" if wrap else latex) + "\n"
