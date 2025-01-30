@@ -141,7 +141,7 @@ def test_Acceptor_alphabet_name():
     g2 = Acceptor.from_string(">I:a--1;b / (1):**--I")
     g5 = Acceptor.from_string(">I:a--1;b / (1):ALL--I")
     g3 = Acceptor.from_string(">I:a--1;b / (1):A--I", alphabet_name="A")
-    g4 = Acceptor.from_string(r">I:a--1;b / (1):\Sigma--I", alphabet_name=r"\Sigma")
+    g4 = Acceptor.from_string(r">I:a--1;b / (1):Sigma--I", alphabet_name=r"Sigma")
     assert g2 == g1
     assert g2 == g5
     assert g3 == g1

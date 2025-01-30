@@ -1,6 +1,5 @@
 import math
 import random
-import re
 from abc import ABC, abstractmethod
 from collections import Counter, deque
 from enum import Enum
@@ -154,13 +153,6 @@ class AbstractGraph(ABC, Generic[Node]):
     # ------------
     # Node methods
     # ------------
-
-    @staticmethod
-    def latex_node_name(node: Node) -> str:
-        name = str(node)
-        if m := re.fullmatch("(\\w+)(\\d+)", name):
-            name = f"{m.group(1)}_{{{m.group(2)}}}"
-        return f"${name}$"
 
     # Nodes must be ordered, to generate the matrix, so do *not* return a set.
     @cached_property

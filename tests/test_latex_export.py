@@ -1,7 +1,7 @@
 import math
 
-from smallgraphlib import WeightedDirectedGraph, Graph
-from smallgraphlib.latex_export import latex_Dijkstra, latex_WelshPowell
+from smallgraphlib import WeightedDirectedGraph, Graph, LabeledDirectedGraph
+from smallgraphlib.latex_export import latex_Dijkstra, latex_WelshPowell, latex_degrees_table
 
 
 def test_latex_dijstra():
@@ -57,7 +57,7 @@ def test_latex_welsh_powell():
         "    \\hline\n"
         "    \\cellcolor{blue!10} colors & red & blue & blue & green & green & orange & orange\\\\\n"
         "    \\hline\n"
-        "\\end{tabular}"
+        "\\end{tabular}\n"
     )
 
 
@@ -71,5 +71,21 @@ def test_latex_welsh_powell2():
     \hline
     \cellcolor{blue!10} colors & red & blue & green & red & green & orange & blue & blue\\
     \hline
-\end{tabular}"""
+\end{tabular}
+"""
     assert latex_WelshPowell(g) == result
+
+
+def test_latex_degrees_table():
+    g = LabeledDirectedGraph.from_string("s5:s1=a1 s2:s1=a2 s4:s5=a3 s4:s2=a4 s3:s2=a5 s3:s3=a6 s1")
+    result = r"""\begin{tabular}{|l|*{5}{c|}}
+    \hline
+    \cellcolor{blue!10} nodes & $s_{1}$ & $s_{2}$ & $s_{3}$ & $s_{4}$ & $s_{5}$\\
+    \hline
+    \cellcolor{blue!10} in degrees & 2 & 2 & 1 & 0 & 1\\
+    \hline
+    \cellcolor{blue!10} out degrees & 0 & 1 & 2 & 2 & 1\\
+    \hline
+\end{tabular}
+"""
+    assert latex_degrees_table(g) == result

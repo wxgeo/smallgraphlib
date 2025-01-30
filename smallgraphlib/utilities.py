@@ -1,7 +1,39 @@
+import math
+import re
 from abc import abstractmethod
 from collections import Counter
 from functools import wraps
-from typing import Protocol, Generator
+from typing import Protocol, Generator, Final
+
+GREEK_LETTERS: Final[tuple[str, ...]] = (
+    "alpha",
+    "beta",
+    "gamma",
+    "delta",
+    "epsilon",
+    "zeta",
+    "eta",
+    "theta",
+    "iota",
+    "kappa",
+    "lambda",
+    "mu",
+    "nu",
+    "xi",
+    "pi",
+    "rho",
+    "sigma",
+    "tau",
+    "upsilon",
+    "phi",
+    "chi",
+    "psi",
+    "omega",
+)
+
+CAPITALIZED_GREEK_LETTERS: Final[tuple[str, ...]] = tuple(letter.capitalize() for letter in GREEK_LETTERS)
+
+GREEK_LETTERS_RE: Final[str] = "(" + "|".join(GREEK_LETTERS + CAPITALIZED_GREEK_LETTERS) + ")"
 
 
 def cached(f):
@@ -150,3 +182,44 @@ def set_repr(obj: object) -> str:
     if isinstance(obj, (set, frozenset)):
         return f"{{{', '.join(set_repr(elt) for elt in sorted(obj))}}}"
     return repr(obj)
+
+
+def _handle_greek_letter(match: re.Match) -> str:
+    word = match.group()
+    if word in GREEK_LETTERS or word in CAPITALIZED_GREEK_LETTERS:
+        return "\\" + word
+    return word
+
+
+def latexify(label: object, default="") -> str:
+    """
+    Prettify label using LaTeX.
+
+    Only basic formatting is applied, notably:
+        - "A" -> "$A$"
+        - "Gamma" -> "\\Gamma"
+        - "S10" -> "$S_{10}$"
+        - "-oo" -> "$-\\infty$"
+        - float("+inf") -> "$\\infty$"
+    """
+    if label is None:
+        return ""
+    elif label == "oo":
+        return r"$\infty$"
+    elif label == "-oo":
+        return r"$-\infty$"
+    try:
+        if math.isinf(label):  # type: ignore
+            return r"$\infty$" if label > 0 else r"$-\infty$"  # type: ignore
+    except TypeError:
+        pass
+    label = str(label)
+    label = label.replace("#", r"\#")
+    # S10 -> S_{10}
+    if match := re.fullmatch("([^\\W\\d_]+)(\\d+)", label):
+        # [^\\W\\d_]+ -> match only alphabetic characters, not digits nor underscore.
+        label = f"{match.group(1)}_{{{match.group(2)}}}"
+    # Handle greek letters
+    label = re.sub("[^\\W\\d_]+", _handle_greek_letter, label)
+    # A -> $A$
+    return f"${label}$" if label else default

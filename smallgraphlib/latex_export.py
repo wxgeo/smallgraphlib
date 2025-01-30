@@ -5,6 +5,7 @@ from smallgraphlib.basic_graphs import Graph
 
 from smallgraphlib.core import AbstractGraph
 from smallgraphlib.custom_types import Node
+from smallgraphlib.utilities import latexify
 
 COLORS = [
     "red",
@@ -133,25 +134,45 @@ def latex_Dijkstra(graph: AbstractGraph[Node], start: Node, end: Node = None) ->
     return "\n" + "\n".join(lines)
 
 
+def _latex_table(rows: dict[str, list[str]]) -> str:
+    size: int | None = None
+    for items in rows.values():
+        new_size = len(items)
+        if size is not None and new_size != size:
+            raise ValueError("All data must have the same length!")
+        size = new_size
+    if size is None:
+        raise ValueError("No data!")
+    lines: list[str] = [
+        f"\\begin{{tabular}}{{|l|*{{{size}}}{{c|}}}}",
+        r"    \hline",
+    ]
+    for header, items in rows.items():
+        content = " & ".join(items)
+        lines.append(rf"    \cellcolor{{blue!10}} {header} & {content}\\")
+        lines.append(r"    \hline")
+    lines.append("\\end{tabular}\n")
+    return "\n".join(lines)
+
+
 def latex_WelshPowell(graph: Graph[Node]) -> str:
     """Generate the LaTeX code of a table ordering nodes by degrees and attributing each a color."""
-    nodes: list[str] = []
-    degrees: list[str] = []
-    colors: list[str] = []
+    data: dict[str, list[str]] = {"nodes": [], "degrees": [], "colors": []}
     for node, color_num in graph.greedy_coloring.items():
-        nodes.append(graph.latex_node_name(node))
-        degrees.append(str(graph.all_degrees[node]))
-        colors.append(COLORS[color_num] if color_num < len(COLORS) else str(color_num))
-    return "\n".join(
-        [
-            r"\begin{tabular}{|l|*{" + str(graph.order) + "}{c|}}",
-            r"    \hline",
-            r"    \cellcolor{blue!10} nodes & " + " & ".join(nodes) + r"\\",
-            r"    \hline",
-            r"    \cellcolor{blue!10} degrees & " + " & ".join(degrees) + r"\\",
-            r"    \hline",
-            r"    \cellcolor{blue!10} colors & " + " & ".join(colors) + r"\\",
-            r"    \hline",
-            r"\end{tabular}",
-        ]
-    )
+        data["nodes"].append(latexify(node))
+        data["degrees"].append(str(graph.all_degrees[node]))
+        data["colors"].append(COLORS[color_num] if color_num < len(COLORS) else str(color_num))
+    return _latex_table(data)
+
+
+def latex_degrees_table(graph: AbstractGraph[Node]) -> str:
+    """Return the latex code of a table giving all the node degrees."""
+    data: dict[str, list[str]] = {"nodes": []}
+    for node in graph.nodes:
+        data["nodes"].append(latexify(node))
+        if graph.is_directed:
+            data.setdefault("in degrees", []).append(str(graph.all_in_degrees[node]))
+            data.setdefault("out degrees", []).append(str(graph.all_out_degrees[node]))
+        else:
+            data.setdefault("degrees", []).append(str(graph.all_degrees[node]))
+    return _latex_table(data)

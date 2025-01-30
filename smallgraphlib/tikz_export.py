@@ -1,8 +1,8 @@
 import math
 import random
-from typing import Generic, TYPE_CHECKING, Final
+from typing import Generic, TYPE_CHECKING
 
-from smallgraphlib.utilities import frange, cached_property, clear_cache
+from smallgraphlib.utilities import frange, cached_property, clear_cache, latexify
 
 from smallgraphlib.custom_types import Node, Segment, Point, Label
 
@@ -13,32 +13,6 @@ if TYPE_CHECKING:
     from smallgraphlib.flow_networks import FlowNetwork
 
 _TIKZ_EXPORT_MAX_MULTIPLE_EDGES_SUPPORT = 3
-
-GREEK_LETTERS: Final[tuple[str, ...]] = (
-    "alpha",
-    "beta",
-    "gamma",
-    "delta",
-    "epsilon",
-    "zeta",
-    "eta",
-    "theta",
-    "iota",
-    "kappa",
-    "lambda",
-    "mu",
-    "nu",
-    "xi",
-    "pi",
-    "rho",
-    "sigma",
-    "tau",
-    "upsilon",
-    "phi",
-    "chi",
-    "psi",
-    "omega",
-)
 
 
 def segments_intersection(segment1: Segment, segment2: Segment, eps: float = 10**-8) -> Point | None:
@@ -313,7 +287,7 @@ class TikzPrinter(Generic[Node]):
             angle = self.angles[node]
             specific_style = self.specific_node_style(node)
             self.lines.append(
-                rf"    \node[vertex,{specific_style}] ({node}) at ({angle}:1cm) {{{self.graph.latex_node_name(node)}}};"
+                rf"    \node[vertex,{specific_style}] ({node}) at ({angle}:1cm) {{{latexify(node)}}};"
             )
 
         for node in nodes:
@@ -441,25 +415,17 @@ class TikzLabeledGraphPrinter(TikzPrinter, Generic[Node, Label]):
     def labels(self, node1: Node, node2: Node) -> list[str]:
         """Overwrite this method to modify tikz value for some labels."""
         labels = self.graph._labels.get(self.graph._edge(node1, node2), [])
-
-        def format_(label):
-            # Note: math.isinf() supports `sympy.oo` too.
-            if label is None:
-                return ""
-            elif math.isinf(label) and label > 0:
-                return r"$\infty$"
-            elif math.isinf(label) and label < 0:
-                return r"$-\infty$"
-            else:
-                return str(label)
-
-        return [format_(label) for label in labels]
+        return [latexify(label) for label in labels]
 
 
 class TikzAutomatonPrinter(TikzPrinter, Generic[Node]):
     def __init__(self, graph: "Automaton[Node]", shuffle_nodes=False):
         self.graph: "Automaton[Node]" = graph  # For Pycharm
         super().__init__(graph, shuffle_nodes=shuffle_nodes)
+
+    @staticmethod
+    def pretty_transition(label):
+        return latexify(label, default=r"$\varepsilon$")
 
     def specific_node_style(self, node: Node) -> str:
         styles = []
@@ -474,15 +440,8 @@ class TikzAutomatonPrinter(TikzPrinter, Generic[Node]):
             and sorted(labels) == list(self.graph.alphabet)
             and len(self.graph.alphabet) > 1
         ):
-            return [self._latex(self.graph.alphabet_name)]
-        return [",".join(self._latex(label) for label in labels)] if labels else []
-
-    @staticmethod
-    def _latex(label: str) -> str:
-        label = label.replace("#", r"\#")
-        if label in GREEK_LETTERS:
-            label = "\\" + label
-        return f"${label}$" if label else r"$\varepsilon$"
+            return [latexify(self.graph.alphabet_name)]
+        return [",".join(self.pretty_transition(label) for label in labels)] if labels else []
 
 
 class TikzAcceptorPrinter(TikzAutomatonPrinter, Generic[Node]):
@@ -516,9 +475,10 @@ class TikzTransducerPrinter(TikzAutomatonPrinter, Generic[Node]):
                 letters_str = self.graph.alphabet_name
             else:
                 letters_str = ",".join(sorted_letters)
-            letters_str = self._latex(letters_str)
+            letters_str = self.pretty_transition(letters_str)
             if word:
-                letters_str += rf"\fbox{{{self._latex(word)}}}"
+                latex = self.pretty_transition(word)
+                letters_str += rf"\fbox{{{latex}}}"
             labels.append(letters_str)
         return labels
 

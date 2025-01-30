@@ -17,6 +17,7 @@ from smallgraphlib.graphs_constructors import (
 )
 from smallgraphlib.core import Traversal, InvalidGraphAttribute
 from smallgraphlib.weighted_graphs import WeightedDirectedGraph, WeightedGraph
+from smallgraphlib.latex_export import latex_degrees_table, latex_WelshPowell, latex_Dijkstra
 
 __version__ = metadata.version(__package__)
 
@@ -39,4 +40,7 @@ __all__ = [
     "FlowNetwork",
     "WeightedDirectedGraph",
     "WeightedGraph",
+    "latex_Dijkstra",
+    "latex_WelshPowell",
+    "latex_degrees_table",
 ]

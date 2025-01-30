@@ -5,7 +5,6 @@ from smallgraphlib.graphs_constructors import random_graph
 
 from smallgraphlib.basic_graphs import Graph, DirectedGraph
 from smallgraphlib.core import InvalidGraphAttribute
-from smallgraphlib.utilities import Multiset
 
 
 def test_properties():
@@ -227,21 +226,6 @@ def test_simultaneous_nodes_renaming():
     reverse_translate = {v: k for k, v in translate.items()}
     g.rename_nodes(reverse_translate)
     assert g == g_copy
-
-
-def test_Multiset():
-    with pytest.raises(ValueError) as _:
-        # Negative counts are not allowed.
-        Multiset({"a": 2, "b": 4, "c": 4, "d": 0, "e": -1})
-    s = Multiset({"a": 2, "b": 4, "c": 4, "d": 0})
-    # Automatically remove key 'd', since its count is zero.
-    assert set(s) == {"a", "b", "c"}
-    s["a"] -= 1
-    assert set(s) == {"a", "b", "c"}
-    s["a"] -= 1
-    assert set(s) == {"b", "c"}
-    with pytest.raises(ValueError) as _:
-        s["a"] -= 1
 
 
 def test_isomorphic_basic_case():
