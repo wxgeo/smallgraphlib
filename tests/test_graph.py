@@ -157,11 +157,14 @@ def test_simple():
     assert g5.is_simple
     assert g5 == DirectedGraph("ABCDE", "AB", "BA", "AC", "AD", "EA", "EC")
 
+
 def test_repr():
     g = Graph("ABCDE", "AB", "BA", "AC", "AD", "EA", "EC")
     assert eval(repr(g)) == g
-    assert repr(g) == ("Graph(('A', 'B', 'C', 'D', 'E'),"
-                       " {'A', 'B'}, {'A', 'B'}, {'A', 'C'}, {'A', 'D'}, {'A', 'E'}, {'C', 'E'})")
+    assert repr(g) == (
+        "Graph(('A', 'B', 'C', 'D', 'E'),"
+        " {'A', 'B'}, {'A', 'B'}, {'A', 'C'}, {'A', 'D'}, {'A', 'E'}, {'C', 'E'})"
+    )
     g2 = Graph((1, 2, 3), {1, 3}, {1, 2}, {2, 1}, {1})
     assert eval(repr(g2)) == g2
     assert repr(g2) == "Graph((1, 2, 3), {1}, {1, 2}, {1, 2}, {1, 3})"
@@ -276,14 +279,17 @@ def test_transitivity():
 
 
 def test_transitive_reduction():
-    g = DirectedGraph((1,2,3,4), (1,2), (2, 3), (3, 4), (1, 3), (1, 4), (4, 4))
-    assert g.transitive_reduction == DirectedGraph((1,2,3,4), (1,2), (2, 3), (3, 4), (4,4))
-    g = DirectedGraph((1,2,3,4), (1,2), (2, 3), (3, 1), (1, 1), (1, 3), (4, 4))
-    assert g.transitive_reduction == DirectedGraph((1,2,3,4), (1,2), (2, 3), (3, 1), (4,4))
+    g = DirectedGraph((1, 2, 3, 4), (1, 2), (2, 3), (3, 4), (1, 3), (1, 4), (4, 4))
+    assert g.transitive_reduction == DirectedGraph((1, 2, 3, 4), (1, 2), (2, 3), (3, 4), (4, 4))
+    g = DirectedGraph((1, 2, 3, 4), (1, 2), (2, 3), (3, 1), (1, 1), (1, 3), (4, 4))
+    assert g.transitive_reduction == DirectedGraph((1, 2, 3, 4), (1, 2), (2, 3), (3, 1), (4, 4))
+
 
 def test_transitive_closure():
-    g = DirectedGraph((1,2,3), (1,2), (2, 3), (3, 1))
-    assert g.transitive_closure == DirectedGraph((1,2,3), (1,1), (1, 2), (1, 3),(2,1), (2, 2), (2, 3),(3,1), (3, 2), (3, 3))
+    g = DirectedGraph((1, 2, 3), (1, 2), (2, 3), (3, 1))
+    assert g.transitive_closure == DirectedGraph(
+        (1, 2, 3), (1, 1), (1, 2), (1, 3), (2, 1), (2, 2), (2, 3), (3, 1), (3, 2), (3, 3)
+    )
 
 
 def test_weight_matrix():
@@ -305,6 +311,7 @@ def test_sources_sinks():
     g = DirectedGraph((1, 2, 3, 4, 5), (1, 4), (2, 1), (2, 4), (3, 4))
     assert g.sources == {2, 3, 5}
     assert g.sinks == {4, 5}
+
 
 def test_totally_ordered():
     g = DirectedGraph((1, 2, 3, 4, 5), (1, 4), (2, 1), (2, 4), (3, 4))

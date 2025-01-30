@@ -8,7 +8,9 @@ Created on Sat May  7 12:24:58 2022
 from typing import (
     FrozenSet,
     Sequence,
-    Generic, Self,
+    Generic,
+    Self,
+    Type,
 )
 
 from smallgraphlib.core import (
@@ -26,6 +28,29 @@ class Graph(AbstractGraph, Generic[Node]):
 
     >>> G = Graph((1, 2, 3), {1, 3}, {1, 2}, {2, 1}, {1})
     """
+
+    @classmethod
+    def from_subgraphs(cls: "Type[Graph]", subgraphs: str) -> "Graph":
+        """Generate a (simple) graph from a string listing complete subgraphs.
+
+        Nodes in a subgraph are separated with commas, and subgraphs are separated with spaces (at least one).
+
+        >>> Graph.from_subgraphs("A,B,C A,E D,F")
+        Graph(('A', 'B', 'C', 'D', 'E', 'F'), {'A', 'B'}, {'A', 'C'}, {'A', 'E'}, {'B', 'C'}, {'D', 'F'})
+
+        """
+        subgraphs_list: list[list[Node]] = [
+            [node.strip() for node in subgraph.split(",")] for subgraph in subgraphs.split()  # type: ignore
+        ]
+        nodes: set[Node] = {node for subgraph in subgraphs_list for node in subgraph}
+        edges: set[tuple[Node, Node]] = set()
+        for subgraph in subgraphs_list:
+            for node1 in subgraph:
+                for node2 in subgraph:
+                    if node1 < node2:
+                        edges.add((node1, node2))
+
+        return Graph(nodes, *edges)
 
     @staticmethod
     def _get_edges_from_adjacency_matrix(
@@ -66,14 +91,17 @@ class Graph(AbstractGraph, Generic[Node]):
                 return f"{{{node1!r}, {node2!r}}}"
             else:
                 assert len(edge) == 1
-                node, = edge
+                (node,) = edge
                 return f"{{{node!r}}}"
 
         edges = ", ".join(repr_edge(edge) for edge in sorted_edges)
         return f"Graph({tuple(self.nodes)!r}, {edges})"
-    def simplify(self, remove_loops:bool = True) -> Self:
+
+    def simplify(self, remove_loops: bool = True) -> Self:
         """Return the simplified graph: loops and duplicate edges are removed."""
-        return self.__class__(self.nodes, *(edge for edge in self.edges_set if len(edge) == 2 or not remove_loops))
+        return self.__class__(
+            self.nodes, *(edge for edge in self.edges_set if len(edge) == 2 or not remove_loops)
+        )
 
     @property
     def is_directed(self):
@@ -207,9 +235,11 @@ class DirectedGraph(AbstractGraph, Generic[Node]):
     def sinks(self) -> frozenset[Node]:
         return frozenset(node for node, out_degree in self.all_out_degrees.items() if out_degree == 0)
 
-    def simplify(self, remove_loops: bool=True) -> Self:
+    def simplify(self, remove_loops: bool = True) -> Self:
         """Return the simplified graph: loops and duplicate edges are removed."""
-        return self.__class__(self.nodes, *(edge for edge in self.edges_set if edge[0] != edge[1] or not remove_loops))
+        return self.__class__(
+            self.nodes, *(edge for edge in self.edges_set if edge[0] != edge[1] or not remove_loops)
+        )
 
     @cached_property
     def levels(self) -> tuple[FrozenSet[Node], ...]:

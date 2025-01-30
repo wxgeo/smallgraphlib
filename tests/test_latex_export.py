@@ -50,12 +50,26 @@ def test_latex_welsh_powell():
     g = Graph.from_string("A:B,D,E,F B:C,D,E,F,G C:E,G D:F,G E:G F:G G")
     assert latex_WelshPowell(g) == (
         "\\begin{tabular}{|l|*{7}{c|}}\n"
-        "\\hline\n"
-        "\\cellcolor{blue!10} nodes & B & G & A & D & E & F & C\\\\\n"
-        "\\hline\n"
-        "\\cellcolor{blue!10} degrees & 6 & 5 & 4 & 4 & 4 & 4 & 3\\\\\n"
-        "\\hline\n"
-        "\\cellcolor{blue!10} colors & red & blue & blue & green & green & orange & orange\\\\\n"
-        "\\hline\n"
+        "    \\hline\n"
+        "    \\cellcolor{blue!10} nodes & $B$ & $G$ & $A$ & $D$ & $E$ & $F$ & $C$\\\\\n"
+        "    \\hline\n"
+        "    \\cellcolor{blue!10} degrees & 6 & 5 & 4 & 4 & 4 & 4 & 3\\\\\n"
+        "    \\hline\n"
+        "    \\cellcolor{blue!10} colors & red & blue & blue & green & green & orange & orange\\\\\n"
+        "    \\hline\n"
         "\\end{tabular}"
     )
+
+
+def test_latex_welsh_powell2():
+    g = Graph.from_subgraphs("P1,P7 P2,P3,P4,P8 P5,P6,P8 P1,P4,P5 P3,P7 P6,P3")
+    result = r"""\begin{tabular}{|l|*{8}{c|}}
+    \hline
+    \cellcolor{blue!10} nodes & $P_{3}$ & $P_{4}$ & $P_{8}$ & $P_{5}$ & $P_{1}$ & $P_{2}$ & $P_{6}$ & $P_{7}$\\
+    \hline
+    \cellcolor{blue!10} degrees & 5 & 5 & 5 & 4 & 3 & 3 & 3 & 2\\
+    \hline
+    \cellcolor{blue!10} colors & red & blue & green & red & green & orange & blue & blue\\
+    \hline
+\end{tabular}"""
+    assert latex_WelshPowell(g) == result

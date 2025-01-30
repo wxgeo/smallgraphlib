@@ -139,19 +139,19 @@ def latex_WelshPowell(graph: Graph[Node]) -> str:
     degrees: list[str] = []
     colors: list[str] = []
     for node, color_num in graph.greedy_coloring.items():
-        nodes.append(node)
+        nodes.append(graph.latex_node_name(node))
         degrees.append(str(graph.all_degrees[node]))
         colors.append(COLORS[color_num] if color_num < len(COLORS) else str(color_num))
     return "\n".join(
         [
             r"\begin{tabular}{|l|*{" + str(graph.order) + "}{c|}}",
-            r"\hline",
-            r"\cellcolor{blue!10} nodes & " + " & ".join(nodes) + r"\\",
-            r"\hline",
-            r"\cellcolor{blue!10} degrees & " + " & ".join(degrees) + r"\\",
-            r"\hline",
-            r"\cellcolor{blue!10} colors & " + " & ".join(colors) + r"\\",
-            r"\hline",
+            r"    \hline",
+            r"    \cellcolor{blue!10} nodes & " + " & ".join(nodes) + r"\\",
+            r"    \hline",
+            r"    \cellcolor{blue!10} degrees & " + " & ".join(degrees) + r"\\",
+            r"    \hline",
+            r"    \cellcolor{blue!10} colors & " + " & ".join(colors) + r"\\",
+            r"    \hline",
             r"\end{tabular}",
         ]
     )

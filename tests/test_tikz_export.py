@@ -114,3 +114,51 @@ def test_latex_preamble_additions():
     preamble = set(line.strip() for line in TikzPrinter.latex_preamble_additions())
     doc = set(line.strip() for line in TikzPrinter.tikz_code.__doc__.split("\n"))
     assert doc & preamble == preamble
+
+
+def test_tikz_result():
+    g = Graph.from_subgraphs("P1,P7 P2,P3,P4,P8 P5,P6,P8 P1,P4,P5 P3,P7 P6,P3")
+    result_template = r"""\providecommand{\contour}[2]{#2}
+\begin{tikzpicture}[
+solid,black,
+every node/.style = {font={\scriptsize}},
+vertex/.style = {draw, circle,font={\scriptsize},inner sep=2},
+directed/.style = {-{Stealth[scale=1.1]}},
+reversed/.style = {{Stealth[scale=1.1]}-},
+undirected/.style = {},
+<OPTIONS>
+]
+    \node[vertex,] (P1) at (0.0:1cm) {$P_{1}$};
+    \node[vertex,] (P2) at (45.0:1cm) {$P_{2}$};
+    \node[vertex,] (P3) at (90.0:1cm) {$P_{3}$};
+    \node[vertex,] (P4) at (135.0:1cm) {$P_{4}$};
+    \node[vertex,] (P5) at (180.0:1cm) {$P_{5}$};
+    \node[vertex,] (P6) at (225.0:1cm) {$P_{6}$};
+    \node[vertex,] (P7) at (270.0:1cm) {$P_{7}$};
+    \node[vertex,] (P8) at (315.0:1cm) {$P_{8}$};
+    \draw[undirected] (P2) to[bend right=30]  (P3);
+    \draw[undirected] (P3) to[bend right=30]  (P4);
+    \draw[undirected] (P4) to[bend right=30]  (P5);
+    \draw[undirected] (P5) to[bend right=30]  (P6);
+    \draw[undirected] (P1) to[]  (P4);
+    \draw[undirected] (P1) to[]  (P5);
+    \draw[undirected] (P1) to[]  (P7);
+    \draw[undirected] (P2) to[]  (P4);
+    \draw[undirected] (P2) to[]  (P8);
+    \draw[undirected] (P3) to[]  (P6);
+    \draw[undirected] (P3) to[]  (P7);
+    \draw[undirected] (P3) to[]  (P8);
+    \draw[undirected] (P4) to[]  (P8);
+    \draw[undirected] (P5) to[]  (P8);
+    \draw[undirected] (P6) to[]  (P8);
+\end{tikzpicture}"""
+    result = result_template.replace("<OPTIONS>\n", "")
+    assert g.as_tikz() == result
+    result = result_template.replace("<OPTIONS>\n", "scale=2\n")
+    assert g.as_tikz(options="scale=2") == result
+    result = (
+        "\\begin{tikzpicture}\n"
+        f"\\node[rounded corners,draw,inner sep=2pt,dotted]{{\n{result}\n}};\n"
+        "\\end{tikzpicture}"
+    )
+    assert g.as_tikz(border="dotted", options="scale=2") == result

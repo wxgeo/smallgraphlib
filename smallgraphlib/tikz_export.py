@@ -283,24 +283,27 @@ class TikzPrinter(Generic[Node]):
         like "dotted", or "dashed,blue".
         """
         if border:
-            return "".join(
+            return "\n".join(
                 [
-                    rf"\begin{{tikzpicture}}\node[rounded corners,draw,inner sep=2pt,{border}]{{",
+                    r"\begin{tikzpicture}",
+                    rf"\node[rounded corners,draw,inner sep=2pt,{border}]{{",
                     self.tikz_code(options=options),
-                    r"};\end{tikzpicture}",
+                    r"};",
+                    r"\end{tikzpicture}",
                 ]
             )
         self._reset()
         self.lines = [
-            r"\providecommand{\contour}[2]{#2}"  # avoid an error if package contour is not loaded.
-            r"\begin{tikzpicture}[solid,black,"
-            r"every node/.style = {font={\scriptsize}},"
-            r"vertex/.style = {draw, circle,font={\scriptsize},inner sep=2},"
-            "directed/.style = {-{Stealth[scale=1.1]}},"
-            "reversed/.style = {{Stealth[scale=1.1]}-},"
-            "undirected/.style = {},"
-            f"{options}"
-            "]"
+            r"\providecommand{\contour}[2]{#2}",  # avoid an error if package contour is not loaded.
+            r"\begin{tikzpicture}[",
+            r"solid,black,",
+            r"every node/.style = {font={\scriptsize}},",
+            r"vertex/.style = {draw, circle,font={\scriptsize},inner sep=2},",
+            "directed/.style = {-{Stealth[scale=1.1]}},",
+            "reversed/.style = {{Stealth[scale=1.1]}-},",
+            "undirected/.style = {},",
+            f"{options}",
+            "]",
         ]
         # theta = 360 / self.graph.order
         nodes = self.nodes  # = list(self.graph.nodes)
@@ -309,7 +312,9 @@ class TikzPrinter(Generic[Node]):
         for i, node in enumerate(nodes):
             angle = self.angles[node]
             specific_style = self.specific_node_style(node)
-            self.lines.append(rf"\node[vertex,{specific_style}] ({node}) at ({angle}:1cm) {{${node}$}};")
+            self.lines.append(
+                rf"    \node[vertex,{specific_style}] ({node}) at ({angle}:1cm) {{{self.graph.latex_node_name(node)}}};"
+            )
 
         for node in nodes:
             alpha = math.radians(self.angles[node])
@@ -359,13 +364,13 @@ class TikzPrinter(Generic[Node]):
                     self._generate_edge(node1, node2)
 
         self.lines.append(r"\end{tikzpicture}")
-        return "\n".join(self.lines)
+        return "\n".join(line for line in self.lines if line)
 
     def _generate_loop(self, node: Node) -> None:
         style = "directed" if self.graph.is_directed else "undirected"
         for i, label in enumerate(self.labels(node, node), start=1):
             self.lines.append(
-                rf"\draw[{style}] ({node}) to "
+                rf"    \draw[{style}] ({node}) to "
                 f"[out={self.angles[node] - 45},in={self.angles[node] + 45},looseness={1 + i * 4}] "
                 rf"node[midway] {{\contour{{white}}{{{label}}}}} "
                 f"({node});"
@@ -423,7 +428,9 @@ class TikzPrinter(Generic[Node]):
                 label_tikz_code = rf"node[pos={pos}] {{\contour{{white}}{{{label}}}}}"
             direction = "left" if bending > 0 else "right"
             tikz_bending = f"bend {direction}={abs(bending)}" if bending != 0 else ""
-            self.lines.append(rf"\draw[{style}] ({node1}) to[{tikz_bending}] {label_tikz_code} ({node2});")
+            self.lines.append(
+                rf"    \draw[{style}] ({node1}) to[{tikz_bending}] {label_tikz_code} ({node2});"
+            )
 
 
 class TikzLabeledGraphPrinter(TikzPrinter, Generic[Node, Label]):

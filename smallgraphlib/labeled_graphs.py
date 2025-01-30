@@ -69,7 +69,7 @@ class AbstractLabeledGraph(AbstractGraph, ABC, Generic[Node, Label]):
         cls: Type[_AbstractLabeledGraph],
         edge_label_dict: dict[str | tuple[Node, Node], Label] = None,  # type: ignore
         /,
-        **edge_label: Label,  # type: ignore
+        **edge_label: Label,
     ) -> _AbstractLabeledGraph:
         """Construct a directed graph using a {edge_name: label} dictionnary (or keywords).
 

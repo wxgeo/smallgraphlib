@@ -6,6 +6,7 @@ from smallgraphlib import (
     complete_graph,
     complete_bipartite_graph,
     graph,
+    Graph,
 )
 
 
@@ -114,6 +115,25 @@ def test_graph_string():
     g = graph("A:B=5,C=8 B:C=inf C")
     assert g.nodes == ("A", "B", "C")
     assert g.weight("B", "C") == float("inf")
+
+
+def test_graph_subgraphs():
+    g = Graph.from_subgraphs("A,B,C A,D E,F")
+    assert g.nodes_set == set("ABCDEF")
+    assert g.edges_set == {
+        frozenset("AB"),
+        frozenset("AC"),
+        frozenset("BC"),
+        frozenset("AD"),
+        frozenset("EF"),
+    }
+    assert g.is_simple
+    assert not g.is_directed
+    assert not g.is_connected
+    g = Graph.from_subgraphs("A,B,C,D,E,F,G")
+    assert g.nodes_set == set("ABCDEFG")
+    assert g.is_complete
+    assert g.order == 7
 
 
 def test_non_isomorphic_with_same_degrees():

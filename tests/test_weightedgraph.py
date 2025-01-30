@@ -36,7 +36,7 @@ def test_weighted_graph_from_matrix():
 
 
 def test_weighted_graph_from_sympy_matrix():
-    import sympy
+    import sympy  # type: ignore
 
     oo = sympy.oo
     M = sympy.Matrix(
