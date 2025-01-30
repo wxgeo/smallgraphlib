@@ -14,7 +14,7 @@ from smallgraphlib.utilities import cached_property
 _AbstractLabeledGraph = TypeVar("_AbstractLabeledGraph", bound="AbstractLabeledGraph")
 
 
-class AbstractLabeledGraph(AbstractGraph, ABC, Generic[Node, Label]):
+class AbstractLabeledGraph(AbstractGraph[Node], ABC, Generic[Node, Label]):
     """Abstract class for all labeled graphs, don't use it directly."""
 
     printer = TikzLabeledGraphPrinter

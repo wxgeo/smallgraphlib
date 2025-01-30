@@ -105,11 +105,11 @@ def test_matrices():
     assert g.latex_adjacency_matrix() == expected
     # Distance matrix
     expected = r"""$\begin{pmatrix}
-0 & $\infty$ & $\infty$ & $\infty$ & $\infty$\\
-1 & 0 & $\infty$ & $\infty$ & $\infty$\\
-2 & 1 & 0 & $\infty$ & $\infty$\\
-2 & 1 & $\infty$ & 0 & 1\\
-1 & $\infty$ & $\infty$ & $\infty$ & 0\\
+0 & \infty & \infty & \infty & \infty\\
+1 & 0 & \infty & \infty & \infty\\
+2 & 1 & 0 & \infty & \infty\\
+2 & 1 & \infty & 0 & 1\\
+1 & \infty & \infty & \infty & 0\\
 \end{pmatrix}$
 """
     assert g.latex_distance_matrix() == expected
