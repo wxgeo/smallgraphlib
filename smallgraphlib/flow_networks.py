@@ -5,7 +5,7 @@ from smallgraphlib.basic_graphs import DirectedGraph
 from smallgraphlib.weighted_graphs import AbstractNumericGraph
 
 from smallgraphlib.custom_types import Node, WeightedEdge
-from smallgraphlib.tikz_export import TikzFlowNetworkPrinter
+from smallgraphlib.printers.tikz import TikzFlowNetworkPrinter
 from smallgraphlib.utilities import cached_property, clear_cache
 
 # CapacityEdge = tuple[Node, Node, int]

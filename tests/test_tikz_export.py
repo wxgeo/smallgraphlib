@@ -2,7 +2,7 @@ import math
 import random
 
 from smallgraphlib import WeightedDirectedGraph, random_graph, Graph
-from smallgraphlib.tikz_export import (
+from smallgraphlib.printers.tikz import (
     segments_intersection,
     barycenter,
     find_free_position,

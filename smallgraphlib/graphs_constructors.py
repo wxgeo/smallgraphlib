@@ -11,7 +11,7 @@ from smallgraphlib.labeled_graphs import (
 )
 from smallgraphlib.weighted_graphs import WeightedGraph, WeightedDirectedGraph
 from smallgraphlib.utilities import Multiset
-from smallgraphlib.tikz_export import _TIKZ_EXPORT_MAX_MULTIPLE_EDGES_SUPPORT
+from smallgraphlib.printers.tikz import _TIKZ_EXPORT_MAX_MULTIPLE_EDGES_SUPPORT
 
 
 def graph(nodes=None, *edges, directed=False, **labeled_edges):

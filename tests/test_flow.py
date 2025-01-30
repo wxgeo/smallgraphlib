@@ -1,5 +1,5 @@
 from smallgraphlib.flow_networks import FlowNetwork
-from smallgraphlib.tikz_export import TikzFlowNetworkPrinter
+from smallgraphlib.printers.tikz import TikzFlowNetworkPrinter
 
 
 def test_FlowNetwork():

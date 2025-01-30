@@ -5,7 +5,7 @@ from smallgraphlib.string2automaton import StringToAutomatonParser
 
 from smallgraphlib.custom_types import Node, LabeledEdge
 from smallgraphlib.labeled_graphs import LabeledDirectedGraph
-from smallgraphlib.tikz_export import TikzTransducerPrinter, TikzAcceptorPrinter, TikzAutomatonPrinter
+from smallgraphlib.printers.tikz import TikzTransducerPrinter, TikzAcceptorPrinter, TikzAutomatonPrinter
 from smallgraphlib.utilities import cached_property, set_repr
 
 _T = TypeVar("_T", bound="Automaton")

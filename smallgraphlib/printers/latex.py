@@ -1,5 +1,5 @@
 import math
-from typing import Iterable
+from typing import Iterable, Sequence
 
 from smallgraphlib.basic_graphs import Graph
 
@@ -176,3 +176,14 @@ def latex_degrees_table(graph: AbstractGraph[Node]) -> str:
         else:
             data.setdefault("degrees", []).append(str(graph.all_degrees[node]))
     return _latex_table(data)
+
+
+def _latex_matrix(matrix: Sequence[Sequence[object]], env: str = "pmatrix") -> str:
+    lines = [f"\\begin{{{env}}}"]
+    lines += [(" & ".join(str(item) for item in row) + r"\\") for row in matrix]
+    lines.append(f"\\end{{{env}}}")
+    return "\n".join(lines) + "\n"
+
+
+def latex_adjacency_matrix(graph: AbstractGraph) -> str:
+    return _latex_matrix(graph.adjacency_matrix)

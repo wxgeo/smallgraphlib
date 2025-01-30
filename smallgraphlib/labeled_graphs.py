@@ -8,7 +8,7 @@ from typing import Iterable, TypeVar, Generic, Any, Type
 from smallgraphlib.basic_graphs import Graph, DirectedGraph
 from smallgraphlib.core import AbstractGraph
 from smallgraphlib.custom_types import Node, Edge, Label, LabeledEdge
-from smallgraphlib.tikz_export import TikzLabeledGraphPrinter
+from smallgraphlib.printers.tikz import TikzLabeledGraphPrinter
 from smallgraphlib.utilities import cached_property
 
 _AbstractLabeledGraph = TypeVar("_AbstractLabeledGraph", bound="AbstractLabeledGraph")

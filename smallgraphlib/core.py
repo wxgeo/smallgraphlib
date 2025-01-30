@@ -23,7 +23,7 @@ from typing import (
 
 from smallgraphlib.custom_types import _AbstractGraph, Node, Edge, EdgeLike
 from smallgraphlib.utilities import cached_property, Multiset, clear_cache
-from smallgraphlib.tikz_export import TikzPrinter
+from smallgraphlib.printers.tikz import TikzPrinter
 
 
 class Traversal(Enum):

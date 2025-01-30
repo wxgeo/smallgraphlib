@@ -3,7 +3,7 @@ import pytest
 from smallgraphlib.string2automaton import StringToAutomatonParser
 
 from smallgraphlib import Acceptor, Transducer
-from smallgraphlib.tikz_export import TikzAcceptorPrinter
+from smallgraphlib.printers.tikz import TikzAcceptorPrinter
 
 
 def test_StringToAutomatonParser():
