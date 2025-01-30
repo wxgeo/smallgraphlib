@@ -840,7 +840,7 @@ class AbstractGraph(ABC, Generic[Node]):
     #     theta = 360 / self.order
     #     return {node: i * theta for i, node in enumerate(self.nodes)}
 
-    def as_tikz(self, *, shuffle_nodes=False, border: str = None, options="") -> str:
+    def as_tikz(self, *, shuffle_nodes=False, border: str = None, options="", preamble=False) -> str:
         r"""Generate tikz code corresponding to this graph.
 
         `Tikz` package must be loaded in the latex preamble, with `arrows.meta` library::
@@ -856,7 +856,9 @@ class AbstractGraph(ABC, Generic[Node]):
         If set, `border` have to be a combination of tikz path drawing styles,
         like "dotted", or "dashed,blue".
         """
-        return self.printer(self, shuffle_nodes=shuffle_nodes).tikz_code(border=border, options=options)
+        return self.printer(self, shuffle_nodes=shuffle_nodes).tikz_code(
+            border=border, options=options, preamble=preamble
+        )
 
 
 class InvalidGraphAttribute(AttributeError):

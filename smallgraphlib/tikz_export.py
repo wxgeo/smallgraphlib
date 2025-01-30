@@ -240,7 +240,7 @@ class TikzPrinter(Generic[Node]):
         """Overwrite this method to modify tikz value for some labels."""
         return self.graph.labels(node1, node2)
 
-    def tikz_code(self, *, border: str = None, options="") -> str:
+    def tikz_code(self, *, border: str = None, options="", preamble=False) -> str:
         r"""Generate tikz code corresponding to this graph.
 
         `Tikz` package must be loaded in the latex preamble, with `arrows.meta` library::
@@ -261,14 +261,16 @@ class TikzPrinter(Generic[Node]):
                 [
                     r"\begin{tikzpicture}",
                     rf"\node[rounded corners,draw,inner sep=2pt,{border}]{{",
-                    self.tikz_code(options=options),
+                    self.tikz_code(options=options, preamble=preamble),
                     r"};",
                     r"\end{tikzpicture}",
                 ]
             )
         self._reset()
-        self.lines = [
-            r"\providecommand{\contour}[2]{#2}",  # avoid an error if package contour is not loaded.
+        self.lines: list[str] = (
+            self.latex_preamble_additions() if preamble else [r"\providecommand{\contour}[2]{#2}"]
+        )  # Provide a (void) \contour command by default to avoid an error if the package `contour` is not loaded.
+        self.lines += [
             r"\begin{tikzpicture}[",
             r"solid,black,",
             r"every node/.style = {font={\scriptsize}},",

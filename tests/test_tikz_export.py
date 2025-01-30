@@ -118,7 +118,7 @@ def test_latex_preamble_additions():
 
 def test_tikz_result():
     g = Graph.from_subgraphs("P1,P7 P2,P3,P4,P8 P5,P6,P8 P1,P4,P5 P3,P7 P6,P3")
-    result_template = r"""\providecommand{\contour}[2]{#2}
+    result_template = r"""<PREAMBLE>
 \begin{tikzpicture}[
 solid,black,
 every node/.style = {font={\scriptsize}},
@@ -152,9 +152,10 @@ undirected/.style = {},
     \draw[undirected] (P5) to[]  (P8);
     \draw[undirected] (P6) to[]  (P8);
 \end{tikzpicture}"""
-    result = result_template.replace("<OPTIONS>\n", "")
+    default_preamble = r"\providecommand{\contour}[2]{#2}"
+    result = result_template.replace("<OPTIONS>\n", "").replace("<PREAMBLE>", default_preamble)
     assert g.as_tikz() == result
-    result = result_template.replace("<OPTIONS>\n", "scale=2\n")
+    result = result_template.replace("<OPTIONS>\n", "scale=2\n").replace("<PREAMBLE>", default_preamble)
     assert g.as_tikz(options="scale=2") == result
     result = (
         "\\begin{tikzpicture}\n"
@@ -162,3 +163,7 @@ undirected/.style = {},
         "\\end{tikzpicture}"
     )
     assert g.as_tikz(border="dotted", options="scale=2") == result
+    result = result_template.replace("<OPTIONS>\n", "").replace(
+        "<PREAMBLE>", "\n".join(TikzPrinter.latex_preamble_additions())
+    )
+    assert g.as_tikz(preamble=True) == result
