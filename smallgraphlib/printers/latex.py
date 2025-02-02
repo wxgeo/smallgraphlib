@@ -75,9 +75,9 @@ def latex_Dijkstra(graph: "AbstractGraph[Node]", start: Node, end: Node = None) 
 
     current: Node
     first_cell = r"\text{start}"
-    while being_processed and end != (
-        current := min(being_processed, key=(lambda n: distance_from_start[n]))
-    ):
+    previous = None
+    while being_processed and (previous is None or end != previous):
+        current = min(being_processed, key=(lambda n: distance_from_start[n]))
         lines.append(
             f"${first_cell}$ & "
             + " & ".join(cell_content(node) for node in nodes)
@@ -100,7 +100,7 @@ def latex_Dijkstra(graph: "AbstractGraph[Node]", start: Node, end: Node = None) 
                     previous_nodes[neighbor] = {current}
                 elif new_distance == current_distance:
                     previous_nodes[neighbor].add(current)
-
+        previous = current
     lines.append("\\end{tabular}")
     lines.append("")
 
@@ -119,7 +119,7 @@ def latex_Dijkstra(graph: "AbstractGraph[Node]", start: Node, end: Node = None) 
         def path_to_str(path: Iterable[Node]):
             return "-".join(str(node) for node in path)
 
-        return ",".join(path_to_str(path) for path in completed_paths)
+        return ", ".join("$" + path_to_str(path) + "$" for path in completed_paths)
 
     targets = list(nodes) if end is None else [end]
 
@@ -128,7 +128,7 @@ def latex_Dijkstra(graph: "AbstractGraph[Node]", start: Node, end: Node = None) 
             distance = distance_from_start[target]
             lines.append(
                 f"Shorter(s) path(s) from ${start}$ to ${target}$: "
-                f"${shortest_paths()}$ (length: {distance})."
+                f"{shortest_paths()} (length: {distance})."
             )
             lines.append("")
 
@@ -181,6 +181,8 @@ def latex_degrees_table(graph: "AbstractGraph[Node]") -> str:
 
 def latex_matrix(matrix: Sequence[Sequence[object]], env: str = "pmatrix", wrap: bool = True) -> str:
     """Return the LaTeX code of a matrix."""
+    if hasattr(matrix, "tolist"):
+        matrix = matrix.tolist()
     lines = [f"\\begin{{{env}}}"]
     lines += [(" & ".join(latexify(item, wrap=False) for item in row) + r"\\") for row in matrix]
     lines.append(f"\\end{{{env}}}")
