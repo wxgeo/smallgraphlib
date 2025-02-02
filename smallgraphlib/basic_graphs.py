@@ -332,8 +332,8 @@ class DirectedGraph(AbstractGraph, Generic[Node]):
             M = new_M
 
     @cached_property
-    def transitive_closure(self) -> Self:
-        return self.__class__.from_matrix(self.transitive_closure_matrix, self.nodes)
+    def transitive_closure(self) -> "DirectedGraph[Node]":
+        return DirectedGraph.from_matrix(self.transitive_closure_matrix, self.nodes)
 
     @cached_property
     def is_transitive(self) -> bool:
