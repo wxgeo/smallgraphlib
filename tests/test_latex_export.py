@@ -1,6 +1,6 @@
 import math
 
-from smallgraphlib import WeightedDirectedGraph, Graph, LabeledDirectedGraph
+from smallgraphlib import WeightedDirectedGraph, Graph, LabeledDirectedGraph, WeightedGraph
 from smallgraphlib.printers.latex import latex_Dijkstra, latex_WelshPowell, latex_degrees_table
 
 
@@ -46,6 +46,23 @@ Shorter(s) path(s) from $A$ to $G$: $A-G$ (length: 10).
     )
 
 
+def test_latex_dijkstra2():
+    g = WeightedGraph.from_string("A:B=12,C=20,D=9 B:F=13 C:D=8,F=2,G=11 D:G=21 E:F=9,G=3 F:G=5 G")
+    result = g.latex_Dijkstra(start="A", end="C")
+    expected = r"""
+\begin{tabular}{|*9{c |}}\cline{2-9}
+\multicolumn{1}{c|}{} & $A$ & $B$ & $C$ & $D$ & $E$ & $F$ & $G$ & Selected\\\hline
+$\text{start}$ & \cellcolor{blue!20}\textbf{0} & $+\infty$ & $+\infty$ & $+\infty$ & $+\infty$ & $+\infty$ & $+\infty$ & A \cellcolor{blue!20}\textbf{0}\\\hline
+$A$ & \cellcolor{lightgray} & 12 $(A)$ & 20 $(A)$ & \cellcolor{blue!20}\textbf{9 $(A)$} & $+\infty$ & $+\infty$ & $+\infty$ & D \cellcolor{blue!20}\textbf{9 $(A)$}\\\hline
+$D$ & \cellcolor{lightgray} & \cellcolor{blue!20}\textbf{12 $(A)$} & 17 $(D)$ & \cellcolor{lightgray} & $+\infty$ & $+\infty$ & 30 $(D)$ & B \cellcolor{blue!20}\textbf{12 $(A)$}\\\hline
+$B$ & \cellcolor{lightgray} & \cellcolor{lightgray} & \cellcolor{blue!20}\textbf{17 $(D)$} & \cellcolor{lightgray} & $+\infty$ & 25 $(B)$ & 30 $(D)$ & C \cellcolor{blue!20}\textbf{17 $(D)$}\\\hline
+\end{tabular}
+
+Shorter(s) path(s) from $A$ to $C$: $A-D-C$ (length: 17).
+"""
+    assert result == expected
+
+
 def test_latex_welsh_powell():
     g = Graph.from_string("A:B,D,E,F B:C,D,E,F,G C:E,G D:F,G E:G F:G G")
     assert latex_WelshPowell(g) == (
@@ -88,7 +105,7 @@ def test_latex_degrees_table():
     \hline
 \end{tabular}
 """
-    assert latex_degrees_table(g) == expected
+    assert latex_degrees_table(g) == g.latex_degrees() == expected
 
 
 def test_matrices():

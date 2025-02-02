@@ -33,36 +33,9 @@ class AbstractLabeledGraph(AbstractGraph[Node], ABC, Generic[Node, Label]):
 
         super().__init__(nodes, *edges, sort_nodes=sort_nodes)
 
-    def __eq__(self, other: Any):
-        return super().__eq__(other) and all(
-            sorted(self.labels(*edge)) == sorted(other.labels(*edge)) for edge in self.edges
-        )
-
-    def __repr__(self):
-        labeled_edges = (repr(labeled_edge) for labeled_edge in self.labeled_edges)
-        return f"{self.__class__.__name__}({tuple(self.nodes)!r}, {', '.join(labeled_edges)})"
-
-    def copy(self):
-        return self.__class__(self.nodes, *self.labeled_edges)
-
-    @cached_property
-    def labeled_edges(self) -> tuple[LabeledEdge, ...]:
-        # noinspection PyTypeChecker
-        return tuple(
-            sorted(
-                (
-                    *(
-                        sorted(edge) if isinstance(edge, (set, frozenset)) else edge
-                    ),  # Sorting nodes will help in making doctests deterministic.
-                    label,
-                )
-                for edge, labels in self._labels.items()
-                for label in labels
-            )
-        )
-
-    def as_dict(self) -> dict[tuple[Node, Node], Label]:
-        return {(node1, node2): label for node1, node2, label in self.labeled_edges}
+    # ------------------------
+    #    Other constructors
+    # ========================
 
     @classmethod
     def from_dict(
@@ -134,6 +107,49 @@ class AbstractLabeledGraph(AbstractGraph[Node], ABC, Generic[Node, Label]):
                     edges.append((node, successor.strip(), label))
         return cls(nodes, *edges)
 
+    # -------------
+    #    Exports
+    # =============
+
+    def as_dict(self) -> dict[tuple[Node, Node], Label]:
+        return {(node1, node2): label for node1, node2, label in self.labeled_edges}
+
+    # ----------------
+    #    Operations
+    # ================
+
+    def __eq__(self, other: Any):
+        return super().__eq__(other) and all(
+            sorted(self.labels(*edge)) == sorted(other.labels(*edge)) for edge in self.edges
+        )
+
+    def __repr__(self):
+        labeled_edges = (repr(labeled_edge) for labeled_edge in self.labeled_edges)
+        return f"{self.__class__.__name__}({tuple(self.nodes)!r}, {', '.join(labeled_edges)})"
+
+    def copy(self):
+        return self.__class__(self.nodes, *self.labeled_edges)
+
+    # ---------------------
+    #    Edges and nodes
+    # =====================
+
+    @cached_property
+    def labeled_edges(self) -> tuple[LabeledEdge, ...]:
+        # noinspection PyTypeChecker
+        return tuple(
+            sorted(
+                (
+                    *(
+                        sorted(edge) if isinstance(edge, (set, frozenset)) else edge
+                    ),  # Sorting nodes will help in making doctests deterministic.
+                    label,
+                )
+                for edge, labels in self._labels.items()
+                for label in labels
+            )
+        )
+
     def labels(self, node1: Node, node2: Node) -> list[str]:
         labels = self._labels.get(self._edge(node1, node2), [])
         assert len(labels) == self.count_edges(node1, node2, count_undirected_loops_twice=False)
@@ -160,6 +176,14 @@ class AbstractLabeledGraph(AbstractGraph[Node], ABC, Generic[Node, Label]):
 class LabeledGraph(AbstractLabeledGraph, Graph):
     """A labeled undirected graph."""
 
+    def as_graph(self) -> Graph[Node]:
+        """Return the unlabelled graph."""
+        return Graph.from_matrix(self.adjacency_matrix, nodes_names=self.nodes)
+
 
 class LabeledDirectedGraph(AbstractLabeledGraph, DirectedGraph):
     """A labeled directed graph."""
+
+    def as_directed_graph(self) -> DirectedGraph[Node]:
+        """Return the unlabelled directed graph."""
+        return DirectedGraph.from_matrix(self.adjacency_matrix, nodes_names=self.nodes)

@@ -22,7 +22,7 @@ from typing import (
 )
 
 from smallgraphlib.custom_types import _AbstractGraph, Node, Edge, EdgeLike
-from smallgraphlib.printers.latex import latex_matrix
+from smallgraphlib.printers.latex import latex_matrix, latex_degrees_table, latex_Dijkstra
 from smallgraphlib.utilities import cached_property, Multiset, clear_cache
 from smallgraphlib.printers.tikz import TikzPrinter
 
@@ -151,9 +151,9 @@ class AbstractGraph(ABC, Generic[Node]):
             g.rename_nodes(dict(enumerate(list(nodes_names)[: len(g.nodes)], start=1)))
         return g
 
-    # ------------
-    # Node methods
-    # ------------
+    # ----------------
+    #   Node methods
+    # ================
 
     # Nodes must be ordered, to generate the matrix, so do *not* return a set.
     @cached_property
@@ -266,9 +266,9 @@ class AbstractGraph(ABC, Generic[Node]):
         random.shuffle(nodes)
         self.rename_nodes(dict((old_name, new_name) for old_name, new_name in zip(self.nodes, nodes)))
 
-    # ------------
-    # Edge methods
-    # ------------
+    # ----------------
+    #   Edge methods
+    # ================
 
     @cached_property
     def edges(self) -> tuple[Edge, ...]:
@@ -853,6 +853,14 @@ class AbstractGraph(ABC, Generic[Node]):
 
     def latex_distance_matrix(self, env: str = "pmatrix") -> str:
         return latex_matrix(self.distance_matrix, env=env)
+
+    def latex_degrees(self) -> str:
+        return latex_degrees_table(self)
+
+    def latex_Dijkstra(self, start: Node | None = None, end: Node | None = None) -> str:
+        if start is None:
+            start = self.nodes[0]
+        return latex_Dijkstra(self, start=start, end=end)
 
 
 class InvalidGraphAttribute(AttributeError):

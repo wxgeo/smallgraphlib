@@ -1,4 +1,4 @@
-from smallgraphlib import LabeledDirectedGraph, LabeledGraph
+from smallgraphlib import LabeledDirectedGraph, LabeledGraph, DirectedGraph
 
 
 def test_LabeledDirectedGraph_from_string():
@@ -33,3 +33,18 @@ def test_dict_and_copy():
     assert h.copy() == h
     # Directed and undirected graphs should never be equal.
     assert g != h
+
+
+def test_LabeledDirectedGraph_as_DirectedGraph():
+    g = LabeledDirectedGraph.from_string("s5:s1=a1 s2:s1=a2 s4:s5=a3 s4:s2=a4 s3:s2=a5 s3:s3=a6 s1")
+    h = DirectedGraph.from_string("s5:s1 s2:s1 s4:s5 s4:s2 s3:s2 s3:s3 s1")
+    assert g.as_directed_graph() == h
+    matrix = (
+        (0, 0, 0, 0, 0),
+        (1, 0, 0, 0, 0),
+        (1, 1, 1, 0, 0),
+        (1, 1, 0, 0, 1),
+        (1, 0, 0, 0, 0),
+    )
+    assert g.transitive_closure_matrix == h.transitive_closure_matrix == matrix
+    assert g.transitive_closure == h.transitive_closure

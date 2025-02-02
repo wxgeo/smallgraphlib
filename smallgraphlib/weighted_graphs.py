@@ -28,6 +28,7 @@ class AbstractNumericGraph(AbstractLabeledGraph, ABC, Generic[Node, Label]):
             for label in labels:
                 if not self._is_positive_number(label):
                     raise ValueError(f"Edge {edge} weight must be a positive real number, not {label!r}.")
+                    raise ValueError(f"Edge {edge} weight must be a positive real number, not {label!r}.")
 
     @staticmethod
     def _is_positive_number(value: Any) -> bool:
