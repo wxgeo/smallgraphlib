@@ -23,7 +23,7 @@ myst-parser = "^0.18.0"
 sympy = "^1.10.1"
 # Version 7.29+ are buggy !
 python-semantic-release = "7.28.1"
-ruff = "^0.3.2"
+ruff = ">=0.9.1"
 numpy = "^1.26.4"
 pytest-pythonhashseed = "^1.0.1"
 
