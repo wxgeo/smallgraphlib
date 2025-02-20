@@ -510,7 +510,7 @@ class TikzFlowNetworkPrinter(TikzPrinter, Generic[Node]):
         # We must remove source and sink from path, since there are already handled.
         paths: tuple[list[Node], list[Node]] = (
             path[1:-1],
-            self.graph.find_path(source, sink, _filter_nodes=path[1:-1])[1:-1],
+            self.graph.find_path(source, sink, _forbidden_nodes=path[1:-1])[1:-1],
         )
         assert len(paths) == 2
         remaining_nodes = self.graph.nodes_set - set(paths[0]) - set(paths[1]) - {source, sink}

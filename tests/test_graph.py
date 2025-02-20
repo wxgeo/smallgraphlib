@@ -308,3 +308,48 @@ def test_totally_ordered():
     assert not g.is_totally_ordered
     g = DirectedGraph((1, 2, 3, 4, 5))
     assert not g.is_totally_ordered
+
+
+def test_eulerian_hamiltonian():
+    #   B     D
+    #   | \ / |
+    #   |  C  |
+    #   | / \ |
+    #   A     E
+    g = Graph.from_string("A:B,C B:C C:D,E D:E E")
+    assert g.is_eulerian
+    assert not g.is_semi_eulerian
+    assert not g.is_hamiltonian
+    assert g.is_semi_hamiltonian
+    # B - C
+    # | \ |
+    # A - D
+    g = Graph.from_string("A:B,D B:C,D C:D D")
+    assert not g.is_eulerian
+    assert g.is_semi_eulerian
+    assert g.is_hamiltonian
+    assert not g.is_semi_hamiltonian
+    # B - C
+    # | X |
+    # A - D
+    g = Graph.from_string("A:B,C,D B:C,D C:D D")  # K4
+    assert not g.is_eulerian
+    assert not g.is_semi_eulerian
+    assert g.is_hamiltonian
+    assert not g.is_semi_hamiltonian
+    # A - B - C - D
+    g = Graph.from_string("A:B B:C C:D D")
+    assert not g.is_eulerian
+    assert g.is_semi_eulerian
+    assert not g.is_hamiltonian
+    assert g.is_semi_hamiltonian
+    #   B     D
+    #   | \ /
+    #   |  C
+    #   | / \
+    #   A     E
+    g = Graph.from_string("A:B,C B:C C:D,E D E")
+    assert not g.is_eulerian
+    assert g.is_semi_eulerian
+    assert not g.is_hamiltonian
+    assert not g.is_semi_hamiltonian

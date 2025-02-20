@@ -102,10 +102,10 @@ class AbstractGraph(ABC, Generic[Node]):
         nodes: list[str] = []
         edges: list[tuple[str, str]] = []
         for substring in string.split():
-            node, *remaining = substring.split(":", 1)
+            node, *successors = substring.split(":", 1)
             nodes.append(node.strip())
-            if remaining:
-                edges.extend((node, successor.strip()) for successor in remaining[0].split(","))
+            if successors:
+                edges.extend((node, successor.strip()) for successor in successors[0].split(","))
         return cls(nodes, *edges)
 
     @staticmethod
@@ -689,7 +689,10 @@ class AbstractGraph(ABC, Generic[Node]):
         *,
         error_if_already_visited=False,
     ) -> Iterator[Node]:
-        """Return a node iterator, using a prefix DFS."""
+        """Return a node iterator, using a prefix DFS.
+
+        If `error_if_already_visited` is set to True, any cycle will raise a `NodeAlreadyFoundError` when detected.
+        """
         if start is None:
             start = self.nodes[0]
         stack: list[Node] = [start]
@@ -793,26 +796,40 @@ class AbstractGraph(ABC, Generic[Node]):
         self,
         start: Node,
         end: Node,
-        _filter_edges: Callable[[Self, Node, Node], bool] = (lambda _, __, ___: True),
-        _filter_nodes: Callable[[Self, Node], bool] | Iterable[Node] = (),
+        _filter_edges: Callable[[Self, Node, Node, dict[Node, Node]], bool] | None = None,
+        _forbidden_nodes: Callable[[Self, Node], bool] | Iterable[Node] = (),
     ) -> list[Node]:
         """Return a path between nodes `start` and `end`, if any, or an empty list.
 
-        If defined, `_filter_edges` is a boolean function, which takes three arguments: the calling class,
-        the current node and its successor.
-        If `_filter(self, node1, node2)` returns `False`, the edge (node1, node2), if it exists, will be ignored.
+        A BFS algorithm is used, so the path is as short as possible.
+
+        If defined, `_filter_edges` is a boolean function, which takes 4 arguments: the calling class,
+        the current node, its successor and a dictionary {previous node: next node}
+        describing the current state of the path.
+        If `_filter_edges(self, node1, node2, previous_nodes)` returns `False`, the edge (node1, node2), if it exists,
+        will be ignored.
+        For convenience, a `_forbidden_nodes` argument is also provided, which may be either a list of forbidden nodes,
+        or a function to generate such a list (if it returns `True`, the node will be removed).
+
+        Note:
+          - if `_forbidden_nodes` is a callable, it must return `True` to discard a node, contrary to `_filter_edges`
+          which must return `False` to discard an edge.
+          - if callable, `_forbidden_nodes` is only called once, while `_filter_edges` will be called everytime
+            a new edge is tested.
         """
         previous: dict[Node, Node] = {}
         queue: deque[Node] = deque([start])
-        if callable(_filter_nodes):
-            _filter_nodes = set(node for node in self.nodes if _filter_nodes(self, node))
+        if callable(_forbidden_nodes):
+            _filter_nodes = set(node for node in self.nodes if _forbidden_nodes(self, node))
         else:
-            _filter_nodes = set(_filter_nodes)
+            _filter_nodes = set(_forbidden_nodes)
         while end not in previous and len(queue) > 0:
             # BFS
             node = queue.popleft()
             for successor in self.successors(node):
-                if _filter_edges(self, node, successor) and node not in _filter_nodes:
+                if (
+                    _filter_edges is None or _filter_edges(self, node, successor, previous)
+                ) and node not in _filter_nodes:
                     # If successor was never seen before, append it to queue.
                     if successor not in previous:
                         previous[successor] = node
@@ -823,6 +840,53 @@ class AbstractGraph(ABC, Generic[Node]):
                 path.append(previous[path[-1]])
             return list(reversed(path))
         return []
+
+    @cached_property
+    def is_hamiltonian(self) -> bool:
+        """Test whether the graph is hamiltonian."""
+        if any(degree <= 1 for degree in self.all_degrees.values()):
+            return False
+        order = self.order
+        if order >= 3 and all(2 * degree >= order for degree in self.all_degrees.values()):
+            return True
+        # Start from any node.
+        start = next(iter(self.nodes))
+
+        def find_n_steps(
+            first: Node, last: Node, n: int, _already_used: frozenset[Node] = frozenset()
+        ) -> bool:
+            """Recursively test whether a path of n steps exists from node first to node last,
+            ensuring that each node is used at most once."""
+            assert n >= 1
+            _already_used |= frozenset((first,))
+            if n == 1:
+                return last in self._successors[first]
+            return any(
+                find_n_steps(successor, last, n - 1, _already_used=_already_used)
+                for successor in self._successors[first]
+                if successor not in _already_used
+            )
+
+        return find_n_steps(start, start, order)
+
+    @cached_property
+    def is_semi_hamiltonian(self) -> bool:
+        """Test whether the graph is semi-hamiltonian."""
+
+        def find_n_steps(first: Node, n: int, _already_used: frozenset[Node] = frozenset()) -> bool:
+            """Recursively test whether a path of n steps starting from node `first` exists,
+            ensuring that each node is used at most once."""
+            assert n >= 0
+            _already_used |= frozenset((first,))
+            if n == 0:
+                return True
+            return any(
+                find_n_steps(successor, n - 1, _already_used=_already_used)
+                for successor in self._successors[first]
+                if successor not in _already_used
+            )
+
+        return not self.is_hamiltonian and any(find_n_steps(node, self.order - 1) for node in self.nodes)
 
     # ----------------------------
     #    Tikz and LaTeX export

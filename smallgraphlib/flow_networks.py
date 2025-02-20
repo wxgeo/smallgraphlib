@@ -108,15 +108,14 @@ class FlowNetwork(Network, Generic[Node]):
         self,
         start: Node,
         end: Node,
-        _filter_edges: Callable[[Self, Node, Node], bool] = (
-            lambda self, node1, node2: self.capacity(node1, node2) > 0
-        ),
-        _filter_nodes: Callable[[Self, Node], bool] | Iterable[Node] = (),
+        _filter_edges: Callable[[Self, Node, Node, dict[Node, Node]], bool]
+        | None = (lambda self, node1, node2, _: self.capacity(node1, node2) > 0),
+        _forbidden_nodes: Callable[[Self, Node], bool] | Iterable[Node] = (),
     ) -> list[Node]:
-        return super().find_path(start, end, _filter_edges=_filter_edges, _filter_nodes=_filter_nodes)
+        return super().find_path(start, end, _filter_edges=_filter_edges, _forbidden_nodes=_forbidden_nodes)
 
     def get_max_flow(self) -> "FlowNetwork":
-        def _filter_edges(network: Network, node1_: Node, node2_: Node) -> bool:
+        def _filter_edges(network: Network, node1_: Node, node2_: Node, _: dict[Node, Node]) -> bool:
             return network.capacity(node1_, node2_) > 0
 
         flow: FlowNetwork[Node] = FlowNetwork.from_dict(dict.fromkeys(self.as_dict(), 0))

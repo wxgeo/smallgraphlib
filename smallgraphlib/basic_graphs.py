@@ -11,6 +11,7 @@ from typing import (
     Generic,
     Self,
     Type,
+    Any,
 )
 
 from smallgraphlib.core import (
@@ -104,7 +105,7 @@ class Graph(AbstractGraph, Generic[Node]):
         )
 
     @property
-    def is_directed(self):
+    def is_directed(self) -> bool:
         return False
 
     @staticmethod
@@ -113,15 +114,15 @@ class Graph(AbstractGraph, Generic[Node]):
             node2 = node1
         return frozenset((node1, node2))
 
-    def _count_odd_degrees(self):
+    def _count_odd_degrees(self) -> int:
         return sum(self.node_degree(node) % 2 for node in self.nodes)
 
     @cached_property
-    def is_eulerian(self):
+    def is_eulerian(self) -> bool:
         return self._count_odd_degrees() == 0
 
     @cached_property
-    def is_semi_eulerian(self):
+    def is_semi_eulerian(self) -> bool:
         return self._count_odd_degrees() == 2
 
     @cached_property
@@ -348,7 +349,7 @@ class DirectedGraph(AbstractGraph, Generic[Node]):
         """Compute the transitive reduction of the graph."""
         g = self.simplify(remove_loops=False)
 
-        def filter_edges(_: Self, n1: Node, n2: Node) -> bool:
+        def filter_edges(_: Self, n1: Node, n2: Node, __: Any) -> bool:
             return (node1, node2) != (n1, n2)
 
         for edge in g.edges:
