@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "smallgraphlib"
-version = "0.10.0"
+version = "1.0.0"
 description = "Simple library for handling small graphs, including Tikz code generation."
 authors = ["Nicolas Pourcelot <nicolas.pourcelot@gmail.com>"]
 repository = "https://github.com/wxgeo/smallgraphlib"
