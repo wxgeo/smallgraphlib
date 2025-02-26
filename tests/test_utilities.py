@@ -28,3 +28,6 @@ def test_latexify():
     assert latexify("oo") == r"$\infty$"
     assert latexify(float("-inf")) == r"$-\infty$"
     assert latexify(float("inf")) == r"$\infty$"
+    # If it already starts with "\", don't insert another one.
+    assert latexify(r"\Sigma") == r"$\Sigma$"
+    assert latexify(r"\infty") == r"$\infty$"

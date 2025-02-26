@@ -222,7 +222,7 @@ def latexify(label: object, default="", wrap: bool = True) -> str:
         # [^\\W\\d_]+ -> match only alphabetic characters, not digits nor underscore.
         label = f"{match.group(1)}_{{{match.group(2)}}}"
     # Handle greek letters
-    label = re.sub("[^\\W\\d_]+", _handle_greek_letter, label)
+    label = re.sub(r"(?<!\\)[^\W\d_]+", _handle_greek_letter, label)
     # A -> $A$
     if wrap and label:
         label = f"${label}$"
