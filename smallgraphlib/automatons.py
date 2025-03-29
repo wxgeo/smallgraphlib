@@ -249,8 +249,11 @@ class Transducer(Automaton, Generic[Node]):
     A transducer is a finite states automaton which translates an input word into another word.
 
         >>> from smallgraphlib import Transducer
-        >>> transducer = Transducer.from_string(">I:a--1;b / 1:b;a[#]--I")
-        >>> transducer.translate("aababba")  # Count the number of "ba" substrings
+        >>> transducer = Transducer.from_string(">I:a[+];b")
+        >>> transducer.translate("aababba")  # Count the number of "a" in the string.
+        '++++'
+        >>> transducer = Transducer.from_string(">I:a;b--1 / 1:b;a[#]--I")
+        >>> transducer.translate("aababba")  # Count the number of "ba" substrings.
         '##'
     """
 

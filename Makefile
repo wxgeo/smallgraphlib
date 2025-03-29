@@ -17,3 +17,6 @@ build: version
 
 publish: build
 	poetry publish
+
+lock:
+	git commit poetry.lock -m "dev: update poetry.lock"

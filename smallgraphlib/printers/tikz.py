@@ -255,6 +255,8 @@ class TikzPrinter(Generic[Node]):
 
         If set, `border` have to be a combination of tikz path drawing styles,
         like "dotted", or "dashed,blue".
+
+        `options` must be a string corresponding to valid Tikz options, like "xscale=1.5,yscale=2".
         """
         if border:
             return "\n".join(
@@ -342,12 +344,14 @@ class TikzPrinter(Generic[Node]):
         self.lines.append(r"\end{tikzpicture}")
         return "\n".join(line for line in self.lines if line)
 
-    def _generate_loop(self, node: Node) -> None:
+    def _generate_loop(self, node: Node, _default_looseness: int = None) -> None:
+        if _default_looseness is None:
+            _default_looseness = 1
         style = "directed" if self.graph.is_directed else "undirected"
         for i, label in enumerate(self.labels(node, node), start=1):
             self.lines.append(
                 rf"    \draw[{style}] ({node}) to "
-                f"[out={self.angles[node] - 45},in={self.angles[node] + 45},looseness={1 + i * 4}] "
+                f"[out={self.angles[node] - 45},in={self.angles[node] + 45},looseness={_default_looseness + i * 4}] "
                 rf"node[midway] {{\contour{{white}}{{{label}}}}} "
                 f"({node});"
             )
@@ -435,6 +439,16 @@ class TikzAutomatonPrinter(TikzPrinter, Generic[Node]):
             styles.append("rectangle")
         return ",".join(styles)
 
+    def _generate_loop(self, node: Node, _default_looseness: int = None) -> None:
+        if _default_looseness is None:
+            if node in self.graph.initial_states:
+                # Since the initial state is represented as a square, it will be smaller than the other nodes,
+                # making the loop smaller as well. Therefore, we need to increase the looseness to compensate.
+                _default_looseness = 4
+            else:
+                _default_looseness = 1
+        super()._generate_loop(node, _default_looseness)
+
     def labels(self, node1, node2) -> list[str]:
         labels = sorted(self.graph.labels(node1, node2))
         if (
@@ -459,8 +473,11 @@ class TikzAcceptorPrinter(TikzAutomatonPrinter, Generic[Node]):
 
 
 class TikzTransducerPrinter(TikzAutomatonPrinter, Generic[Node]):
-    def __init__(self, graph: "Transducer[Node]", shuffle_nodes=False):
+    def __init__(
+        self, graph: "Transducer[Node]", shuffle_nodes: bool = False, fboxsep: str = "1.5pt"
+    ) -> None:
         self.graph: "Transducer[Node]" = graph  # For Pycharm
+        self.fboxsep = fboxsep
         super().__init__(graph, shuffle_nodes=shuffle_nodes)
 
     def labels(self, node1: Node, node2: Node) -> list[str]:
@@ -480,7 +497,7 @@ class TikzTransducerPrinter(TikzAutomatonPrinter, Generic[Node]):
             letters_str = self.pretty_transition(letters_str)
             if word:
                 latex = self.pretty_transition(word)
-                letters_str += rf"\fbox{{{latex}}}"
+                letters_str += rf" \setlength{{\fboxsep}}{{{self.fboxsep}}}\fbox{{{latex}}}"
             labels.append(letters_str)
         return labels
 
