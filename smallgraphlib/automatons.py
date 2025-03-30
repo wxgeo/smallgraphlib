@@ -292,7 +292,7 @@ class Transducer(Automaton, Generic[Node]):
             sort_nodes=sort_nodes,
         )
         sorted_output_alphabet: tuple[str, ...] = tuple(sorted(output_alphabet))
-        self.output_alphabet_name = sorted_output_alphabet
+        self.output_alphabet = sorted_output_alphabet
         deterministic = True
         for state in self.nodes:
             for letter in self.alphabet:

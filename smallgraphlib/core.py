@@ -536,6 +536,11 @@ class AbstractGraph(ABC, Generic[Node]):
         return tuple(tuple(self.weight(node1, node2) for node2 in self.nodes) for node1 in self.nodes)
 
     def labels(self, node1: Node, node2: Node) -> list[str]:
+        """List the labels the edges joining the given nodes.
+
+        The length of the list in the number of edges joining the two nodes.
+        (If the edge has no label, an empty string will be used as label by default.)
+        """
         n = self.count_edges(node1, node2, count_undirected_loops_twice=False)
         return n * [""]
 

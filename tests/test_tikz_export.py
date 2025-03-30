@@ -1,6 +1,8 @@
 import math
 import random
 
+from smallgraphlib.automatons import Transducer
+
 from smallgraphlib import WeightedDirectedGraph, random_graph, Graph
 from smallgraphlib.printers.tikz import (
     segments_intersection,
@@ -116,7 +118,18 @@ def test_latex_preamble_additions():
     assert doc & preamble == preamble
 
 
-def test_tikz_result():
+def test_Transducer_to_tikz():
+    g = Transducer.from_string(">I:a--1;b / 1:b;a[#]--I")
+    assert r"\fbox{$\#$}" in g.as_tikz()
+
+
+def test_Transducer_to_tikz_bug():
+    g = Transducer.from_string(">I:c;b / 1:b[*]--I;c--I ")
+    tikz = g.as_tikz()
+    assert tikz.count("\\fbox{") == 1
+
+
+def test_full_tikz_result():
     g = Graph.from_subgraphs("P1,P7 P2,P3,P4,P8 P5,P6,P8 P1,P4,P5 P3,P7 P6,P3")
     result_template = r"""<PREAMBLE>
 \begin{tikzpicture}[
@@ -140,17 +153,17 @@ undirected/.style = {},
     \draw[undirected] (P3) to[bend right=30]  (P4);
     \draw[undirected] (P4) to[bend right=30]  (P5);
     \draw[undirected] (P5) to[bend right=30]  (P6);
-    \draw[undirected] (P1) to[]  (P4);
-    \draw[undirected] (P1) to[]  (P5);
-    \draw[undirected] (P1) to[]  (P7);
-    \draw[undirected] (P2) to[]  (P4);
-    \draw[undirected] (P2) to[]  (P8);
-    \draw[undirected] (P3) to[]  (P6);
-    \draw[undirected] (P3) to[]  (P7);
-    \draw[undirected] (P3) to[]  (P8);
-    \draw[undirected] (P4) to[]  (P8);
-    \draw[undirected] (P5) to[]  (P8);
-    \draw[undirected] (P6) to[]  (P8);
+    \draw[undirected] (P4) to[]  (P1);
+    \draw[undirected] (P4) to[]  (P2);
+    \draw[undirected] (P5) to[]  (P1);
+    \draw[undirected] (P6) to[]  (P3);
+    \draw[undirected] (P7) to[]  (P1);
+    \draw[undirected] (P7) to[]  (P3);
+    \draw[undirected] (P8) to[]  (P2);
+    \draw[undirected] (P8) to[]  (P3);
+    \draw[undirected] (P8) to[]  (P4);
+    \draw[undirected] (P8) to[]  (P5);
+    \draw[undirected] (P8) to[]  (P6);
 \end{tikzpicture}"""
     default_preamble = r"\providecommand{\contour}[2]{#2}"
     result = result_template.replace("<OPTIONS>\n", "").replace("<PREAMBLE>", default_preamble)
@@ -167,3 +180,35 @@ undirected/.style = {},
         "<PREAMBLE>", "\n".join(TikzPrinter.latex_preamble_additions())
     )
     assert g.as_tikz(preamble=True) == result
+
+
+def test_full_tikz_transducer_result():
+    s = ">I:a;c;b--1 / 1:b[*]--I;c--I;a--2 / 2:a--I;c--I;b--1"
+    t = Transducer.from_string(s)
+    assert t.alphabet == ("a", "b", "c")
+    assert t.output_alphabet == ("*",)
+    assert set(t.states) == {"1", "2", "I"}
+    expected_tikz_code = r"""
+    \providecommand{\contour}[2]{#2}
+\begin{tikzpicture}[
+solid,black,
+every node/.style = {font={\scriptsize}},
+vertex/.style = {draw, circle,font={\scriptsize},inner sep=2},
+directed/.style = {-{Stealth[scale=1.1]}},
+reversed/.style = {{Stealth[scale=1.1]}-},
+undirected/.style = {},
+scale=1.25
+]
+    \node[vertex,] (1) at (0.0:1cm) {$1$};
+    \node[vertex,] (2) at (120.0:1cm) {$2$};
+    \node[vertex,rectangle] (I) at (240.0:1cm) {$I$};
+    \draw[directed] (I) to [out=195.0,in=285.0,looseness=8] node[midway,sloped,anchor=center] {\contour{white}{$a,c$}} (I);
+    \draw[directed] (1) to[bend left=15] node[pos=0.5,sloped,anchor=center] {\contour{white}{$a$}} (2);
+    \draw[reversed] (1) to[bend right=15] node[pos=0.5,sloped,anchor=center] {\contour{white}{$b$}} (2);
+    \draw[directed] (2) to[] node[pos=0.5,sloped,anchor=center] {\contour{white}{$a,c$}} (I);
+    \draw[directed] (I) to[bend left=30] node[pos=0.5,sloped,anchor=center] {\contour{white}{$b$}} (1);
+    \draw[reversed] (I) to[] node[pos=0.5,sloped,anchor=center] {\contour{white}{$b$\hspace{1pt}\setlength{\fboxsep}{1.5pt}\fbox{$*$}}} (1);
+    \draw[reversed] (I) to[bend right=30] node[pos=0.5,sloped,anchor=center] {\contour{white}{$c$}} (1);
+\end{tikzpicture}
+"""
+    assert t.as_tikz(options="scale=1.25") == expected_tikz_code.strip()

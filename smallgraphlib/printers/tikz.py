@@ -316,33 +316,51 @@ class TikzPrinter(Generic[Node]):
                                     self.labels_positions.append(intersection)
                                     self._cartography[(node1, node2, node3, node4)] = intersection
 
-        # Let's draw now the edges and the labels.
-        #
+        self._draw_all_edges()
+
+        self.lines.append(r"\end{tikzpicture}")
+        return "\n".join(line for line in self.lines if line)
+
+    def _draw_all_edges(self) -> None:
+        """Draw all the edges and the corresponding labels."""
+
         # If the graph is undirected, one should only draw i -> j edge and not j -> i edge,
         # since it is in fact the same edge.
         # An easy way to do that is to keep index[node2] always superior or equal to index[node1].
         #
-        # Generating a simple-to-read graph is not so easy.
+        # Generating an easy-to-read graph is not so easy.
         # One should avoid labels' collisions notably.
         # For the edges joining adjacent nodes, the label should always be placed midway for readability.
         # For the other edges, different positions are tried to minimize collisions' risk.
 
         # First, draw loops
-        for node in nodes:
+        for node in self.nodes:
             self._generate_loop(node)
 
-        # Then, draw the edges joining neighbours, since the label position is fixed.
-        # (The label is always positioned midway because those edges are short).
-        if len(nodes) >= 2:
-            for i, node in enumerate(nodes):
-                self._generate_edge(node, nodes[(i + 1) % len(nodes)])
+        # When drawing oriented edges, we have to draw (i) -> (j) edges and (j) -> (i) edges TOGETHER,
+        # to calculate where to place them.
+        # So, when calling self._generate_edge(i, j), we'll draw both any (i) -> (j) and any (j) -> (i) edges.
 
-            for node1 in nodes:
-                for node2 in nodes[self.index[node1] + 2 :]:
-                    self._generate_edge(node1, node2)
+        if len(self.nodes) == 2:
+            # If we have 3 nodes, we draw (1) <-> (2) edges, then (2) <-> (3), then (3) <-> (1).
+            # The same stands for 4 or more nodes.
+            # But for only 2 nodes, we must NOT draw (1) <-> (2) edges, then (2) <-> (1) edges again!
+            self._generate_edge(self.nodes[0], self.nodes[1])
+        elif len(self.nodes) > 2:
+            # Then, draw the edges joining neighbours, since the label position is fixed.
+            # (The label is always positioned midway because those edges are short).
+            for i, node in enumerate(self.nodes):
+                self._generate_edge(node, self.nodes[(i + 1) % len(self.nodes)])
 
-        self.lines.append(r"\end{tikzpicture}")
-        return "\n".join(line for line in self.lines if line)
+            # Finally, draw all the remaining edges, adjusting their label's position to avoid collisions.
+            for i, node1 in enumerate(self.nodes):
+                for j, node2 in enumerate(self.nodes):
+                    if (
+                        i > j
+                        and ((i - j - 1) % len(self.nodes)) != 0
+                        and ((i - j + 1) % len(self.nodes)) != 0
+                    ):  # Exclude neighbours (already drawn).
+                        self._generate_edge(node1, node2)
 
     def _generate_loop(self, node: Node, _default_looseness: int = None) -> None:
         if _default_looseness is None:
@@ -352,11 +370,17 @@ class TikzPrinter(Generic[Node]):
             self.lines.append(
                 rf"    \draw[{style}] ({node}) to "
                 f"[out={self.angles[node] - 45},in={self.angles[node] + 45},looseness={_default_looseness + i * 4}] "
-                rf"node[midway] {{\contour{{white}}{{{label}}}}} "
+                rf"node[midway,sloped,anchor=center] {{\contour{{white}}{{{label}}}}} "
                 f"({node});"
             )
 
     def _generate_edge(self, node1: Node, node2: Node) -> None:
+        """
+        Draw edges between (node1) and (node2) in both directions.
+
+        Both directional edges, (node1) → (node2) and (node2) → (node1),
+        are drawn simultaneously to accurately determine their positions.
+        """
         assert node1 != node2
         # This is a normal edge, joining two different nodes.
         styles: list[str] = []
@@ -405,7 +429,7 @@ class TikzPrinter(Generic[Node]):
                     pos, xy = find_free_position(point1, point2, self.labels_positions, bending=bending)
                 self.labels_positions.append(xy)
                 self._cartography[(node1, node2)] = xy
-                label_tikz_code = rf"node[pos={pos}] {{\contour{{white}}{{{label}}}}}"
+                label_tikz_code = rf"node[pos={pos},sloped,anchor=center] {{\contour{{white}}{{{label}}}}}"
             direction = "left" if bending > 0 else "right"
             tikz_bending = f"bend {direction}={abs(bending)}" if bending != 0 else ""
             self.lines.append(
@@ -497,7 +521,7 @@ class TikzTransducerPrinter(TikzAutomatonPrinter, Generic[Node]):
             letters_str = self.pretty_transition(letters_str)
             if word:
                 latex = self.pretty_transition(word)
-                letters_str += rf" \setlength{{\fboxsep}}{{{self.fboxsep}}}\fbox{{{latex}}}"
+                letters_str += rf"\hspace{{1pt}}\setlength{{\fboxsep}}{{{self.fboxsep}}}\fbox{{{latex}}}"
             labels.append(letters_str)
         return labels
 

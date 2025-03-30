@@ -192,8 +192,9 @@ def test_Transducer():
 def test_Transducer_from_string():
     g = Transducer.from_string(">I:a--1;b / 1:b;a[#]--I")
     assert g.translate("aababba") == "##"
-
-
-def test_Transducer_to_tikz():
-    g = Transducer.from_string(">I:a--1;b / 1:b;a[#]--I")
-    assert r"\fbox{$\#$}" in g.as_tikz()
+    s = ">I:a;c[c];b--1 / 1:b[*]--I;c[c]--I;a--2 / 2:a--I;c[c]--I;b--1"  # bb -> *
+    t = Transducer.from_string(s)
+    assert t.alphabet == ("a", "b", "c")
+    assert t.output_alphabet == ("*", "c")
+    assert set(t.states) == {"1", "2", "I"}
+    assert t.translate("cbaabccbbbbbabcbbcac") == "ccc**c*cc"
