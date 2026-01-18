@@ -1,35 +1,47 @@
-[tool.poetry]
+[project]
 name = "smallgraphlib"
 version = "1.1.0"
 description = "Simple library for handling small graphs, including Tikz code generation."
-authors = ["Nicolas Pourcelot <nicolas.pourcelot@gmail.com>"]
-repository = "https://github.com/wxgeo/smallgraphlib"
-license = "GPL-3.0-or-later"
+authors = [{ name = "Nicolas Pourcelot", email = "nicolas.pourcelot@gmail.com" }]
+requires-python = ">=3.10,<4"
 readme = "README.md"
-keywords = ["graph", "tikz", "latex"]
+license = "GPL-3.0-or-later"
+keywords = [
+    "graph",
+    "tikz",
+    "latex",
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+]
 
-[tool.poetry.dependencies]
-python = "^3.10"
+[project.urls]
+Repository = "https://github.com/wxgeo/smallgraphlib"
 
-[tool.poetry.group.dev.dependencies]
-pytest = "^7"
-mypy = "^1.8"
-black = "^22.1.0"
-tox = "^4.1.2"
-sphinx-autodoc-typehints = "^1.18.3"
-sphinx-rtd-theme = "^1.0.0"#
-myst-parser = "^0.18.0"
-# To test compatibility with sympy.
-sympy = "^1.10.1"
-# Version 7.29+ are buggy !
-python-semantic-release = "7.28.1"
-ruff = ">=0.9.1"
-numpy = "^1.26.4"
-pytest-pythonhashseed = "^1.0.1"
+[dependency-groups]
+dev = [
+    "pytest>=7,<8",
+    "mypy>=1.8,<2",
+    "black>=22.1.0,<23",
+    "tox>=4.1.2,<5",
+    "sphinx-autodoc-typehints>=1.18.3,<2",
+    "sphinx-rtd-theme>=1.0.0,<2",
+    "myst-parser>=0.18.0,<0.19",
+    "sympy>=1.10.1,<2",
+    "python-semantic-release==7.28.1",
+    "ruff>=0.9.1",
+    "numpy>=1.26.4,<2",
+    "pytest-pythonhashseed>=1.0.1,<2",
+]
 
 [build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
+requires = ["uv_build>=0.9.6,<0.10.0"]
+build-backend = "uv_build"
 
 [tool.semantic_release]
 version_variable = "pyproject.toml:version"
@@ -56,19 +68,4 @@ ignore = ["E203"]
 "tests/test_latex_export.py" = ["E501"]
 
 
-[tool.tox]
-legacy_tox_ini = """
-[tox]
-skipsdist = true
-envlist = py311
 
-[testenv]
-allowlist_externals = poetry
-commands =
-    poetry install -v
-    poetry run black smallgraphlib tests
-    poetry run ruff check smallgraphlib tests
-    poetry run pytest --pythonhashseed 0 tests
-    poetry run pytest --doctest-modules
-    poetry run mypy smallgraphlib tests
-"""
