@@ -920,6 +920,9 @@ class AbstractGraph(ABC, Generic[Node]):
     def latex_adjacency_matrix(self, env: str = "pmatrix") -> str:
         return latex_matrix(self.adjacency_matrix, env=env)
 
+    def latex_weight_matrix(self, env: str = "pmatrix") -> str:
+        return latex_matrix(self.weight_matrix, env=env)
+
     def latex_distance_matrix(self, env: str = "pmatrix") -> str:
         return latex_matrix(self.distance_matrix, env=env)
 
