@@ -354,11 +354,12 @@ def test_eulerian_hamiltonian():
     assert not g.is_hamiltonian
     assert not g.is_semi_hamiltonian
 
+
 def test_multigraph_hamiltonian():
-    g = Graph.from_matrix([[0, 1, 0,1],[1,2,2,2],[0,2,0,0],[1,2,0,0]])
+    g = Graph.from_matrix([[0, 1, 0, 1], [1, 2, 2, 2], [0, 2, 0, 0], [1, 2, 0, 0]])
     assert g == Graph((1, 2, 3, 4), {1, 2}, {1, 4}, {2}, {2, 3}, {2, 3}, {2, 4}, {2, 4})
     assert g.has_loop
     assert not g.is_simple
     assert g.all_degrees == {1: 2, 2: 7, 3: 2, 4: 3}
     assert not g.is_hamiltonian
-    assert not g.is_semi_hamiltonian
+    assert g.is_semi_hamiltonian
