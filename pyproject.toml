@@ -47,7 +47,15 @@ module-root = ""
 module-name= "smallgraphlib"
 
 [tool.semantic_release]
-version_variable = "pyproject.toml:version"
+version_toml = ["pyproject.toml:project.version"]
+build_command = """
+    uv lock --upgrade-package "$PACKAGE_NAME"
+    git add uv.lock
+    uv build
+"""
+
+[semantic_release.remote.token]
+env = "GH_TOKEN"
 
 [tool.mypy]
 implicit_optional = true
