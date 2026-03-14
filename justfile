@@ -1,3 +1,6 @@
+# Main recipes, using just.
+# See README.md for more information.
+
 set shell := ["bash", "-cu"]
 
 uv := "env -u VIRTUAL_ENV uv"
