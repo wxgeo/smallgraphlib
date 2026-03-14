@@ -852,7 +852,7 @@ class AbstractGraph(ABC, Generic[Node]):
         if any(degree <= 1 for degree in self.all_degrees.values()):
             return False
         order = self.order
-        if order >= 3 and all(2 * degree >= order for degree in self.all_degrees.values()):
+        if order >= 3 and self.is_simple and all(2 * degree >= order for degree in self.all_degrees.values()):
             return True
         # Start from any node.
         start = next(iter(self.nodes))
