@@ -32,7 +32,7 @@ dev = [
     "sphinx-rtd-theme>=1.0.0,<2",
     "myst-parser>=0.18.0,<0.19",
     "sympy>=1.10.1,<2",
-    "python-semantic-release==7.28.1",
+    "python-semantic-release>=10",
     "ruff>=0.9.1",
     "numpy>=1.26.4,<2",
     "pytest-pythonhashseed>=1.0.1,<2",
