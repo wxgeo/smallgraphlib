@@ -168,7 +168,7 @@ class HuffmanTree(Tree[tuple[int, str]]):
     #         or (other.left_branch == self.left_branch and other.right_branch == self.right_branch)
     #     )
 
-    def as_tikz(self, *, leaf_style="fill=blue!20", options="") -> str:
+    def as_tikz(self, *, leaf_style="fill=blue!20", options="", with_labels=False) -> str:
         """Generate Tikz code corresponding to the huffman tree.
 
         Needed libraries:
@@ -182,7 +182,7 @@ class HuffmanTree(Tree[tuple[int, str]]):
             f"{options}"
             "]"
         ]
-        lines.extend(_tikz_for_huffman_tree(self))
+        lines.extend(_tikz_for_huffman_tree(self,with_labels=with_labels))
         lines.append(r"\end{tikzpicture}")
         return "\n".join(lines)
 
@@ -199,6 +199,8 @@ def _tikz_for_huffman_tree(
     _x=0.0,
     _y=0.0,
     _parent: str = None,
+    _label="",
+    with_labels: bool = False,
 ) -> list[str]:
     if gap is None:
         gap = 2 ** (tree.height - 2)
@@ -211,11 +213,13 @@ def _tikz_for_huffman_tree(
     if node_text == " ":
         node_text = r"\textvisiblespace{}"
     lines = [rf"\node[{'leaf' if tree.is_leaf else ''}] ({current}) at ({_x},{_y}) {{{node_text}}};"]
+    if tree.is_leaf and with_labels:
+        lines.append(rf"\node[anchor=north,color=red] at ({current}.south) {{{_label}}};")
     if _parent is not None:
         lines.append(rf"\draw ({_parent}) -- ({current});")
     gap = gap / 2
     _y -= 1
     if not tree.is_leaf:
-        lines.extend(_tikz_for_huffman_tree(tree.left_branch, gap=gap, _parent=current, _x=_x - gap, _y=_y))
-        lines.extend(_tikz_for_huffman_tree(tree.right_branch, gap=gap, _parent=current, _x=_x + gap, _y=_y))
+        lines.extend(_tikz_for_huffman_tree(tree.left_branch, gap=gap, _parent=current, _x=_x - gap, _y=_y, _label=_label+"0", with_labels=with_labels))
+        lines.extend(_tikz_for_huffman_tree(tree.right_branch, gap=gap, _parent=current, _x=_x + gap, _y=_y, _label=_label+"1", with_labels=with_labels))
     return lines
