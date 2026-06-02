@@ -171,7 +171,7 @@ class HuffmanTree(Tree[tuple[int, str]]):
         Return the tree as a dict.
 
         For example:
-        >>> from smallgraphlib.huffman import HuffmanTree
+        >>> from smallgraphlib import HuffmanTree
         >>> HuffmanTree.from_text("HELLO").as_dict()
         {(5, 'E'): [(2, 'L'), (3, 'E')],
          (2, 'L'): [],

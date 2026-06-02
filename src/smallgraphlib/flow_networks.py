@@ -81,7 +81,7 @@ class FlowNetwork(Network, Generic[Node]):
         for each currently used edge, the residual will contain the reversed edge,
         with the current flow as value.
 
-            >>> from smallgraphlib.flow_networks import FlowNetwork
+            >>> from smallgraphlib import FlowNetwork
             >>> maximal_f = FlowNetwork(("A", "B"), ("A", "B", 5))
             >>> current_f = FlowNetwork(("A", "B"), ("A", "B", 3))
             >>> maximal_f.get_residual(current_f)

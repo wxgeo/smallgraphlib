@@ -1,7 +1,7 @@
 import math
 import random
 
-from smallgraphlib.automatons import Transducer
+from smallgraphlib import Transducer
 
 from smallgraphlib import WeightedDirectedGraph, random_graph, Graph
 from smallgraphlib.printers.tikz import (

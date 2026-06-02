@@ -1,10 +1,10 @@
 import random
 
 import pytest
-from smallgraphlib.graphs_constructors import random_graph
+from smallgraphlib import random_graph
 
-from smallgraphlib.basic_graphs import Graph, DirectedGraph
-from smallgraphlib.core import InvalidGraphAttribute
+from smallgraphlib import Graph, DirectedGraph
+from smallgraphlib import InvalidGraphAttribute
 
 
 def test_properties():

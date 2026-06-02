@@ -1,53 +1,9 @@
-# Main recipes, using just.
-# See README.md for more information.
-
-set shell := ["bash", "-cu"]
-
-uv := "env -u VIRTUAL_ENV uv"
-project := "smallgraphlib"
+import "justfiles/config.just"
+import "justfiles/git.just"
+import "justfiles/install.just"
+import "justfiles/quality.just"
+import "justfiles/release.just"
+import "justfiles/uv.just"
 
 default:
     just --list
-    
-    
-sync:
-   {{uv}} run sync
-   
-doc:
-    {{uv}} run make -C doc autodoc
-    {{uv}} run make -C doc html
-
-ruff:
-    {{uv}} run ruff check {{project}} tests
-
-mypy: 
-    {{uv}} run mypy {{project}} tests
-
-pytest:
-    {{uv}} run pytest tests
-    
-test: ruff mypy pytest
-
-push:
-    git push
-    git push --tags    
-
-version:
-    {{uv}} run semantic-release --noop version
-
-update-version:
-    {{uv}} run semantic-release version
-	
-build-new-version: update-version
-    rm -rf dist/
-    {{uv}} build
-    
-publish: build-new-version
-    {{uv}} publish
-	
-fix:
-    {{uv}} run black .
-    {{uv}} run ruff check --fix {{project}} tests
-    
-lock:
-    git commit uv.lock -m "dev: update uv.lock"

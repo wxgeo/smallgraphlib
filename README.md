@@ -34,6 +34,7 @@ uv tool install rust-just
 ## Usage
 
 Main classes are `Graph`, `DirectedGraph`, `WeightedGraph` and `WeightedDirectedGraph`:
+
 ```python
 >>> from smallgraphlib import DirectedGraph
 >>> g = DirectedGraph(["A", "B", "C"], ("A", "B"), ("B", "A"), ("B", "C"))
@@ -56,8 +57,9 @@ True
 ```
 
 Special graphs may be generated using factory functions:
+
 ```python
->>> from smallgraphlib import complete_graph, complete_bipartite_graph
+>>>  from smallgraphlib import complete_graph, complete_bipartite_graph
 >>> K5 = complete_graph(5)
 >>> len(K5.greedy_coloring)
 5

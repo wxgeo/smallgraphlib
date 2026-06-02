@@ -1,9 +1,9 @@
 import pytest
 
-from smallgraphlib.string2automaton import StringToAutomatonParser
 
 from smallgraphlib import Acceptor, Transducer
 from smallgraphlib.printers.tikz import TikzAcceptorPrinter
+from smallgraphlib.string2automaton import StringToAutomatonParser
 
 
 def test_StringToAutomatonParser():

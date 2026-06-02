@@ -1,7 +1,8 @@
 import math
 
-from smallgraphlib import WeightedDirectedGraph, Graph, LabeledDirectedGraph, WeightedGraph
 from smallgraphlib.printers.latex import latex_Dijkstra, latex_WelshPowell, latex_degrees_table
+
+from smallgraphlib import WeightedDirectedGraph, Graph, LabeledDirectedGraph, WeightedGraph
 
 
 def test_latex_dijstra():
