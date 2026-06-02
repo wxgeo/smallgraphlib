@@ -212,3 +212,29 @@ scale=1.25
 \end{tikzpicture}
 """
     assert t.as_tikz(options="scale=1.25") == expected_tikz_code.strip()
+
+
+def test_tikz_export_options():
+    tikz_code = Graph((1, 2), {1, 2}, {1, 2}, {1, 2}).as_tikz(border="dotted", name_nodes=False)
+    expected_tikz_code = r"""
+    \begin{tikzpicture}
+\node[rounded corners,draw,inner sep=2pt,dotted]{
+\providecommand{\contour}[2]{#2}
+\begin{tikzpicture}[
+solid,black,
+every node/.style = {font={\scriptsize}},
+vertex/.style = {draw, circle,font={\scriptsize},inner sep=2},
+directed/.style = {-{Stealth[scale=1.1]}},
+reversed/.style = {{Stealth[scale=1.1]}-},
+undirected/.style = {},
+]
+    \node[vertex,] (1) at (0.0:1cm) {};
+    \node[vertex,] (2) at (180.0:1cm) {};
+    \draw[undirected] (1) to[bend left=30]  (2);
+    \draw[undirected] (1) to[]  (2);
+    \draw[undirected] (1) to[bend right=30]  (2);
+\end{tikzpicture}
+};
+\end{tikzpicture}
+    """
+    assert tikz_code == expected_tikz_code.strip()

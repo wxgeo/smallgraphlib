@@ -62,7 +62,7 @@ class AbstractLabeledGraph(AbstractGraph[Node], ABC, Generic[Node, Label]):
         """
         if edge_label_dict is None:
             edge_label_dict = {}
-        edge_label_dict.update(edge_label)  # type: ignore
+        edge_label_dict.update(edge_label)
         nodes = set(chain(*(edge for edge in edge_label_dict)))
         return cls(nodes, *((*edge, label) for edge, label in edge_label_dict.items()))
 

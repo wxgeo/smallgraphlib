@@ -29,7 +29,7 @@ class NodeAlreadyFoundError(RuntimeError):
 
 
 class AbstractGraph(ABC, Generic[Node]):
-    printer = TikzPrinter
+    printer: type[TikzPrinter] = TikzPrinter
 
     def __init__(
         self,
