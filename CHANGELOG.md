@@ -2,6 +2,14 @@
 
 <!-- version list -->
 
+## v1.3.0 (2026-06-02)
+
+### Features
+
+- Add option to hide nodes' names when exporting to tikz.
+  ([`11c685e`](https://github.com/wxgeo/smallgraphlib/commit/11c685e7df95901069c7edc9ac8a3e858137d719))
+
+
 ## v1.2.0 (2026-06-02)
 
 ### Bug Fixes
