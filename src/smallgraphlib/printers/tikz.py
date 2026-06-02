@@ -240,7 +240,14 @@ class TikzPrinter(Generic[Node]):
         """Overwrite this method to modify tikz value for some labels."""
         return self.graph.labels(node1, node2)
 
-    def tikz_code(self, *, border: str = None, options="", preamble=False) -> str:
+    def tikz_code(
+        self,
+        *,
+        border: str | None = None,
+        options: str = "",
+        preamble: bool = False,
+        name_nodes: bool = True,
+    ) -> str:
         r"""Generate tikz code corresponding to this graph.
 
         `Tikz` package must be loaded in the latex preamble, with `arrows.meta` library::
@@ -263,7 +270,7 @@ class TikzPrinter(Generic[Node]):
                 [
                     r"\begin{tikzpicture}",
                     rf"\node[rounded corners,draw,inner sep=2pt,{border}]{{",
-                    self.tikz_code(options=options, preamble=preamble),
+                    self.tikz_code(options=options, preamble=preamble, name_nodes=name_nodes),
                     r"};",
                     r"\end{tikzpicture}",
                 ]
@@ -290,8 +297,9 @@ class TikzPrinter(Generic[Node]):
         for i, node in enumerate(nodes):
             angle = self.angles[node]
             specific_style = self.specific_node_style(node)
+            node_label = latexify(node) if name_nodes else ""
             self.lines.append(
-                rf"    \node[vertex,{specific_style}] ({node}) at ({angle}:1cm) {{{latexify(node)}}};"
+                rf"    \node[vertex,{specific_style}] ({node}) at ({angle}:1cm) {{{node_label}}};"
             )
 
         for node in nodes:

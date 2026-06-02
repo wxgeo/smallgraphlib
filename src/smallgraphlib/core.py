@@ -888,7 +888,15 @@ class AbstractGraph(ABC, Generic[Node]):
     #    Tikz and LaTeX export
     # ============================
 
-    def as_tikz(self, *, shuffle_nodes=False, border: str = None, options="", preamble=False) -> str:
+    def as_tikz(
+        self,
+        *,
+        shuffle_nodes: bool = False,
+        border: str | None = None,
+        options: str = "",
+        preamble: bool = False,
+        name_nodes: bool = True,
+    ) -> str:
         r"""Generate tikz code corresponding to this graph.
 
         `Tikz` package must be loaded in the latex preamble, with `arrows.meta` library::
@@ -903,9 +911,11 @@ class AbstractGraph(ABC, Generic[Node]):
 
         If set, `border` have to be a combination of tikz path drawing styles,
         like "dotted", or "dashed,blue".
+
+        To hide the nodes' names, set `name_nodes` to `False`.
         """
         return self.printer(self, shuffle_nodes=shuffle_nodes).tikz_code(
-            border=border, options=options, preamble=preamble
+            border=border, options=options, preamble=preamble, name_nodes=name_nodes
         )
 
     def latex_adjacency_matrix(self, env: str = "pmatrix") -> str:
