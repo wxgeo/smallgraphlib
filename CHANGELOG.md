@@ -2,6 +2,24 @@
 
 <!-- version list -->
 
+## v1.2.0 (2026-06-02)
+
+### Bug Fixes
+
+- Improve labels default style in HuffmanTree.
+  ([`2ef41ea`](https://github.com/wxgeo/smallgraphlib/commit/2ef41eacea215598e7c5de9261a6bdfc96f0bd5f))
+
+### Features
+
+- Add labels to leafs in HuffmanTree tikz export.
+  ([`a6706d3`](https://github.com/wxgeo/smallgraphlib/commit/a6706d377d3e7df03c8ec2cd75b85266d8460d10))
+
+### Refactoring
+
+- Modernize python code.
+  ([`10b8f96`](https://github.com/wxgeo/smallgraphlib/commit/10b8f965a472a16ab882f022c91eb8fcec01bacf))
+
+
 ## v1.1.1 (2026-03-14)
 
 ### Bug Fixes
