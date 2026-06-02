@@ -53,10 +53,12 @@ class HuffmanTree(Tree[tuple[int, str]]):
 
     @property
     def weight(self) -> int:
+        """The total number of characters."""
         return self.root[0]
 
     @property
     def char(self) -> str:
+        """The smallest character according to alphabetical order (extended to Unicode)."""
         return self.root[1]
 
     @property
@@ -106,6 +108,12 @@ class HuffmanTree(Tree[tuple[int, str]]):
         return "".join(read)
 
     def decode(self, bits: str) -> str:
+        """
+        Recover the text from the binary encoded text.
+
+        The argument must be a string of 0 and 1.
+        If you want to decompress an effectively compressed byte's sequence, use `.uncompress()` instead.
+        """
         position = self
         read: list[str] = []
         for digit in bits:
@@ -116,6 +124,12 @@ class HuffmanTree(Tree[tuple[int, str]]):
         return "".join(read)
 
     def encode(self, text: str) -> str:
+        """
+        Use the Huffman tree to encode the text in binary.
+
+        The result is a string of 0 and 1, so that it is easy to display.
+        If you want effective compression, use `.compress()` instead.
+        """
         return "".join(self.labels[char] for char in text)
 
     @property
@@ -153,6 +167,20 @@ class HuffmanTree(Tree[tuple[int, str]]):
         return "\n".join(lines)
 
     def as_dict(self):
+        """
+        Return the tree as a dict.
+
+        For example:
+        >>> from smallgraphlib.huffman import HuffmanTree
+        >>> HuffmanTree.from_text("HELLO").as_dict()
+        {(5, 'E'): [(2, 'L'), (3, 'E')],
+         (2, 'L'): [],
+         (3, 'E'): [(1, 'O'), (2, 'E')],
+         (1, 'O'): [],
+         (2, 'E'): [(1, 'E'), (1, 'H')],
+         (1, 'E'): [],
+         (1, 'H'): []}
+        """
         if self.is_leaf:
             return {self.root: []}
         else:
@@ -182,7 +210,7 @@ class HuffmanTree(Tree[tuple[int, str]]):
             f"{options}"
             "]"
         ]
-        lines.extend(_tikz_for_huffman_tree(self,with_labels=with_labels))
+        lines.extend(_tikz_for_huffman_tree(self, with_labels=with_labels))
         lines.append(r"\end{tikzpicture}")
         return "\n".join(lines)
 
@@ -198,7 +226,7 @@ def _tikz_for_huffman_tree(
     gap=None,
     _x=0.0,
     _y=0.0,
-    _parent: str = None,
+    _parent: str | None = None,
     _label="",
     with_labels: bool = False,
 ) -> list[str]:
@@ -214,12 +242,32 @@ def _tikz_for_huffman_tree(
         node_text = r"\textvisiblespace{}"
     lines = [rf"\node[{'leaf' if tree.is_leaf else ''}] ({current}) at ({_x},{_y}) {{{node_text}}};"]
     if tree.is_leaf and with_labels:
-        lines.append(rf"\node[anchor=north,color=red] at ({current}.south) {{{_label}}};")
+        lines.append(rf"\node[draw=none,anchor=north,color=red] at ({current}.south) {{{_label}}};")
     if _parent is not None:
         lines.append(rf"\draw ({_parent}) -- ({current});")
     gap = gap / 2
     _y -= 1
     if not tree.is_leaf:
-        lines.extend(_tikz_for_huffman_tree(tree.left_branch, gap=gap, _parent=current, _x=_x - gap, _y=_y, _label=_label+"0", with_labels=with_labels))
-        lines.extend(_tikz_for_huffman_tree(tree.right_branch, gap=gap, _parent=current, _x=_x + gap, _y=_y, _label=_label+"1", with_labels=with_labels))
+        lines.extend(
+            _tikz_for_huffman_tree(
+                tree.left_branch,
+                gap=gap,
+                _parent=current,
+                _x=_x - gap,
+                _y=_y,
+                _label=_label + "0",
+                with_labels=with_labels,
+            )
+        )
+        lines.extend(
+            _tikz_for_huffman_tree(
+                tree.right_branch,
+                gap=gap,
+                _parent=current,
+                _x=_x + gap,
+                _y=_y,
+                _label=_label + "1",
+                with_labels=with_labels,
+            )
+        )
     return lines
