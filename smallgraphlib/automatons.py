@@ -1,5 +1,6 @@
 from abc import ABC
-from typing import Iterable, Generic, TypeVar, NewType, cast
+from typing import Generic, TypeVar, NewType, cast
+from collections.abc import Iterable
 
 from smallgraphlib.string2automaton import StringToAutomatonParser
 

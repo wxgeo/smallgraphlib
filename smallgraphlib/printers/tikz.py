@@ -197,7 +197,7 @@ class TikzPrinter(Generic[Node]):
     _cartography: dict[tuple[Node, ...], Point]
 
     def __init__(self, graph: "AbstractGraph[Node]", shuffle_nodes=False):
-        self.graph: "AbstractGraph[Node]" = graph
+        self.graph: AbstractGraph[Node] = graph
         self._reset()
         self.shuffle_nodes: bool = shuffle_nodes
 
@@ -439,7 +439,7 @@ class TikzPrinter(Generic[Node]):
 
 class TikzLabeledGraphPrinter(TikzPrinter, Generic[Node, Label]):
     def __init__(self, graph: "AbstractLabeledGraph[Node, Label]", shuffle_nodes=False):
-        self.graph: "AbstractLabeledGraph[Node, Label]" = graph  # For Pycharm
+        self.graph: AbstractLabeledGraph[Node, Label] = graph  # For Pycharm
         super().__init__(graph, shuffle_nodes=shuffle_nodes)
 
     def labels(self, node1: Node, node2: Node) -> list[str]:
@@ -450,7 +450,7 @@ class TikzLabeledGraphPrinter(TikzPrinter, Generic[Node, Label]):
 
 class TikzAutomatonPrinter(TikzPrinter, Generic[Node]):
     def __init__(self, graph: "Automaton[Node]", shuffle_nodes=False):
-        self.graph: "Automaton[Node]" = graph  # For Pycharm
+        self.graph: Automaton[Node] = graph  # For Pycharm
         super().__init__(graph, shuffle_nodes=shuffle_nodes)
 
     @staticmethod
@@ -486,7 +486,7 @@ class TikzAutomatonPrinter(TikzPrinter, Generic[Node]):
 
 class TikzAcceptorPrinter(TikzAutomatonPrinter, Generic[Node]):
     def __init__(self, graph: "Acceptor[Node]", shuffle_nodes=False):
-        self.graph: "Acceptor[Node]" = graph  # For Pycharm
+        self.graph: Acceptor[Node] = graph  # For Pycharm
         super().__init__(graph, shuffle_nodes=shuffle_nodes)
 
     def specific_node_style(self, node: Node) -> str:
@@ -500,7 +500,7 @@ class TikzTransducerPrinter(TikzAutomatonPrinter, Generic[Node]):
     def __init__(
         self, graph: "Transducer[Node]", shuffle_nodes: bool = False, fboxsep: str = "1.5pt"
     ) -> None:
-        self.graph: "Transducer[Node]" = graph  # For Pycharm
+        self.graph: Transducer[Node] = graph  # For Pycharm
         self.fboxsep = fboxsep
         super().__init__(graph, shuffle_nodes=shuffle_nodes)
 
@@ -528,7 +528,7 @@ class TikzTransducerPrinter(TikzAutomatonPrinter, Generic[Node]):
 
 class TikzFlowNetworkPrinter(TikzPrinter, Generic[Node]):
     def __init__(self, graph: "FlowNetwork[Node]", shuffle_nodes=False):
-        self.graph: "FlowNetwork[Node]" = graph  # For Pycharm
+        self.graph: FlowNetwork[Node] = graph  # For Pycharm
         super().__init__(graph, shuffle_nodes=shuffle_nodes)
 
     @cached_property

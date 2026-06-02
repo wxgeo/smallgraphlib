@@ -6,20 +6,11 @@ from enum import Enum
 from itertools import chain
 from numbers import Integral
 from typing import (
-    Tuple,
-    FrozenSet,
-    Set,
-    Iterable,
     Any,
     Generic,
-    Counter as CounterType,
-    Optional,
-    Iterator,
-    Sequence,
-    Type,
-    Callable,
     Self,
 )
+from collections.abc import Iterable, Iterator, Sequence, Callable
 
 from smallgraphlib.custom_types import _AbstractGraph, Node, Edge, EdgeLike
 from smallgraphlib.printers.latex import latex_matrix, latex_degrees_table, latex_Dijkstra
@@ -54,9 +45,9 @@ class AbstractGraph(ABC, Generic[Node]):
         then two edges are added, one from A to B and one from B to A.
         Note that in that case, adding {A} will result in two edges too.
         """
-        self._successors: dict[Node, CounterType[Node]] = {}
+        self._successors: dict[Node, Counter[Node]] = {}
         if self.is_directed:
-            self._predecessors: dict[Node, CounterType[Node]] = {}
+            self._predecessors: dict[Node, Counter[Node]] = {}
         else:
             self._predecessors = self._successors
         # Nodes must be added before edges.
@@ -71,7 +62,7 @@ class AbstractGraph(ABC, Generic[Node]):
 
     @classmethod
     def from_dict(
-        cls: Type[_AbstractGraph], d: dict[Node, Iterable[Node]] = None, /, **successors: Iterable[Node]
+        cls: type[_AbstractGraph], d: dict[Node, Iterable[Node]] = None, /, **successors: Iterable[Node]
     ) -> _AbstractGraph:
         """Generate a graph from a dictionary of nodes, each node being associated with its successors.
 
@@ -96,7 +87,7 @@ class AbstractGraph(ABC, Generic[Node]):
         return cls(nodes, *edges)
 
     @classmethod
-    def from_string(cls: Type[_AbstractGraph], string: str) -> _AbstractGraph:
+    def from_string(cls: type[_AbstractGraph], string: str) -> _AbstractGraph:
         """DirectedGraph.from_string("A:B,C B:C C") will generate a graph of 3 nodes, A, B and C, with
         edges A->B, A->C and B->C."""
         nodes: list[str] = []
@@ -109,7 +100,7 @@ class AbstractGraph(ABC, Generic[Node]):
         return cls(nodes, *edges)
 
     @staticmethod
-    def _matrix_as_tuple_of_tuples(matrix: Iterable[Iterable]) -> tuple[Tuple, ...]:
+    def _matrix_as_tuple_of_tuples(matrix: Iterable[Iterable]) -> tuple[tuple, ...]:
         if hasattr(matrix, "tolist"):  # for numpy or sympy
             matrix = matrix.tolist()
         tuple_matrix = tuple(tuple(iterable) for iterable in matrix)
@@ -128,7 +119,7 @@ class AbstractGraph(ABC, Generic[Node]):
 
     @classmethod
     def from_matrix(
-        cls: Type[_AbstractGraph], matrix: Iterable[Iterable[int]], nodes_names: Iterable[Node] = None
+        cls: type[_AbstractGraph], matrix: Iterable[Iterable[int]], nodes_names: Iterable[Node] = None
     ) -> _AbstractGraph:
         """Construct the graph corresponding to the given adjacency matrix.
 
@@ -161,7 +152,7 @@ class AbstractGraph(ABC, Generic[Node]):
         return tuple(self._successors)
 
     @cached_property
-    def nodes_set(self) -> FrozenSet[Node]:
+    def nodes_set(self) -> frozenset[Node]:
         return frozenset(self.nodes)
 
     def _add_node(self, node: Node) -> None:
@@ -272,7 +263,7 @@ class AbstractGraph(ABC, Generic[Node]):
 
     @cached_property
     def edges(self) -> tuple[Edge, ...]:
-        edges_count: CounterType[Edge] = Multiset()
+        edges_count: Counter[Edge] = Multiset()
         for node in self.nodes:
             for successor in self.successors(node):
                 edge: Edge = self._edge(node, successor)
@@ -283,7 +274,7 @@ class AbstractGraph(ABC, Generic[Node]):
         return tuple(edges_count.elements())
 
     @cached_property
-    def edges_set(self) -> FrozenSet[Edge]:
+    def edges_set(self) -> frozenset[Edge]:
         return frozenset(self.edges)
 
     @staticmethod
@@ -361,8 +352,8 @@ class AbstractGraph(ABC, Generic[Node]):
 
         def count_in_and_out_degrees(
             graph: AbstractGraph,
-        ) -> CounterType[tuple[int, int]]:
-            return Counter((graph.in_out_degree(node_) for node_ in graph.nodes))
+        ) -> Counter[tuple[int, int]]:
+            return Counter(graph.in_out_degree(node_) for node_ in graph.nodes)
 
         if count_in_and_out_degrees(self) != count_in_and_out_degrees(other):
             return False
@@ -376,7 +367,7 @@ class AbstractGraph(ABC, Generic[Node]):
         remaining_self_nodes = set(self.nodes)
         remaining_other_nodes = set(other.nodes)
         used_nodes: list[Node] = [remaining_self_nodes.pop()]
-        corresponding_nodes_possibilities: dict[Node, Optional[list[Node]]] = {}
+        corresponding_nodes_possibilities: dict[Node, list[Node] | None] = {}
         reversed_mapping: dict[Node, Node] = {}
         order = self.order
 
@@ -570,10 +561,10 @@ class AbstractGraph(ABC, Generic[Node]):
     def in_out_degree(self, node: Node) -> tuple[int, int]:
         return self.in_degree(node), self.out_degree(node)
 
-    def successors(self, node: Node) -> Set[Node]:
+    def successors(self, node: Node) -> set[Node]:
         return set(self._successors[node])
 
-    def predecessors(self, node: Node) -> Set[Node]:
+    def predecessors(self, node: Node) -> set[Node]:
         return set(self._predecessors[node])
 
     def copy(self):
@@ -701,12 +692,12 @@ class AbstractGraph(ABC, Generic[Node]):
         if start is None:
             start = self.nodes[0]
         stack: list[Node] = [start]
-        previous_nodes: list[Optional[Node]] = [None]
+        previous_nodes: list[Node | None] = [None]
         # If the graph isn't a rooted tree, there is no notion of parent.
         # If we want to use DFS to test if the graph is a tree, we must try to visit all adjacents nodes
         # except the one we come from, and see if there were already visited.
         # So we must keep track of the node we come from for each node of the stack.
-        visited: Set[Node] = set()
+        visited: set[Node] = set()
         while stack:
             node = stack.pop()
             previous = previous_nodes.pop()
@@ -727,7 +718,7 @@ class AbstractGraph(ABC, Generic[Node]):
         """Recursive implementation of DFS (Depth First Search)."""
         if start is None:
             start = self.nodes[0]
-        visited: Set[Node] = set()
+        visited: set[Node] = set()
         if not isinstance(order, Traversal):
             raise NotImplementedError(
                 f"Order must be Traversal.PREORDER, Traversal.POSTORDER or Traversal.INORDER, not {order!r}."
@@ -790,7 +781,7 @@ class AbstractGraph(ABC, Generic[Node]):
         if start is None:
             start = self.nodes[0]
         queue = deque([start])
-        visited: Set[Node] = set()
+        visited: set[Node] = set()
         while queue:
             node = queue.popleft()
             visited.add(node)

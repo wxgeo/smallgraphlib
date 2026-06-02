@@ -2,7 +2,8 @@ import math
 from abc import ABC, abstractmethod
 from math import inf
 from numbers import Real
-from typing import Generic, Iterable, Any, Sequence, Type, TypeVar
+from typing import Generic, Any, TypeVar
+from collections.abc import Iterable, Sequence
 
 from smallgraphlib.core import InvalidGraphAttribute
 
@@ -97,7 +98,7 @@ class AbstractWeightedGraph(AbstractNumericGraph, ABC, Generic[Node, Label]):
 
     @classmethod
     def from_matrix(
-        cls: Type[_AbstractWeightedGraph],
+        cls: type[_AbstractWeightedGraph],
         matrix: Iterable[Iterable[float]],
         nodes_names: Iterable[Node] = None,
     ) -> _AbstractWeightedGraph:

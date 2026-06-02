@@ -3,7 +3,8 @@ import re
 from abc import abstractmethod
 from collections import Counter
 from functools import wraps
-from typing import Protocol, Generator, Final
+from typing import Protocol, Final
+from collections.abc import Generator
 
 GREEK_LETTERS: Final[tuple[str, ...]] = (
     "alpha",

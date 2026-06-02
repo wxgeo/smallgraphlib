@@ -1,5 +1,6 @@
 from numbers import Real
-from typing import Iterable, Any, Set, Iterator, Generic
+from typing import Any, Generic
+from collections.abc import Iterable, Iterator
 
 from smallgraphlib import Graph, WeightedGraph, LabeledGraph
 from smallgraphlib.core import (
@@ -53,7 +54,7 @@ class Tree(Generic[Node]):
     def edges(self) -> tuple[Edge, ...]:
         return self._graph.edges
 
-    def children(self, node: Node) -> Set[Node]:
+    def children(self, node: Node) -> set[Node]:
         return self._graph.successors(node)
 
     def parent(self, node: Node) -> Node:

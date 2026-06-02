@@ -1,6 +1,6 @@
 import re
 from dataclasses import dataclass
-from typing import Iterable
+from collections.abc import Iterable
 
 
 @dataclass

@@ -1,5 +1,6 @@
 import math
-from typing import Iterable, Sequence, TYPE_CHECKING
+from typing import TYPE_CHECKING
+from collections.abc import Iterable, Sequence
 
 from smallgraphlib.custom_types import Node
 from smallgraphlib.utilities import latexify

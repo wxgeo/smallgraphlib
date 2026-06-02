@@ -1,5 +1,6 @@
 import math
-from typing import Iterable, Generic, Callable, Self
+from typing import Generic, Self
+from collections.abc import Iterable, Callable
 
 from smallgraphlib.basic_graphs import DirectedGraph
 from smallgraphlib.weighted_graphs import AbstractNumericGraph

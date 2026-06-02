@@ -1,18 +1,15 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """
 Created on Sat May  7 12:24:58 2022
 
 @author: nicolas
 """
 from typing import (
-    FrozenSet,
-    Sequence,
     Generic,
     Self,
-    Type,
     Any,
 )
+from collections.abc import Sequence
 
 from smallgraphlib.core import (
     AbstractGraph,
@@ -31,7 +28,7 @@ class Graph(AbstractGraph, Generic[Node]):
     """
 
     @classmethod
-    def from_subgraphs(cls: "Type[Graph]", subgraphs: str) -> "Graph":
+    def from_subgraphs(cls: "type[Graph]", subgraphs: str) -> "Graph":
         """Generate a (simple) graph from a string listing complete subgraphs.
 
         Nodes in a subgraph are separated with commas, and subgraphs are separated with spaces (at least one).
@@ -243,9 +240,9 @@ class DirectedGraph(AbstractGraph, Generic[Node]):
         )
 
     @cached_property
-    def levels(self) -> tuple[FrozenSet[Node], ...]:
+    def levels(self) -> tuple[frozenset[Node], ...]:
         graph = self.copy()
-        levels: list[FrozenSet] = []
+        levels: list[frozenset] = []
         while True:
             level = set()
             for node in graph.nodes:
@@ -260,7 +257,7 @@ class DirectedGraph(AbstractGraph, Generic[Node]):
         return tuple(levels)
 
     @cached_property
-    def kernel(self) -> FrozenSet[Node]:
+    def kernel(self) -> frozenset[Node]:
         graph = self.copy()
         kernel = set()
         while True:

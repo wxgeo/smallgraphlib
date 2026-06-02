@@ -3,7 +3,8 @@ import math
 import re
 from abc import ABC
 from itertools import chain
-from typing import Iterable, TypeVar, Generic, Any, Type
+from typing import TypeVar, Generic, Any
+from collections.abc import Iterable
 
 from smallgraphlib.basic_graphs import Graph, DirectedGraph
 from smallgraphlib.core import AbstractGraph
@@ -39,7 +40,7 @@ class AbstractLabeledGraph(AbstractGraph[Node], ABC, Generic[Node, Label]):
 
     @classmethod
     def from_dict(
-        cls: Type[_AbstractLabeledGraph],
+        cls: type[_AbstractLabeledGraph],
         edge_label_dict: dict[str | tuple[Node, Node], Label] = None,  # type: ignore
         /,
         **edge_label: Label,
@@ -66,7 +67,7 @@ class AbstractLabeledGraph(AbstractGraph[Node], ABC, Generic[Node, Label]):
         return cls(nodes, *((*edge, label) for edge, label in edge_label_dict.items()))
 
     @classmethod
-    def from_string(cls: Type[_AbstractLabeledGraph], string: str) -> _AbstractLabeledGraph:
+    def from_string(cls: type[_AbstractLabeledGraph], string: str) -> _AbstractLabeledGraph:
         """LabeledGraph.from_string("A:B=label,C='other label' B:C=5 C D:C")
         will generate a graph of 4 nodes, A, B, C and D, with edges A->B, A->C, B->C and C->D
         and respective labels 'label', 'other label', 5 and `None`.

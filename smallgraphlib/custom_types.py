@@ -1,4 +1,5 @@
-from typing import TypeVar, FrozenSet, Union, Set, Iterable, Any, TYPE_CHECKING
+from typing import TypeVar, Union, Any, TYPE_CHECKING
+from collections.abc import Iterable
 
 from smallgraphlib.utilities import ComparableAndHashable
 
@@ -9,11 +10,11 @@ _AbstractGraph = TypeVar("_AbstractGraph", bound="AbstractGraph")
 Node = TypeVar("Node", bound=ComparableAndHashable)
 # Node = TypeVar("Node", bound=typing.Hashable)  # too subtile for Pycharm ? ;-(
 DirectedEdge = tuple[Node, Node]
-UndirectedEdge = FrozenSet[Node]
+UndirectedEdge = frozenset[Node]
 Edge = Union[DirectedEdge, UndirectedEdge]
-EdgeLike = Union[Edge, Set[Node], Iterable[Node]]
+EdgeLike = Union[Edge, set[Node], Iterable[Node]]
 Label_ = Any
-InternalGraphRepresentation = dict[Node, dict[Node, Union[int, list[Label_]]]]
+InternalGraphRepresentation = dict[Node, dict[Node, int | list[Label_]]]
 Point = tuple[float, float]
 Segment = tuple[Point, Point]
 Label = TypeVar("Label")

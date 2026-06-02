@@ -1,5 +1,5 @@
 import random
-from typing import Iterable
+from collections.abc import Iterable
 
 
 from smallgraphlib.custom_types import Node, Edge
