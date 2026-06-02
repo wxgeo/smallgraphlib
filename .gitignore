@@ -1,6 +1,6 @@
 __pycache__
 .idea
-
+/doc/build/
 /.tox/
 /.mypy_cache/
 /.pytest_cache/

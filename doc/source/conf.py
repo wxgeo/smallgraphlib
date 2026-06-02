@@ -4,6 +4,7 @@
 # This file does only contain a selection of the most common options. For a
 # full list see the documentation:
 # http://www.sphinx-doc.org/en/master/config
+import datetime
 
 # -- Path setup --------------------------------------------------------------
 
@@ -21,22 +22,22 @@ def get_version():
     """Read version number from `pyproject.toml` file."""
     path = Path(__file__).parent.parent.parent / "pyproject.toml"
     with open(path) as toml:
-        tool_poetry_section = False
+        project_section = False
         for line in toml:
-            if line.startswith("[tool.poetry]"):
-                tool_poetry_section = True
-            if tool_poetry_section and line.startswith("version ="):
+            if line.startswith("[project]"):
+                project_section = True
+            if project_section and line.startswith("version ="):
                 return line[9:].strip("\"' \n")
-    if tool_poetry_section:
-        raise RuntimeError(f"No line starts with 'version =' in [tool.poetry] section of {path}.")
+    if project_section:
+        raise RuntimeError(f"No line starts with 'version =' in [project] section of {path}.")
     else:
-        raise RuntimeError(f"[tool.poetry] section not found in {path} (maybe an indentation problem ?)")
+        raise RuntimeError(f"[project] section not found in {path} (maybe an indentation problem ?)")
 
 
 # -- Project information -----------------------------------------------------
 
 project = "SmallGraphLib"
-copyright = "2022, Nicolas Pourcelot"
+copyright = f"2022-{datetime.datetime.now().year}, Nicolas Pourcelot"
 author = "Nicolas Pourcelot"
 
 # The short X.Y version
@@ -46,6 +47,9 @@ release = version
 
 
 # -- General configuration ---------------------------------------------------
+
+# Optional: Explicitly list allowed builders (not always necessary)
+builders = ["html"]
 
 # If your documentation needs a minimal Sphinx version, state it here.
 #
@@ -183,24 +187,6 @@ texinfo_documents = [
         "Miscellaneous",
     ),
 ]
-
-
-# -- Options for Epub output -------------------------------------------------
-
-# Bibliographic Dublin Core info.
-epub_title = project
-
-# The unique identifier of the text. This can be a ISBN number
-# or the project homepage.
-#
-# epub_identifier = ''
-
-# A unique identification for the text.
-#
-# epub_uid = ''
-
-# A list of files that should not be packed into the epub file.
-epub_exclude_files = ["search.html"]
 
 
 # -- Extension configuration -------------------------------------------------
