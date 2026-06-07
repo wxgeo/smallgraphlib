@@ -2,6 +2,14 @@
 
 <!-- version list -->
 
+## v1.4.0 (2026-06-07)
+
+### Features
+
+- In tikz, add distinction between 6 and 9 (and similar chars).
+  ([`07b184c`](https://github.com/wxgeo/smallgraphlib/commit/07b184c80c532e7e77b7ad9c0e0997566aaea81d))
+
+
 ## v1.3.0 (2026-06-02)
 
 ### Features
