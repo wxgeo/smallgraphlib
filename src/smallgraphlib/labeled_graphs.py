@@ -115,6 +115,29 @@ class AbstractLabeledGraph(AbstractGraph[Node], ABC, Generic[Node, Label]):
     def as_dict(self) -> dict[tuple[Node, Node], Label]:
         return {(node1, node2): label for node1, node2, label in self.labeled_edges}
 
+    def as_tikz(
+        self,
+        *,
+        shuffle_nodes: bool = False,
+        border: str | None = None,
+        options: str = "",
+        preamble: bool = False,
+        name_nodes: bool = True,
+        underline_labels: bool | None = None,
+    ) -> str:
+        r"""Generate tikz code corresponding to this graph.
+
+
+
+        See `AbstractGraphLabel.as_tikz()` for more information.
+        """
+        return self.printer(self, shuffle_nodes=shuffle_nodes, underline_labels=underline_labels).tikz_code(
+            border=border,
+            options=options,
+            preamble=preamble,
+            name_nodes=name_nodes,
+        )
+
     # ----------------
     #    Operations
     # ================

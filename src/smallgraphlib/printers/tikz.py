@@ -1,5 +1,6 @@
 import math
 import random
+import re
 from typing import Generic, TYPE_CHECKING
 
 from smallgraphlib.utilities import frange, cached_property, clear_cache, latexify
@@ -284,6 +285,7 @@ class TikzPrinter(Generic[Node]):
             r"solid,black,",
             r"every node/.style = {font={\scriptsize}},",
             r"vertex/.style = {draw, circle,font={\scriptsize},inner sep=2},",
+            r"edge-label/.style = {sloped,anchor=center,fill=white,rounded corners=2pt, inner sep=0.5pt},",
             "directed/.style = {-{Stealth[scale=1.1]}},",
             "reversed/.style = {{Stealth[scale=1.1]}-},",
             "undirected/.style = {},",
@@ -370,6 +372,11 @@ class TikzPrinter(Generic[Node]):
                     ):  # Exclude neighbours (already drawn).
                         self._generate_edge(node1, node2)
 
+    def _generate_edge_label(self, label: str, label_position: str = "midway") -> str:
+        """Generate the tikz code for the node of an edge's label. To be implemented by a subclass."""
+
+        return ""
+
     def _generate_loop(self, node: Node, _default_looseness: int = None) -> None:
         if _default_looseness is None:
             _default_looseness = 1
@@ -378,7 +385,7 @@ class TikzPrinter(Generic[Node]):
             self.lines.append(
                 rf"    \draw[{style}] ({node}) to "
                 f"[out={self.angles[node] - 45},in={self.angles[node] + 45},looseness={_default_looseness + i * 4}] "
-                rf"node[midway,sloped,anchor=center] {{\contour{{white}}{{{label}}}}} "
+                f"{self._generate_edge_label(label)} "
                 f"({node});"
             )
 
@@ -437,7 +444,7 @@ class TikzPrinter(Generic[Node]):
                     pos, xy = find_free_position(point1, point2, self.labels_positions, bending=bending)
                 self.labels_positions.append(xy)
                 self._cartography[(node1, node2)] = xy
-                label_tikz_code = rf"node[pos={pos},sloped,anchor=center] {{\contour{{white}}{{{label}}}}}"
+                label_tikz_code = self._generate_edge_label(label, f"pos={pos}")
             direction = "left" if bending > 0 else "right"
             tikz_bending = f"bend {direction}={abs(bending)}" if bending != 0 else ""
             self.lines.append(
@@ -446,20 +453,56 @@ class TikzPrinter(Generic[Node]):
 
 
 class TikzLabeledGraphPrinter(TikzPrinter, Generic[Node, Label]):
-    def __init__(self, graph: "AbstractLabeledGraph[Node, Label]", shuffle_nodes=False):
+    def __init__(
+        self,
+        graph: "AbstractLabeledGraph[Node, Label]",
+        shuffle_nodes=False,
+        underline_labels: bool | None = None,
+    ):
         self.graph: AbstractLabeledGraph[Node, Label] = graph  # For Pycharm
         super().__init__(graph, shuffle_nodes=shuffle_nodes)
+        self.underline_labels = underline_labels
 
     def labels(self, node1: Node, node2: Node) -> list[str]:
         """Overwrite this method to modify tikz value for some labels."""
         labels = self.graph._labels.get(self.graph._edge(node1, node2), [])
         return [latexify(label) for label in labels]
 
+    def _generate_edge_label(self, label: str, label_position: str = "midway") -> str:
+        """Generate the tikz code for the node of an edge's label."""
 
-class TikzAutomatonPrinter(TikzPrinter, Generic[Node]):
-    def __init__(self, graph: "Automaton[Node]", shuffle_nodes=False):
+        if not label:
+            return ""
+        # When writing a label on a vertical line, 6 and 9 are a source of confusion.
+        # For example, it is not possible to distinguish between 908 and 806.
+        # Other characters that transform in another one when rotated include q -> b
+        # and p -> d.
+        # So, we have to underline the text if there is any risk of confusion.
+        # Characters that may be a source of confusion:
+        source_of_confusion = r"][69bqdp<>(),'/\\"  # ] must be the first, for the regex to compile!
+        # Characters that are unable to dissipate the confusion:
+        symmetrical_chars = "08HINOSXZosxz$|+=:* -"  # - must be the last, for the regex to compile!
+        save_color = False
+        if self.underline_labels or (
+            self.underline_labels is None
+            and re.fullmatch(f"[{source_of_confusion + symmetrical_chars}]+", label)
+            and any(c in label for c in source_of_confusion)
+        ):
+            # Underline the label, to be able to distinguished between
+            # the text and its symmetrical version.
+            label = r"\color{gray}\underline{\color{saved}" + label + r"}"
+            save_color = True
+
+        label = r"\contour{white}{" + label + "}"
+        if save_color:
+            label = r"\colorlet{saved}{.}" + label + r"\color{saved}"
+        return rf"node[{label_position},edge-label] {{{label}}}"
+
+
+class TikzAutomatonPrinter(TikzLabeledGraphPrinter, Generic[Node]):
+    def __init__(self, graph: "Automaton[Node]", shuffle_nodes=False, underline_labels: bool | None = False):
         self.graph: Automaton[Node] = graph  # For Pycharm
-        super().__init__(graph, shuffle_nodes=shuffle_nodes)
+        super().__init__(graph, shuffle_nodes=shuffle_nodes, underline_labels=underline_labels)
 
     @staticmethod
     def pretty_transition(label):
@@ -493,9 +536,14 @@ class TikzAutomatonPrinter(TikzPrinter, Generic[Node]):
 
 
 class TikzAcceptorPrinter(TikzAutomatonPrinter, Generic[Node]):
-    def __init__(self, graph: "Acceptor[Node]", shuffle_nodes=False):
+    def __init__(
+        self,
+        graph: "Acceptor[Node]",
+        shuffle_nodes=False,
+        underline_labels: bool | None = False,
+    ):
         self.graph: Acceptor[Node] = graph  # For Pycharm
-        super().__init__(graph, shuffle_nodes=shuffle_nodes)
+        super().__init__(graph, shuffle_nodes=shuffle_nodes, underline_labels=underline_labels)
 
     def specific_node_style(self, node: Node) -> str:
         styles = [super().specific_node_style(node)]
@@ -506,11 +554,15 @@ class TikzAcceptorPrinter(TikzAutomatonPrinter, Generic[Node]):
 
 class TikzTransducerPrinter(TikzAutomatonPrinter, Generic[Node]):
     def __init__(
-        self, graph: "Transducer[Node]", shuffle_nodes: bool = False, fboxsep: str = "1.5pt"
+        self,
+        graph: "Transducer[Node]",
+        shuffle_nodes: bool = False,
+        fboxsep: str = "1.5pt",
+        underline_labels: bool | None = False,
     ) -> None:
         self.graph: Transducer[Node] = graph  # For Pycharm
         self.fboxsep = fboxsep
-        super().__init__(graph, shuffle_nodes=shuffle_nodes)
+        super().__init__(graph, shuffle_nodes=shuffle_nodes, underline_labels=underline_labels)
 
     def labels(self, node1: Node, node2: Node) -> list[str]:
         # Associate to each output word all the input letters than can produce it.
@@ -534,10 +586,15 @@ class TikzTransducerPrinter(TikzAutomatonPrinter, Generic[Node]):
         return labels
 
 
-class TikzFlowNetworkPrinter(TikzPrinter, Generic[Node]):
-    def __init__(self, graph: "FlowNetwork[Node]", shuffle_nodes=False):
+class TikzFlowNetworkPrinter(TikzLabeledGraphPrinter, Generic[Node]):
+    def __init__(
+        self,
+        graph: "FlowNetwork[Node]",
+        shuffle_nodes=False,
+        underline_labels: bool | None = None,
+    ):
         self.graph: FlowNetwork[Node] = graph  # For Pycharm
-        super().__init__(graph, shuffle_nodes=shuffle_nodes)
+        super().__init__(graph, shuffle_nodes=shuffle_nodes, underline_labels=underline_labels)
 
     @cached_property
     def nodes(self) -> tuple[Node, ...]:

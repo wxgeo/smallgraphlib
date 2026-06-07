@@ -1,7 +1,7 @@
 import math
 import random
 
-from smallgraphlib import Transducer
+from smallgraphlib import Transducer, graph, LabeledDirectedGraph
 
 from smallgraphlib import WeightedDirectedGraph, random_graph, Graph
 from smallgraphlib.printers.tikz import (
@@ -136,6 +136,7 @@ def test_full_tikz_result():
 solid,black,
 every node/.style = {font={\scriptsize}},
 vertex/.style = {draw, circle,font={\scriptsize},inner sep=2},
+edge-label/.style = {sloped,anchor=center,fill=white,rounded corners=2pt, inner sep=0.5pt},
 directed/.style = {-{Stealth[scale=1.1]}},
 reversed/.style = {{Stealth[scale=1.1]}-},
 undirected/.style = {},
@@ -189,11 +190,12 @@ def test_full_tikz_transducer_result():
     assert t.output_alphabet == ("*",)
     assert set(t.states) == {"1", "2", "I"}
     expected_tikz_code = r"""
-    \providecommand{\contour}[2]{#2}
+\providecommand{\contour}[2]{#2}
 \begin{tikzpicture}[
 solid,black,
 every node/.style = {font={\scriptsize}},
 vertex/.style = {draw, circle,font={\scriptsize},inner sep=2},
+edge-label/.style = {sloped,anchor=center,fill=white,rounded corners=2pt, inner sep=0.5pt},
 directed/.style = {-{Stealth[scale=1.1]}},
 reversed/.style = {{Stealth[scale=1.1]}-},
 undirected/.style = {},
@@ -202,13 +204,13 @@ scale=1.25
     \node[vertex,] (1) at (0.0:1cm) {$1$};
     \node[vertex,] (2) at (120.0:1cm) {$2$};
     \node[vertex,rectangle] (I) at (240.0:1cm) {$I$};
-    \draw[directed] (I) to [out=195.0,in=285.0,looseness=8] node[midway,sloped,anchor=center] {\contour{white}{$a,c$}} (I);
-    \draw[directed] (1) to[bend left=15] node[pos=0.5,sloped,anchor=center] {\contour{white}{$a$}} (2);
-    \draw[reversed] (1) to[bend right=15] node[pos=0.5,sloped,anchor=center] {\contour{white}{$b$}} (2);
-    \draw[directed] (2) to[] node[pos=0.5,sloped,anchor=center] {\contour{white}{$a,c$}} (I);
-    \draw[directed] (I) to[bend left=30] node[pos=0.5,sloped,anchor=center] {\contour{white}{$b$}} (1);
-    \draw[reversed] (I) to[] node[pos=0.5,sloped,anchor=center] {\contour{white}{$b$\hspace{1pt}\setlength{\fboxsep}{1.5pt}\fbox{$*$}}} (1);
-    \draw[reversed] (I) to[bend right=30] node[pos=0.5,sloped,anchor=center] {\contour{white}{$c$}} (1);
+    \draw[directed] (I) to [out=195.0,in=285.0,looseness=8] node[midway,edge-label] {\contour{white}{$a,c$}} (I);
+    \draw[directed] (1) to[bend left=15] node[pos=0.5,edge-label] {\contour{white}{$a$}} (2);
+    \draw[reversed] (1) to[bend right=15] node[pos=0.5,edge-label] {\contour{white}{$b$}} (2);
+    \draw[directed] (2) to[] node[pos=0.5,edge-label] {\contour{white}{$a,c$}} (I);
+    \draw[directed] (I) to[bend left=30] node[pos=0.5,edge-label] {\contour{white}{$b$}} (1);
+    \draw[reversed] (I) to[] node[pos=0.5,edge-label] {\contour{white}{$b$\hspace{1pt}\setlength{\fboxsep}{1.5pt}\fbox{$*$}}} (1);
+    \draw[reversed] (I) to[bend right=30] node[pos=0.5,edge-label] {\contour{white}{$c$}} (1);
 \end{tikzpicture}
 """
     assert t.as_tikz(options="scale=1.25") == expected_tikz_code.strip()
@@ -224,6 +226,7 @@ def test_tikz_export_options():
 solid,black,
 every node/.style = {font={\scriptsize}},
 vertex/.style = {draw, circle,font={\scriptsize},inner sep=2},
+edge-label/.style = {sloped,anchor=center,fill=white,rounded corners=2pt, inner sep=0.5pt},
 directed/.style = {-{Stealth[scale=1.1]}},
 reversed/.style = {{Stealth[scale=1.1]}-},
 undirected/.style = {},
@@ -238,3 +241,51 @@ undirected/.style = {},
 \end{tikzpicture}
     """
     assert tikz_code == expected_tikz_code.strip()
+
+
+def test_underline():
+    g = graph("A:B=6,C=908 B:C=63 C", directed=True)
+    assert isinstance(g, LabeledDirectedGraph)
+    template = r"""
+\providecommand{\contour}[2]{#2}
+\begin{tikzpicture}[
+solid,black,
+every node/.style = {font={\scriptsize}},
+vertex/.style = {draw, circle,font={\scriptsize},inner sep=2},
+edge-label/.style = {sloped,anchor=center,fill=white,rounded corners=2pt, inner sep=0.5pt},
+directed/.style = {-{Stealth[scale=1.1]}},
+reversed/.style = {{Stealth[scale=1.1]}-},
+undirected/.style = {},
+]
+    \node[vertex,] (A) at (0.0:1cm) {$A$};
+    \node[vertex,] (B) at (120.0:1cm) {$B$};
+    \node[vertex,] (C) at (240.0:1cm) {$C$};
+    \draw[directed] (A) to[] node[pos=0.5,edge-label] {<LABEL1>} (B);
+    \draw[directed] (B) to[] node[pos=0.5,edge-label] {<LABEL2>} (C);
+    \draw[reversed] (C) to[] node[pos=0.5,edge-label] {<LABEL3>} (A);
+\end{tikzpicture}
+    """
+    replacements = {
+        "<LABEL1>": r"\colorlet{saved}{.}\contour{white}{\color{gray}\underline{\color{saved}$6$}}\color{saved}",
+        "<LABEL2>": r"\contour{white}{$63$}",
+        "<LABEL3>": r"\colorlet{saved}{.}\contour{white}{\color{gray}\underline{\color{saved}$908$}}\color{saved}",
+    }
+
+    def replace(s: str, d: dict[str, str]) -> str:
+        for key in d:
+            s = s.replace(key, d[key])
+        return s
+
+    assert g.as_tikz().strip() == replace(template, replacements).strip()
+
+    replacements[
+        "<LABEL2>"
+    ] = r"\colorlet{saved}{.}\contour{white}{\color{gray}\underline{\color{saved}$63$}}\color{saved}"
+    assert g.as_tikz(underline_labels=True).strip() == replace(template, replacements).strip()
+
+    replacements = {
+        "<LABEL1>": r"\contour{white}{$6$}",
+        "<LABEL2>": r"\contour{white}{$63$}",
+        "<LABEL3>": r"\contour{white}{$908$}",
+    }
+    assert g.as_tikz(underline_labels=False).strip() == replace(template, replacements).strip()

@@ -92,6 +92,33 @@ class Automaton(LabeledDirectedGraph, ABC, Generic[Node]):
                 f"Invalid {state_type}state: {state}. The states of this automaton are {self.states}."
             )
 
+    def as_tikz(
+        self,
+        *,
+        shuffle_nodes: bool = False,
+        border: str | None = None,
+        options: str = "",
+        preamble: bool = False,
+        name_nodes: bool = True,
+        underline_labels: bool | None = False,
+    ) -> str:
+        r"""
+        Generate tikz code corresponding to this graph.
+
+
+
+        See `AbstractGraphLabel.as_tikz()` for more information.
+        """
+
+        return super().as_tikz(
+            shuffle_nodes=shuffle_nodes,
+            underline_labels=underline_labels,
+            border=border,
+            options=options,
+            preamble=preamble,
+            name_nodes=name_nodes,
+        )
+
 
 class Acceptor(Automaton, Generic[Node]):
     """An acceptor, i.e. a finite state automaton which defines a language by accepting or rejecting words."""
